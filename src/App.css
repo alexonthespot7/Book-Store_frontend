@@ -2,6 +2,20 @@
   text-align: center;
 }
 
+.ag-theme-alpine {
+    display: 'flex';
+    flex-direction: 'column';
+    justify-content: 'center';
+    height: 444;
+    width: 1077;
+    margin: 'auto';
+    margin-top: 10;
+}
+
+@media only screen and (max-width: 600px) {
+
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -36,3 +50,9 @@
     transform: rotate(360deg);
   }
 }
+
+table {
+  margin: auto;
+}
+
+
