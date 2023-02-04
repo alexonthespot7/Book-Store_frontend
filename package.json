@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.4",
     "@testing-library/jest-dom": "^5.16.5",
@@ -12,12 +13,18 @@
     "@testing-library/user-event": "^13.5.0",
     "ag-grid-community": "^28.2.1",
     "ag-grid-react": "^28.2.1",
+    "firebase": "^9.16.0",
+    "framer-motion": "^8.5.4",
+    "nuka-carousel": "^5.4.1",
     "rc-footer": "^0.6.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-media": "^1.10.0",
     "react-router-dom": "^6.6.2",
     "react-scripts": "5.0.1",
+    "react-select": "^5.7.0",
+    "react-select-country-list": "^2.2.3",
+    "uuid": "^9.0.0",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 
-import { CircularProgress, DialogActions, DialogContent, IconButton, InputAdornment, OutlinedInput, TextField } from "@mui/material";
+import { CircularProgress, DialogActions, DialogContent, IconButton, InputAdornment, TextField } from "@mui/material";
 
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -9,6 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import AuthContext from "../context/AuthContext";
+import useMediaQuery from "../Hooks/useMediaQuery";
 
 function Signup({ userSignup, setUserSignup, pwdCheck, setPwdCheck, firstnameError, setFirstnameError,
     firstnameHelper, setFirstnameHelper, usernameErrorSignup, lastnameError, setLastnameError,
@@ -18,6 +19,10 @@ function Signup({ userSignup, setUserSignup, pwdCheck, setPwdCheck, firstnameErr
 
     const [showPassword, setShowPassword] = useState(false);
     const [progress, setProgress] = useState(false);
+
+    const matches350 = useMediaQuery("(min-width: 350px)");
+
+    const inputSize = matches350 ? 'medium' : 'small';
 
     const { setSignupMessage, setSignupSuccess, dialogueWidth } = useContext(AuthContext);
 
@@ -145,6 +150,8 @@ function Signup({ userSignup, setUserSignup, pwdCheck, setPwdCheck, firstnameErr
                 <DialogTitle>Sign up</DialogTitle>
                 <DialogContent style={{ display: 'flex', flexDirection: 'column' }}>
                     <TextField
+                        size={inputSize}
+                        color='sidish'
                         style={{ width: dialogueWidth }}
                         value={userSignup.firstname}
                         type='text'
@@ -157,6 +164,8 @@ function Signup({ userSignup, setUserSignup, pwdCheck, setPwdCheck, firstnameErr
                         onChange={inputChanged}
                     />
                     <TextField
+                        size={inputSize}
+                        color='sidish'
                         style={{ width: dialogueWidth }}
                         value={userSignup.lastname}
                         type='text'
@@ -169,6 +178,8 @@ function Signup({ userSignup, setUserSignup, pwdCheck, setPwdCheck, firstnameErr
                         onChange={inputChanged}
                     />
                     <TextField
+                        size={inputSize}
+                        color='sidish'
                         style={{ width: dialogueWidth }}
                         value={userSignup.username}
                         type='text'
@@ -181,6 +192,8 @@ function Signup({ userSignup, setUserSignup, pwdCheck, setPwdCheck, firstnameErr
                         onChange={inputChanged}
                     />
                     <TextField
+                        size={inputSize}
+                        color='sidish'
                         style={{ width: dialogueWidth }}
                         value={userSignup.email}
                         type='email'
@@ -193,6 +206,8 @@ function Signup({ userSignup, setUserSignup, pwdCheck, setPwdCheck, firstnameErr
                         onChange={inputChanged}
                     />
                     <TextField
+                        size={inputSize}
+                        color='sidish'
                         style={{ width: dialogueWidth }}
                         value={userSignup.password}
                         margin='dense'
@@ -218,6 +233,8 @@ function Signup({ userSignup, setUserSignup, pwdCheck, setPwdCheck, firstnameErr
                         }}
                     />
                     <TextField
+                        size={inputSize}
+                        color='sidish'
                         style={{ width: dialogueWidth }}
                         value={pwdCheck}
                         margin='dense'
@@ -244,14 +261,14 @@ function Signup({ userSignup, setUserSignup, pwdCheck, setPwdCheck, firstnameErr
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button color='primary' variant='outlined' onClick={signup}>Sign up</Button>
-                    <Button color='primary' variant='outlined' onClick={handleClose}>Cancel</Button>
+                    <Button color='sidish' sx={{ "&:hover": { filter: 'brightness(40%)' }, transition: '0.45s' }} variant='outlined' onClick={signup}>Sign up</Button>
+                    <Button color='sidish' sx={{ "&:hover": { filter: 'brightness(40%)' }, transition: '0.45s' }} variant='outlined' onClick={handleClose}>Cancel</Button>
                 </DialogActions>
             </Dialog>}
             {progress && <Dialog style={{ margin: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }} open={openSignup} onClose={handleClose} >
                 <DialogTitle>Sign up</DialogTitle>
                 <DialogContent style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: dialogueWidth, height: 300 }}>
-                    <CircularProgress size={80} />
+                    <CircularProgress color='sidish' size={80} />
                 </DialogContent>
             </Dialog>}
         </div>

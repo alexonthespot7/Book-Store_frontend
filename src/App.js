@@ -1,6 +1,6 @@
 import './App.css';
 
-import React, { forwardRef, useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -19,11 +19,11 @@ import CategoryIcon from '@mui/icons-material/Category';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import GroupIcon from '@mui/icons-material/Group';
 import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 
 import { styled } from '@mui/material/styles';
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import Myfooter from './Components/Myfooter';
 import Logout from './Components/Logout';
@@ -33,45 +33,22 @@ import AuthContext from './context/AuthContext';
 
 import useMediaQuery from './Hooks/useMediaQuery';
 import BookRoutes from './Routes/BookRoutes';
+import { Button } from '@mui/material';
+import CartMenu from './Components/CartMenu';
+import SearchOrder from './Components/SearchOrder';
 
 
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
+  ({ theme }) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: `-${drawerWidth}px`,
-    ...(open && {
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginLeft: 0,
-    }),
+
+    marginLeft: 0,
   }),
 );
 
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
-  transition: theme.transitions.create(['margin', 'width'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: `${drawerWidth}px`,
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}));
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -86,17 +63,17 @@ function App() {
   const [authorizedSuccess, setAuthorizedSuccess] = React.useState(false);
   const [loggedout, setLoggedout] = React.useState(false);
 
-  const { authorize, setAuthorize, setAuthorizedUsername, signupMessage, signupSuccess, setSignupSuccess } = useContext(AuthContext);
+  const { authorize, setAuthorize, setAuthorizedUsername, signupMessage, signupSuccess, setSignupSuccess, bgrColor, secondDrawerOpen, setSecondDrawerOpen } = useContext(AuthContext);
 
   const matchesThird = useMediaQuery("(min-width: 400px)");
-
   const matchesFourth = useMediaQuery("(min-width: 350px)");
+  const matchesFifth = useMediaQuery("(min-width: 300px)");
 
+  const secondDrawerWidth = matchesThird ? 350 : '100%';
   const myIndent = matchesThird ? 25 : 10;
-
   const typography = matchesFourth ? 'h5' : 'h6';
-
   const indentMinus = matchesFourth ? 0 : 5;
+
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
@@ -111,8 +88,12 @@ function App() {
       return '/';
     } else if (value === 'Categories') {
       return '/categories';
-    } else {
+    } else if (value === 'Users') {
       return '/userlist';
+    } else if (value === 'By Categories') {
+      return '/bycategories';
+    } else if (value === 'Orders') {
+      return '/orders';
     }
   }
 
@@ -132,24 +113,29 @@ function App() {
     }
   }
 
-  const pages = sessionStorage.getItem('role') === 'ADMIN' ? ['Books', 'Categories', 'Users'] : ['Books'];
+  const adminPages = sessionStorage.getItem('role') === 'ADMIN' ? ['Categories', 'Users', 'Orders'] : [];
+  const pages = ['Books', 'By Categories'];
+
+  const navigate = useNavigate();
 
   return (
     <div className="App">
-      <Box sx={{ display: 'flex' }}>
-        <AppBar position="fixed">
+      <Box sx={{ display: 'flex' }} >
+        <MuiAppBar position="fixed" sx={{ backgroundColor: 'black' }}>
           <Toolbar style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-            <IconButton
-              style={{ position: 'absolute', left: myIndent - indentMinus }}
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={{ mr: 2, ...(drawerOpen && { display: 'none' }) }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant={typography} component="div">
+            <div style={{ position: 'absolute', left: myIndent - indentMinus, display: 'flex', alignItems: 'center' }}>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                edge="start"
+                sx={{ mr: 2, ...(drawerOpen && { display: 'none' }) }}
+              >
+                <MenuIcon />
+              </IconButton>
+              <SearchOrder />
+            </div>
+            <Typography onClick={() => navigate("/")} style={{ cursor: 'pointer' }} variant={typography} component="div">
               Book Store
             </Typography>
             <div style={{ position: 'absolute', right: myIndent - indentMinus }}>
@@ -157,8 +143,9 @@ function App() {
               {!authorize && <SignIn setAuthorizedSuccess={setAuthorizedSuccess} />}
             </div>
           </Toolbar>
-        </AppBar>
-        <Drawer
+        </MuiAppBar>
+        <Drawer //first drawer - menu
+          transitionDuration={500}
           sx={{
             width: drawerWidth,
             flexShrink: 0,
@@ -167,9 +154,9 @@ function App() {
               boxSizing: 'border-box',
             },
           }}
-          variant="persistent"
           anchor="left"
           open={drawerOpen}
+          onClose={handleDrawerClose}
         >
           <DrawerHeader>
             <IconButton onClick={handleDrawerClose}>
@@ -181,16 +168,51 @@ function App() {
             {pages.map((value, index) => (
               <ListItem button onClick={handleDrawerClose} component={Link} to={setLink(value)} >
                 <ListItemIcon>
-                  {index === 0 && <MenuBookIcon />}
-                  {index === 1 && <CategoryIcon />}
-                  {index === 2 && <GroupIcon />}
+                  {index === 0 && <MenuBookIcon color='sidish' />}
+                  {index === 1 && <CategoryIcon color='sidish' />}
+                </ListItemIcon>
+                <ListItemText primary={value} />
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+          <List>
+            {adminPages.map((value, index) => (
+              <ListItem button onClick={handleDrawerClose} component={Link} to={setLink(value)} >
+                <ListItemIcon>
+                  {index === 0 && <CategoryIcon color='sidish' />}
+                  {index === 1 && <GroupIcon color='sidish' />}
+                  {index === 2 && <MonetizationOnIcon color='sidish' />}
                 </ListItemIcon>
                 <ListItemText primary={value} />
               </ListItem>
             ))}
           </List>
         </Drawer>
-        <Main style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} open={drawerOpen}>
+        <Drawer   //second drawer - cart
+          transitionDuration={1000}
+          sx={{
+            width: secondDrawerWidth,
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: secondDrawerWidth,
+              boxSizing: 'border-box',
+            },
+          }}
+          anchor="right"
+          open={secondDrawerOpen}
+          onClose={() => setSecondDrawerOpen(false)}
+        >
+          <DrawerHeader sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Button color='sidish' onClick={() => setSecondDrawerOpen(false)}>
+              <ChevronLeftIcon color='sidish' />
+              Continue Shopping
+            </Button>
+          </DrawerHeader>
+          <Divider />
+          <CartMenu />
+        </Drawer>
+        <Main style={{ display: 'flex', flexDirection: 'column', backgroundColor: bgrColor }} >
           <DrawerHeader />
           <BookRoutes />
           <Snackbar
@@ -220,7 +242,7 @@ function App() {
         </Main>
       </Box>
       <Myfooter />
-    </div>
+    </div >
 
   );
 }

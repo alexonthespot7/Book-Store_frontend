@@ -11,10 +11,13 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
 import AuthContext from "../context/AuthContext";
 
+import { AnimatePresence, motion } from 'framer-motion';
+
 import '../App.css'
 
 import Editcategory from './Editcategory';
 import Addcategory from './Addcategory';
+import { CircularProgress } from '@mui/material';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -25,21 +28,26 @@ function Categories() {
     const [categoryDeleted, setCategoryDeleted] = useState(false);
     const [categoryAdded, setCategoryAdded] = useState(false);
     const [categoryEdited, setCategoryEdited] = useState(false);
+    const [dataLoaded, setDataLoaded] = useState(false);
 
-    const { dialogueWidth } = useContext(AuthContext);
+    const { dialogueWidth, setBgrColor } = useContext(AuthContext);
 
     useEffect(() => {
         fetchCategories();
+        setBgrColor('#FFFAFA');
     }, []);
 
     const fetchCategories = () => {
         fetch(process.env.REACT_APP_API_URL + 'categories')
             .then(response => response.json())
-            .then(data => setCategories(data))
+            .then(data => {
+                setCategories(data);
+                setDataLoaded(true);
+            })
             .catch(err => console.error(err))
     }
 
-    const deleteCategory = (link) => {
+    /**const deleteCategory = (link) => {
         if (window.confirm('Do you want to delete this category?')) {
             const token = sessionStorage.getItem('jwt');
             fetch(link,
@@ -59,7 +67,7 @@ function Categories() {
                 })
                 .catch(err => console.error(err))
         }
-    }
+    }*/
 
     const addCategory = (newCategory) => {
         const token = sessionStorage.getItem('jwt');
@@ -80,7 +88,7 @@ function Categories() {
                     alert('Something went wrong during adding new category');
                 }
             })
-            .catch(err => console.error(err))
+            .catch(err => console.error(err));
     }
 
     const updateCategory = (updatedCategory, link) => {
@@ -116,37 +124,46 @@ function Categories() {
             valueGetter: linkGetter,
             cellRenderer: params => <Editcategory params={params} updateCategory={updateCategory} />
         },
-        {
+        /**{
             headerName: '',
             valueGetter: linkGetter,
             width: '100%',
             cellRenderer: params =>
                 <IconButton onClick={() => deleteCategory(params.value)}>
-                    <DeleteIcon style={{ color: 'red' }} />
+                    <DeleteIcon color='sidish' />
                 </IconButton>
-        }
+        }*/
     ]);
 
     return (
-        <div className="ag-theme-alpine" style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            gap: 15,
-            height: 617,
-            width: dialogueWidth,
-            margin: 'auto',
-            marginTop: 10,
-        }}>
+        <motion.div
+            className="ag-theme-alpine"
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                gap: 15,
+                height: 617,
+                width: dialogueWidth,
+                margin: 'auto',
+                marginTop: 10,
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+        >
             <Typography color='#424242' variant="h5">Genres</Typography>
-            <AgGridReact
-                columnDefs={columns}
-                rowData={categories}
-                pagination={true}
-                paginationPageSize={10}
-                suppressCellFocus={true}
-                animateRows="true"
-            />
+            {dataLoaded &&
+                <AgGridReact
+                    columnDefs={columns}
+                    rowData={categories}
+                    pagination={true}
+                    paginationPageSize={10}
+                    suppressCellFocus={true}
+                    animateRows="true"
+                />
+            }
+            {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="inherit" /></div>}
             <div style={{ display: 'flex', justifyContent: 'end', marginRight: 15 }}>
                 <Addcategory addCategory={addCategory} />
             </div>
@@ -157,16 +174,16 @@ function Categories() {
                 message='Category was deleted successfully'
             />
             <Snackbar open={categoryAdded} autoHideDuration={3000} onClose={() => setCategoryAdded(false)}>
-                <Alert onClose={() => setCategoryAdded(false)} severity="success" sx={{ width: '100%' }}>
+                <Alert onClose={() => setCategoryAdded(false)} severity="sidish" sx={{ width: '100%' }}>
                     New category was added successfully!
                 </Alert>
             </Snackbar>
             <Snackbar open={categoryEdited} autoHideDuration={3000} onClose={() => setCategoryEdited(false)}>
-                <Alert onClose={() => setCategoryEdited(false)} severity="success" sx={{ width: '100%' }}>
+                <Alert onClose={() => setCategoryEdited(false)} severity="sidish" sx={{ width: '100%' }}>
                     Category info was updated successfully!
                 </Alert>
             </Snackbar>
-        </div>
+        </motion.div>
     )
 }
 

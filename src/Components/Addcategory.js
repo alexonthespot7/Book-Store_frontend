@@ -55,7 +55,7 @@ export default function Addcategory({ addCategory }) {
 
     return (
         <div>
-            <Button variant="contained" onClick={handleClickOpen}>
+            <Button color='sidish' sx={{ color: 'white', "&:hover": { filter: 'brightness(50%)', backgroundColor: '#303030' }, transition: '0.45s' }} variant="contained" onClick={handleClickOpen}>
                 <AddIcon color="white" />
                 Category
             </Button>

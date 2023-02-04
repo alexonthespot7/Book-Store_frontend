@@ -10,6 +10,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CircularProgress from '@mui/material/CircularProgress';
 
 import ResetPassword from "./ResetPassword";
+import useMediaQuery from "../Hooks/useMediaQuery";
 
 function Login({ open, setOpen, usernameError, setUsernameError,
     usernameHelper, setUsernameHelper, pwdError, setPwdError, pwdHelper, setPwdHelper,
@@ -24,6 +25,10 @@ function Login({ open, setOpen, usernameError, setUsernameError,
     const [emailHelper, setEmailHelper] = useState('');
 
     const [progress, setProgress] = useState(false);
+
+    const matches350 = useMediaQuery("(min-width: 350px)");
+
+    const inputSize = matches350 ? 'medium' : 'small';
 
     const { setAuthorize, setAuthorizedUsername, dialogueWidth } = useContext(AuthContext);
 
@@ -59,6 +64,8 @@ function Login({ open, setOpen, usernameError, setUsernameError,
                         });
                         setAuthorize(role);
                         setOpen(false);
+                        sessionStorage.removeItem('cartId');
+                        sessionStorage.removeItem('cartPass');
                         setAuthorizedSuccess(true);
                         sessionStorage.setItem('authorizedUsername', creds.username);
                         setAuthorizedUsername(creds.username);
@@ -135,6 +142,8 @@ function Login({ open, setOpen, usernameError, setUsernameError,
                 <DialogTitle>Login</DialogTitle>
                 <DialogContent style={{ display: 'flex', flexDirection: 'column' }}>
                     <TextField
+                        size={inputSize}
+                        color="sidish"
                         fullWidth
                         value={user.username}
                         type='text'
@@ -147,6 +156,8 @@ function Login({ open, setOpen, usernameError, setUsernameError,
                         onChange={inputChanged}
                     />
                     <TextField
+                        size={inputSize}
+                        color="sidish"
                         fullWidth
                         value={user.password}
                         margin='dense'
@@ -173,15 +184,15 @@ function Login({ open, setOpen, usernameError, setUsernameError,
                     />
                 </DialogContent>
                 <DialogActions style={{ marginTop: -20 }}>
-                    <Button size='small' variant="text" onClick={handleReset}>forgot password?</Button>
-                    <Button size="small" color='primary' variant='contained' onClick={login}>Login</Button>
-                    <Button size='small' color='primary' variant='outlined' onClick={handleClose}>Cancel</Button>
+                    <Button size='small' color='sidish' variant="text" onClick={handleReset}>forgot password?</Button>
+                    <Button size="small" color='sidish' sx={{ color: 'white', "&:hover": { filter: 'brightness(50%)', backgroundColor: '#303030' }, transition: '0.45s' }} variant='contained' onClick={login}>Login</Button>
+                    <Button size='small' color='sidish' sx={{ "&:hover": { filter: 'brightness(40%)' }, transition: '0.45s' }} variant='outlined' onClick={handleClose}>Cancel</Button>
                 </DialogActions>
             </Dialog>}
             {progress && <Dialog style={{ margin: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }} open={open} onClose={handleClose} >
                 <DialogTitle>Login</DialogTitle>
                 <DialogContent style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: dialogueWidth, height: 300 }}>
-                    <CircularProgress size={80} />
+                    <CircularProgress color='sidish' size={80} />
                 </DialogContent>
             </Dialog>}
             <ResetPassword openReset={openReset} setOpenReset={setOpenReset} emailInfo={emailInfo} setEmailInfo={setEmailInfo}

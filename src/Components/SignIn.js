@@ -1,14 +1,16 @@
 import React, { useContext, useState } from 'react';
 
-import { Menu, MenuItem, Button } from '@mui/material';
+import { Menu, MenuItem, Button, IconButton } from '@mui/material';
 
 import LoginIcon from '@mui/icons-material/Login';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 
 import Login from './Login';
 import Signup from './Signup';
 
 import useMediaQuery from '../Hooks/useMediaQuery';
+import AuthContext from '../context/AuthContext';
 
 export default function SignIn({ setAuthorizedSuccess }) {
     const [userSignup, setUserSignup] = useState({
@@ -41,12 +43,18 @@ export default function SignIn({ setAuthorizedSuccess }) {
     const [pwdError, setPwdError] = useState(false);
     const [pwdHelper, setPwdHelper] = useState('');
 
+    const { setSecondDrawerOpen } = useContext(AuthContext);
+
     const [anchorEl, setAnchorEl] = React.useState(null);
     const openMenu = Boolean(anchorEl);
 
     const matchesFirst = useMediaQuery("(min-width: 1028px)");
 
     const matchesSecond = useMediaQuery("(min-width: 870px)");
+
+    const matchesFourth = useMediaQuery("(min-width: 450px)");
+
+    const matchesFifth = useMediaQuery("(min-width: 300px)");
 
     const myGap = matchesFirst ? 8 : 0;
 
@@ -122,13 +130,18 @@ export default function SignIn({ setAuthorizedSuccess }) {
                         setPwdHelperSignup={setPwdHelperSignup} openSignup={openSignup} setOpenSignup={setOpenSignup}
                     />
                 </div>
+                <div>
+                    <IconButton size='small' onClick={() => setSecondDrawerOpen(true)}>
+                        <ShoppingCartOutlinedIcon color='thirdary' />
+                    </IconButton>
+                </div>
             </div>
         );
     } else {
         return (
-            <div>
-                <Button onClick={handleClick} variant='text' endIcon={<ExitToAppIcon />} color='inherit'>
-                    Sign in
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+                <Button sx={{ marginRight: matchesFifth ? 0 : -1 }} onClick={handleClick} variant='text' endIcon={<ExitToAppIcon />} color='inherit'>
+                    {matchesFourth && 'Sign in'}
                 </Button>
                 <Menu
                     anchorEl={anchorEl}
@@ -176,6 +189,9 @@ export default function SignIn({ setAuthorizedSuccess }) {
                         </Button>
                     </MenuItem>
                 </Menu>
+                <IconButton size='small' onClick={() => setSecondDrawerOpen(true)}>
+                    <ShoppingCartOutlinedIcon color='thirdary' />
+                </IconButton>
                 <Login open={open} setOpen={setOpen} usernameError={usernameError}
                     setUsernameError={setUsernameError} usernameHelper={usernameHelper}
                     setUsernameHelper={setUsernameHelper} pwdError={pwdError}

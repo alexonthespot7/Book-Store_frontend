@@ -1,25 +1,78 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo, useContext } from 'react';
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
 import Snackbar from '@mui/material/Snackbar';
+import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import MuiAlert from '@mui/material/Alert';
-import TextField from '@mui/material/TextField';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
-import InputAdornment from '@mui/material/InputAdornment';
+import SearchOffIcon from '@mui/icons-material/SearchOff';
 
 import useMediaQuery from '../Hooks/useMediaQuery';
 
 import AuthContext from '../context/AuthContext';
 
-import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-
 import Addbook from './Addbook';
-import Editbook from './Editbook';
 import '../App.css';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Card, CardActionArea, CircularProgress, IconButton, InputAdornment, Pagination, Paper, TextField } from '@mui/material';
+
+import { AnimatePresence, motion } from 'framer-motion';
+
+const buttonStyle = {
+    transition: '0.4s',
+    borderRadius: '25px 25px 25px 25px',
+    width: 200, backgroundColor: 'white',
+    color: 'black',
+    fontFamily: 'serif',
+    "&:hover": { color: 'white', backgroundColor: 'black' }
+}
+
+const buttonTakenStyle = {
+    transition: '0.4s',
+    borderRadius: '25px 25px 25px 25px',
+    width: 200, backgroundColor: 'black',
+    color: 'white',
+    fontFamily: 'serif',
+    "&:hover": { color: 'black', backgroundColor: 'white' }
+}
+
+const priceHolder = {
+    borderRadius: '25px 0px 15px 0px',
+    width: 80, height: 27,
+    backgroundColor: 'black',
+    color: 'white', display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontFamily: 'display',
+    fontSize: 18
+}
+
+const cardStyle = {
+    borderRadius: '25px',
+    display: 'flex',
+    flexDirection: 'column',
+
+    backgroundColor: 'white',
+    width: 200,
+    height: 300,
+    marginBottom: 15
+}
+
+const cardAction = {
+    height: '100%',
+    width: '100%',
+    marginTop: 0,
+    "&:hover": { filter: 'brightness(40%)' },
+    transition: '0.4s'
+}
+
+const imageDiv = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginTop: 15
+}
 
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -27,24 +80,116 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 function Booklist() {
+    const [dataFetched, setDataFetched] = useState(false);
     const [books, setBooks] = useState([]);
-    const [bookDeleted, setBookDeleted] = useState(false);
     const [bookAdded, setBookAdded] = useState(false);
-    const [bookEdited, setBookEdited] = useState(false);
+    const [cartUpdated, setCartUpdated] = useState(false);
+    const [page, sestPage] = useState(1);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchNow, setSearchNow] = useState('');
+    const [openSearch, setOpenSearch] = useState(false);
+
     const [searchParams, setSearchParams] = useSearchParams({});
 
-    const { setSignupMessage, setSignupSuccess, setActionReset, actionReset, typeReset, msgReset } = useContext(AuthContext);
 
-    const gridRef = useRef();
+    const matchesXL = useMediaQuery("(min-width: 1200px)");
+    const matchesL = useMediaQuery("(min-width: 1000px)");
+    const matchesM = useMediaQuery("(min-width: 800px)");
+    const matchesMidM = useMediaQuery("(min-width: 600px)");
+    const matchesS = useMediaQuery("(min-width: 500px)");
+    const matchesXS = useMediaQuery("(min-width: 400px)");
+    const matchesXXS = useMediaQuery("(min-width: 300px)");
+
+    const defineMarginSearch = () => {
+        if (matchesS) {
+            return 70;
+        } else if (matchesXS) {
+            return 40;
+        } else if (matchesXXS) {
+            return 20;
+        } else {
+            return 10;
+        }
+    }
+
+    const marginSearch = defineMarginSearch();
+
+    const searchSize = matchesS ? 'medium' : 'small';
+
+    const defineItemsPerDiv = () => {
+        if (matchesXL) {
+            return 5;
+        } else if (matchesL) {
+            return 4;
+        } else if (matchesM) {
+            return 3;
+        } else if (matchesS) {
+            return 2;
+        } else {
+            return 1;
+        }
+    }
+
+    let truthly = true;
+
+    const typoSize = matchesM ? 'h4' : 'h5';
+
+    const marg = matchesMidM ? 0 : 10
+
+    const mainStyle = {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        marginTop: 20,
+        marginBottom: 20,
+        marginLeft: 20 - marg,
+        marginRight: 20 - marg,
+    }
+
+    const itemsPerDiv = defineItemsPerDiv();
+
+    const filteredBooks = books.filter(
+        book => {
+            return (
+                book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                book.isbn.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                book.bookYear.toString().includes(searchQuery) ||
+                book.price.toString().includes(searchQuery) ||
+                book.category.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
+    );
+
+    const divsPerPage = 4;
+
+    //used to use raw books here
+    const pages = Array.from({ length: Math.ceil(filteredBooks.length / (divsPerPage * itemsPerDiv)) }, (_, i) => i + 1);
+    const divs = Array.from(Array(Math.ceil(filteredBooks.length / itemsPerDiv)).keys());
+
+    const handleChange = (event, value) => {
+        sestPage(value);
+    }
+
+    const { setSignupMessage, setSignupSuccess, setActionReset, actionReset, typeReset, setTypeReset, msgReset, setMsgReset, setBgrColor, bookDeleted, setBookDeleted, setSecondDrawerOpen, fetchIds, takenIds, setTakenIds, fetchIdsNotLogged } = useContext(AuthContext);
 
     const fetchBooks = () => {
         fetch(process.env.REACT_APP_API_URL + 'books')
             .then(response => response.json())
-            .then(data => setBooks(data))
+            .then(data => {
+                setBooks(data);
+                setDataFetched(true);
+            })
             .catch(err => console.error(err));
     }
 
+    const navigate = useNavigate();
+
+    let quant = 1;
+
     const checkToken = (token) => {
+        quant += 1;
         const tokenInfo = { 'token': token };
         fetch(process.env.REACT_APP_API_URL + 'verify', {
             method: 'POST',
@@ -55,53 +200,53 @@ function Booklist() {
         })
             .then(response => {
                 if (response.ok) {
+                    navigate('/');
+                    console.log('VERIFICATION: ', quant);
                     setSignupSuccess(true);
-                    setSignupMessage('Your account was successfully verified. You can login now!')
+                    setSignupMessage('Your account was successfully verified. You can login now!');
                 } else {
                     setSignupSuccess(true);
                     setSignupMessage('Verification code is incorrect or you are already verified');
+                    navigate('/');
                 }
             })
-            .catch(err => console.error(err))
+            .catch(err => console.error(err));
     }
 
     useEffect(() => {
+        setBgrColor('#FFFAFA');
         fetchBooks();
-        if (searchParams.get('token')) {
+        if (sessionStorage.getItem('authorizedUsername') !== null) {
+            fetchIds(); //fetching ids of books which are already in the cart
+        } else if (sessionStorage.getItem('cartId') !== null) {
+            fetchIdsNotLogged(sessionStorage.getItem('cartId'));
+        } else {
+            setTakenIds([]);
+        }
+        if (searchParams.get('token') && quant === 1) {
             checkToken(searchParams.get('token'));
+        }
+        if (searchParams.get('cart')) {
+            setActionReset(true);
+            setTypeReset('sidish');
+            setMsgReset('Your cart is empty now!');
+            navigate('/');
         }
     }, []);
 
-    const matchesAdmin = useMediaQuery("(min-width: 1199px)");
+    //used to use raw books here
+    if (filteredBooks.length > 0 && truthly) {
+        truthly = false;
+    }
 
-    const gridWidthAdmin = matchesAdmin ? '1079px' : '94%';
+    if (page > pages.length && !truthly) {
+        sestPage(1);
+    }
 
-    const matches = useMediaQuery("(min-width: 966px)");
-
-    const gridWidth = matches ? '869px' : '94%';
-
-    const currentWidth = sessionStorage.getItem('role') === 'ADMIN' ? gridWidthAdmin : gridWidth;
-
-    const deleteBook = (link) => {
-        if (window.confirm('Do you want to delete this book?')) {
-            const token = sessionStorage.getItem('jwt');
-            fetch(link,
-                {
-                    method: 'DELETE',
-                    headers: { 'Authorization': token }
-                }
-            )
-                .then(response => {
-                    if (!response.ok) {
-                        alert('Something went wrong in deletion');
-                    }
-                    else {
-                        fetchBooks();
-                        setBookDeleted(true);
-                    }
-                })
-                .catch(err => console.error(err))
-        }
+    const currencyFormatter = (currency, sign) => {
+        let sansDec = currency.toFixed(2);
+        let formatted = sansDec.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return sign + `${formatted}`;
     }
 
     const addBook = (newBook) => {
@@ -125,148 +270,228 @@ function Booklist() {
             .catch(err => console.error(err));
     }
 
-    const updateBook = (updatedBook, link) => {
-        const token = sessionStorage.getItem('jwt');
-        fetch(link, {
-            method: 'PUT',
-            headers: {
-                'Content-type': 'application/json',
-                'Authorization': token
+    const createCart = (bookid) => {
+        fetch(process.env.REACT_APP_API_URL + 'createbacket')
+            .then(response => response.json())
+            .then(data => {
+                sessionStorage.setItem('cartId', data.bookid);
+                sessionStorage.setItem('cartPass', data.password);
+                addBookForNotLogged(bookid);
+            })
+            .catch(err => console.error(err));
+    }
+
+    const addBookForNotLogged = (bookid) => {
+        const backetId = sessionStorage.getItem('cartId');
+        const password = sessionStorage.getItem('cartPass');
+        fetch(process.env.REACT_APP_API_URL + 'addbook/' + backetId, {
+            method: 'POST',
+            headers:
+            {
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify(updatedBook)
+            body: JSON.stringify({ quantity: 1, bookid: bookid, password: password })
         })
             .then(response => {
                 if (response.ok) {
                     fetchBooks();
-                    setBookEdited(true);
+                    fetchIdsNotLogged(backetId);
+                    setSecondDrawerOpen(true);
+                    setCartUpdated(true);
                 } else {
-                    alert('Something went wrong during the book update');
+                    alert('Something went wrong during adding book into the cart');
                 }
             })
-            .catch(err => console.error(err))
+            .catch(err => console.error(err));
     }
 
-    const linkGetter = (params) => {
-        return `${process.env.REACT_APP_API_URL}api/books/${params.data.id}`;
-    }
-
-    const onBtnExport = useCallback(() => {
-        gridRef.current.api.exportDataAsCsv();
-    }, []);
-
-    const currencyFormatter = (currency, sign) => {
-        let sansDec = currency.toFixed(2);
-        let formatted = sansDec.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        return sign + `${formatted}`;
-    }
-
-    const [columns, setColumns] = useState([
-        { field: 'title' },
-        { field: 'author' },
-        { headerName: 'ISBN', field: 'isbn' },
-        { headerName: 'Year', field: 'bookYear', type: 'numberColumn' },
-        {
-            headerName: "Price",
-            type: 'numberColumn',
-            field: "price",
-            valueFormatter: params => currencyFormatter(params.data.price, "€"),
-            filterParams: {
-                suppressAndOrCondition: true,
-            },
-            cellStyle: { fontWeight: 'bold', color: 'green', fontSize: 'medium' }
-        },
-        { headerName: 'Category', field: 'category.name' },
-        {
-            hide: sessionStorage.getItem('role') !== "ADMIN",
-            type: 'special',
-            headerName: '',
-            width: '100%',
-            valueGetter: linkGetter,
-            cellRenderer: params => <Editbook params={params} updateBook={updateBook} />
-        },
-        {
-            hide: sessionStorage.getItem('role') !== "ADMIN",
-            type: 'special',
-            headerName: '',
-            valueGetter: linkGetter,
-            width: '100%',
-            cellRenderer: params =>
-                <IconButton onClick={() => deleteBook(params.value)}>
-                    <DeleteIcon style={{ color: 'red' }} />
-                </IconButton>
+    const addToNonuserCart = (bookid) => {
+        if (sessionStorage.getItem('authorizedUsername') === null) {
+            if (!sessionStorage.getItem('cartId')) {
+                createCart(bookid);
+            } else {
+                addBookForNotLogged(bookid);
+            }
         }
-    ]);
+    }
 
-    const defaultColDef = useMemo(() => {
-        return {
-            width: 150,
-            filter: 'agTextColumnFilter',
-            resizable: true,
-            sortable: true,
-            cellStyle: { 'text-align': 'left' }
-        };
-    }, []);
-
-    const columnTypes = useMemo(() => {
-        return {
-            numberColumn: { width: 130, filter: 'agNumberColumnFilter' },
-            special: { width: '100%', floatingFilter: false, resizable: false, filter: false }
+    const addToCart = (bookid) => {
+        if (sessionStorage.getItem('authorizedUsername') !== null) {
+            const token = sessionStorage.getItem('jwt');
+            fetch(process.env.REACT_APP_API_URL + 'additem/' + bookid, {
+                method: 'POST',
+                headers:
+                {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ quantity: 1 })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        fetchBooks();
+                        fetchIds();
+                        setSecondDrawerOpen(true);
+                        setCartUpdated(true);
+                    } else {
+                        alert('Something went wrong during adding book into the cart');
+                    }
+                })
+                .catch(err => console.error(err));
+        } else {
+            addToNonuserCart(bookid);
         }
-    }, []);
+    }
 
-    const onFilterTextBoxChanged = useCallback(() => {
-        gridRef.current.api.setQuickFilter(
-            document.getElementById('filter-text-box').value
-        );
-    }, []);
+    //used to use raw books
+
+    const rows = divs.map((number, index) =>
+        (divsPerPage * (page - 1) <= index && index < divsPerPage * page) &&
+        <AnimatePresence>
+            <motion.div key={index} style={mainStyle}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+            >
+                {filteredBooks.map((book, indexs) =>
+                    (itemsPerDiv * number <= indexs && indexs < itemsPerDiv * (number + 1)) &&
+                    <div>
+                        <Card
+                            style={cardStyle}
+                            elevation={10}
+                        >
+                            <div style={{ display: 'flex', justifyContent: 'left', marginTop: 0 }}>
+                                <Paper style={priceHolder} elevation={0}>
+                                    {currencyFormatter(book.price, "€")}
+                                </Paper>
+                            </div>
+                            <CardActionArea
+                                component={Link}
+                                to={`/book/${book.id}`}
+                                sx={cardAction}
+                            >
+                                <div style={imageDiv}>
+                                    <img
+                                        height={240}
+                                        width='80%'
+                                        src={book.url}
+                                        alt={book.title}
+                                    />
+
+                                </div>
+                            </CardActionArea>
+
+
+                        </Card>
+                        {((sessionStorage.getItem('authorizedUsername') === null && sessionStorage.getItem('cartId') === null) || !takenIds.includes(book.id)) && <Button onClick={() => addToCart(book.id)} endIcon={<AddShoppingCartIcon />} sx={buttonStyle} component={Paper} elevation={10} >
+                            Add to Cart
+                        </Button>}
+                        {takenIds.includes(book.id) && <Button onClick={() => setSecondDrawerOpen(true)} endIcon={<ShoppingCartIcon />} sx={buttonTakenStyle} component={Paper} elevation={10} >
+                            Open Cart
+                        </Button>}
+                    </div>
+                )}
+            </motion.div>
+        </AnimatePresence>
+    );
+
+    const handleLocalChange = (event) => {
+        setSearchNow(event.target.value);
+    }
+
+    const search = () => {
+        setSearchQuery(searchNow);
+    }
+
+    const stopSearch = () => {
+        setSearchQuery('');
+        setOpenSearch(false);
+        setSearchNow('');
+    }
 
     return (
-        <div className="ag-theme-alpine" style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            height: 447,
-            width: currentWidth, //make media query later
-            margin: 'auto',
-            marginTop: 10,
-        }}>
-            <div style={{ display: 'flex', flexDirection: 'row', marginBottom: -10 }}>
-                <TextField
-                    type='search'
-                    fullWidth={false}
-                    size='small'
-                    id="filter-text-box"
-                    placeholder="Search..."
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon />
-                            </InputAdornment>
-                        ),
-                    }}
-                    variant="standard"
-                    onChange={onFilterTextBoxChanged}
-                />
-                <div style={{ display: 'flex', justifyContent: 'end', marginBottom: 15, marginLeft: 15, marginRight: 15 }}>
-                    {sessionStorage.getItem('role') === 'ADMIN' && <Addbook addBook={addBook} />}
-                    <Button variant="text" onClick={onBtnExport}>Export</Button>
+
+        <motion.div
+            style={{ display: 'flex', flexDirection: 'column', gap: 30 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+        >
+            {sessionStorage.getItem('role') === 'ADMIN' &&
+                <div style={{ marginBottom: -20, display: 'flex', justifyContent: 'center', gap: 20 }}>
+                    {!openSearch && <IconButton onClick={() => setOpenSearch(true)} sx={{ marginRight: -2.5 }}>
+                        <SearchIcon color='sidish' />
+                    </IconButton>}
+                    {openSearch && <IconButton onClick={stopSearch} sx={{ marginRight: -2.5 }}>
+                        <SearchOffIcon color='sidish' />
+                    </IconButton>}
+                    <Typography variant={typoSize}>All books</Typography>
+                    <Addbook addBook={addBook} />
+                </div>}
+            {sessionStorage.getItem('role') !== 'ADMIN' &&
+                <div style={{ marginBottom: -20, display: 'flex', justifyContent: 'center', gap: 0 }}>
+                    {!openSearch && <IconButton onClick={() => setOpenSearch(true)}>
+                        <SearchIcon color='sidish' />
+                    </IconButton>}
+                    {openSearch && <IconButton onClick={stopSearch}>
+                        <SearchOffIcon color='sidish' />
+                    </IconButton>}
+                    <div style={{ display: 'flex', gap: 8 }}>
+                        <Typography variant={typoSize}>All</Typography>
+                        <Typography sx={{ backgroundColor: 'black', color: 'white', paddingLeft: 1, paddingRight: 1 }} variant={typoSize}>Books</Typography>
+                    </div>
+                </div>}
+            {dataFetched &&
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
+                    <AnimatePresence>{openSearch &&
+                        <motion.div
+                            style={{ display: 'flex', marginLeft: marginSearch, marginRight: marginSearch, gap: 15, marginBottom: -20 }}
+                            initial={{ opacity: 0, scale: 0.5 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.5 }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            <TextField
+                                size={searchSize}
+                                fullWidth
+                                value={searchNow}
+                                onChange={handleLocalChange}
+                                type='search'
+                                placeholder="Search for books..."
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon color='sidish' />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                variant="outlined"
+                                color='sidish'
+                            />
+                            <Button
+                                size={searchSize}
+                                onClick={search}
+                                variant='contained'
+                                sx={{
+                                    color: 'white',
+                                    backgroundColor: 'black',
+                                    "&:hover": { backgroundColor: 'gray' },
+                                    transition: '0.45s'
+                                }}
+                            >
+                                Search
+                            </Button>
+                        </motion.div>
+                    }</AnimatePresence>
+                    {rows}
+                </div>}
+            {dataFetched &&
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Pagination sx={{ marginBottom: 5, marginTop: 5 }} count={pages.length} page={page} onChange={handleChange} />
                 </div>
+            }
+            {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="inherit" /></div>}
 
-            </div>
-
-
-            <AgGridReact
-                ref={gridRef}
-                columnDefs={columns}
-                rowData={books}
-                defaultColDef={defaultColDef}
-                columnTypes={columnTypes}
-                pagination={true}
-                paginationPageSize={7}
-                suppressCellFocus={true}
-                animateRows={true}
-                cacheQuickFilter={true}
-            />
             <Snackbar
                 open={bookDeleted}
                 autoHideDuration={3000}
@@ -278,18 +503,20 @@ function Booklist() {
                     New book was added successfully!
                 </Alert>
             </Snackbar>
-            <Snackbar open={bookEdited} autoHideDuration={3000} onClose={() => setBookEdited(false)}>
-                <Alert onClose={() => setBookEdited(false)} severity="success" sx={{ width: '100%' }}>
-                    Book info was updated successfully!
-                </Alert>
-            </Snackbar>
+
             <Snackbar open={actionReset} autoHideDuration={3000} onClose={() => setActionReset(false)}>
                 <Alert onClose={() => setActionReset(false)} severity={typeReset} sx={{ width: '100%' }}>
                     {msgReset}
                 </Alert>
             </Snackbar>
-        </div>
-    )
+            <Snackbar open={cartUpdated} autoHideDuration={3000} onClose={() => setCartUpdated(false)}>
+                <Alert onClose={() => setCartUpdated(false)} severity='sidish' sx={{ width: '100%' }}>
+                    Book was added to your cart
+                </Alert>
+            </Snackbar>
+        </motion.div>
+    );
 }
 
 export default Booklist;
+

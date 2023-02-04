@@ -81,6 +81,7 @@ function ResetPassword({ openReset, setOpenReset, emailInfo, setEmailInfo, email
             <DialogTitle>Reset password</DialogTitle>
             <DialogContent style={{ display: 'flex', flexDirection: 'column', width: 400, height: 100, justifyContent: 'center' }}>
                 <TextField
+                    color='sidish'
                     value={emailInfo.email}
                     type='email'
                     margin='dense'
@@ -93,8 +94,8 @@ function ResetPassword({ openReset, setOpenReset, emailInfo, setEmailInfo, email
                 />
             </DialogContent>
             <DialogActions style={{ marginTop: -20 }}>
-                <Button color='primary' variant='contained' onClick={resetPassword}>Reset Password</Button>
-                <Button color='error' variant='outlined' onClick={handleClose}>Cancel</Button>
+                <Button color='sidish' sx={{ color: 'white', "&:hover": { filter: 'brightness(50%)', backgroundColor: '#303030' }, transition: '0.45s' }} variant='contained' onClick={resetPassword}>Reset Password</Button>
+                <Button color='sidish' sx={{ "&:hover": { filter: 'brightness(40%)' }, transition: '0.45s' }} variant='outlined' onClick={handleClose}>Cancel</Button>
             </DialogActions>
         </Dialog>
     )

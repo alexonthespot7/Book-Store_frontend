@@ -8,6 +8,11 @@ import DialogTitle from '@mui/material/DialogTitle';
 import AddIcon from '@mui/icons-material/Add';
 import MenuItem from '@mui/material/MenuItem';
 import InputAdornment from '@mui/material/InputAdornment';
+import OutlinedInput from '@mui/material/OutlinedInput';
+
+import { storage } from '../firebase/firebase';
+import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { v4 } from 'uuid';
 
 
 function Addbook({ addBook }) {
@@ -32,8 +37,29 @@ function Addbook({ addBook }) {
         isbn: '',
         bookYear: '',
         price: '',
-        category: ''
+        category: '',
+        url: ''
     });
+    const [imageUpload, setImageUpload] = useState(null);
+    const [imgUploaded, setImageUploaded] = useState(false);
+
+    const uploadImage = () => {
+        if (imageUpload === null) {
+            alert('Nothing to be uploaded');
+        }
+        const imageRef = ref(storage, `covers/${imageUpload.name + v4()}`);
+        uploadBytes(imageRef, imageUpload)
+            .then((snapshot) => {
+                getDownloadURL(snapshot.ref)
+                    .then((urlNow) => {
+                        setBook({ ...book, url: urlNow });
+                        setImageUploaded(true);
+                        setImageUpload(null);
+                    });
+                alert("Image was uploaded successfully");
+            })
+            .catch(err => console.error(err));
+    }
 
     useEffect(() => {
         fetchCategories();
@@ -54,8 +80,10 @@ function Addbook({ addBook }) {
             isbn: '',
             bookYear: '',
             price: '',
-            category: ''
+            category: '',
+            url: ''
         });
+        setImageUploaded(false);
         setTitleErr(false);
         setTitleHelper('');
         setAuthorErr(false);
@@ -71,7 +99,21 @@ function Addbook({ addBook }) {
     }
 
     const handleClose = () => {
-        setOpen(false);
+        if (imgUploaded) {
+            let pictureRef = ref(storage, book.url);
+            deleteObject(pictureRef)
+                .then(() => {
+                    setBook({ ...book, url: '' });
+                    alert("Picture is deleted successfully!");
+                    setImageUploaded(false);
+                    setOpen(false);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            setOpen(false);
+        }
     }
 
     const inputChanged = (event) => {
@@ -142,23 +184,33 @@ function Addbook({ addBook }) {
                 isbn: '',
                 bookYear: '',
                 price: '',
-                category: ''
+                category: '',
+                url: ''
             });
             setOpen(false);
         }
-
     }
 
+
     return (
-        <div>
-            <Button variant="contained" onClick={handleClickOpen}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Button
+                sx={{
+                    backgroundColor: 'black',
+                    "&: hover": { backgroundColor: 'white', color: 'black' },
+                    transition: '0.45s'
+                }}
+                variant="contained"
+                onClick={handleClickOpen}
+            >
                 <AddIcon color="white" />
                 Book
             </Button>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>New book</DialogTitle>
-                <DialogContent>
+                {imgUploaded && <DialogContent>
                     <TextField
+                        color='sidish'
                         error={titleErr}
                         helperText={titleHelper}
                         margin="dense"
@@ -170,6 +222,7 @@ function Addbook({ addBook }) {
                         variant="outlined"
                     />
                     <TextField
+                        color='sidish'
                         error={authorErr}
                         helperText={authorHelper}
                         margin="dense"
@@ -181,6 +234,7 @@ function Addbook({ addBook }) {
                         variant="outlined"
                     />
                     <TextField
+                        color='sidish'
                         error={isbnErr}
                         helperText={isbnHelper}
                         margin="dense"
@@ -192,6 +246,7 @@ function Addbook({ addBook }) {
                         variant="outlined"
                     />
                     <TextField
+                        color='sidish'
                         type='number'
                         error={yearErr}
                         helperText={yearHelper}
@@ -204,12 +259,16 @@ function Addbook({ addBook }) {
                         variant="outlined"
                     />
                     <TextField
+                        color='sidish'
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
                                     €
                                 </InputAdornment>
                             ),
+                            style: {
+                                color: 'black'
+                            }
                         }}
                         type="number"
                         error={priceErr}
@@ -223,6 +282,8 @@ function Addbook({ addBook }) {
                         variant="outlined"
                     />
                     <TextField
+                        color='sidish'
+                        sx={{ color: 'black' }}
                         variant="outlined"
                         error={categoryErr}
                         helperText={categoryHelper}
@@ -240,13 +301,24 @@ function Addbook({ addBook }) {
                             </MenuItem>
                         ))}
                     </TextField>
-                </DialogContent>
+                </DialogContent>}
+                {!imgUploaded &&
+                    <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                        <OutlinedInput
+                            type="file"
+                            onChange={(event) => {
+                                setImageUpload(event.target.files[0]);
+                            }}
+                        />
+                        <Button sx={{ color: 'black' }} onClick={uploadImage}> Upload Image </Button>
+                    </DialogContent>
+                }
                 <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleSave}>Save</Button>
+                    <Button sx={{ color: 'black' }} onClick={handleClose}>Cancel</Button>
+                    {imgUploaded && < Button sx={{ color: 'black' }} onClick={handleSave}>Save</Button>}
                 </DialogActions>
             </Dialog>
-        </div>
+        </div >
     )
 }
 

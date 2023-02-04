@@ -9,7 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import MenuItem from '@mui/material/MenuItem';
 
-export default function Editbook({ params, updateCategory }) {
+export default function Editcategory({ params, updateCategory }) {
   const [open, setOpen] = useState(false);
   const [nameErr, setNameErr] = useState(false);
   const [nameHelper, setNameHelper] = useState('');
@@ -52,12 +52,13 @@ export default function Editbook({ params, updateCategory }) {
   return (
     <div>
       <IconButton onClick={handleClickOpen}>
-        <EditIcon />
+        <EditIcon color='sidish' />
       </IconButton>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Edit Category</DialogTitle>
         <DialogContent>
           <TextField
+            color="sidish"
             error={nameErr}
             helperText={nameHelper}
             margin="dense"
@@ -70,10 +71,10 @@ export default function Editbook({ params, updateCategory }) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSave}>Save</Button>
+          <Button color='sidish' onClick={handleClose}>Cancel</Button>
+          <Button color='sidish' onClick={handleSave}>Save</Button>
         </DialogActions>
       </Dialog>
     </div>
-  )
+  );
 }
