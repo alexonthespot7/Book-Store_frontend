@@ -135,12 +135,20 @@ function Allcategories() {
 
     const content = filteredCategories.map((category, index) => {
         return (
-            <div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: salesMargin }}>
-                <Typography variant={titleSize} sx={{ color: 'white', fontFamily: 'serif', marginBottom: 2.5 }} >{category.name}</Typography>
-                <div style={{ width: carouselWidth }}>
-                    <BooksinCategory category={category} setCartUpdated={setCartUpdated} />
-                </div>
-            </div >
+            <AnimatePresence>
+                <motion.div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: salesMargin }}
+                    layout
+                    initial={{ scale: 0.5, height: 0 }}
+                    animate={{ scale: 1, height: 'auto' }}
+                    exit={{ scale: 0.5, height: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <Typography variant={titleSize} sx={{ color: 'white', fontFamily: 'serif', marginBottom: 2.5 }} >{category.name}</Typography>
+                    <div style={{ width: carouselWidth }}>
+                        <BooksinCategory category={category} setCartUpdated={setCartUpdated} />
+                    </div>
+                </motion.div>
+            </AnimatePresence>
         );
     });
 
@@ -185,53 +193,55 @@ function Allcategories() {
             </div>
             {
                 dataFetched &&
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
-                    <AnimatePresence>{openSearch &&
-                        <motion.div
-                            style={{ display: 'flex', marginLeft: marginSearch, marginRight: marginSearch, gap: 15, marginBottom: -20 }}
-                            initial={{ opacity: 0, scale: 0.5 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.5 }}
-                            transition={{ duration: 0.5 }}
-                        >
-                            <TextField
-                                size={searchSize}
-                                fullWidth
-                                value={searchNow}
-                                onChange={handleLocalChange}
-                                type='search'
-                                placeholder="Search for categories..."
-                                sx={{ backgroundColor: '#E8E8E8', color: 'black' }}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SearchIcon color='sidish' />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                                variant="outlined"
-                                color='thirdary'
-                            />
-                            <Button
-                                size={searchSize}
-                                onClick={search}
-                                variant='contained'
-                                sx={{
-                                    color: 'black',
-                                    backgroundColor: 'white',
-                                    "&:hover": { backgroundColor: 'gray' },
-                                    transition: '0.45s'
-                                }}
+                <AnimatePresence>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
+                        {openSearch &&
+                            <motion.div
+                                style={{ display: 'flex', marginLeft: marginSearch, marginRight: marginSearch, gap: 15, marginBottom: -20 }}
+                                initial={{ opacity: 0, scale: 0.5, height: 0 }}
+                                animate={{ opacity: 1, scale: 1, height: 'auto' }}
+                                exit={{ opacity: 0, scale: 0.5, height: 0 }}
+                                transition={{ duration: 0.5 }}
                             >
-                                Search
-                            </Button>
-                        </motion.div>
+                                <TextField
+                                    size={searchSize}
+                                    fullWidth
+                                    value={searchNow}
+                                    onChange={handleLocalChange}
+                                    type='search'
+                                    placeholder="Search for categories..."
+                                    sx={{ backgroundColor: '#E8E8E8', color: 'black' }}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <SearchIcon color='sidish' />
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                    variant="outlined"
+                                    color='thirdary'
+                                />
+                                <Button
+                                    size={searchSize}
+                                    onClick={search}
+                                    variant='contained'
+                                    sx={{
+                                        color: 'black',
+                                        backgroundColor: 'white',
+                                        "&:hover": { backgroundColor: 'gray' },
+                                        transition: '0.45s'
+                                    }}
+                                >
+                                    Search
+                                </Button>
+                            </motion.div>
 
-                    }</AnimatePresence>
-                    {(filteredCategories.length > 0) && content}
-                    {(filteredCategories.length === 0 && openSearch) && <Typography color='white' variant='h6' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}>No categories were found for your query: "{searchQuery}"</Typography>}
-                    {(filteredCategories.length === 0 && !openSearch) && <Typography color='white' variant='h6' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}>Please reload the page or visit the website later</Typography>}
-                </div>
+                        }
+                        {(filteredCategories.length > 0) && content}
+                        {(filteredCategories.length === 0 && openSearch) && <Typography color='white' variant='h6' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}>No categories were found for your query: "{searchQuery}"</Typography>}
+                        {(filteredCategories.length === 0 && !openSearch) && <Typography color='white' variant='h6' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}>Please reload the page or visit the website later</Typography>}
+                    </div>
+                </AnimatePresence>
             }
             {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="thirdary" /></div>}
 

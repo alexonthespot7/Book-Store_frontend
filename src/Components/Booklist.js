@@ -349,9 +349,11 @@ function Booklist() {
         (divsPerPage * (page - 1) <= index && index < divsPerPage * page) &&
         <AnimatePresence>
             <motion.div key={index} style={mainStyle}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                layout
+                initial={{ scale: 0.5, height: 0, width: 0 }}
+                animate={{ scale: 1, height: 'auto', width: 'auto' }}
+                exit={{ scale: 0.5, height: 0, width: 0 }}
+                transition={{ duration: 0.5 }}
             >
                 {filteredBooks.map((book, indexs) =>
                     (itemsPerDiv * number <= indexs && indexs < itemsPerDiv * (number + 1)) &&
@@ -442,13 +444,13 @@ function Booklist() {
                     </div>
                 </div>}
             {dataFetched &&
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
+                <AnimatePresence><div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
                     <AnimatePresence>{openSearch &&
                         <motion.div
                             style={{ display: 'flex', marginLeft: marginSearch, marginRight: marginSearch, gap: 15, marginBottom: -20 }}
-                            initial={{ opacity: 0, scale: 0.5 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.5 }}
+                            initial={{ opacity: 0, scale: 0.5, height: 0 }}
+                            animate={{ opacity: 1, scale: 1, height: 'auto' }}
+                            exit={{ opacity: 0, scale: 0.5, height: 0 }}
                             transition={{ duration: 0.5 }}
                         >
                             <TextField
@@ -482,9 +484,10 @@ function Booklist() {
                                 Search
                             </Button>
                         </motion.div>
-                    }</AnimatePresence>
+                    }
+                    </AnimatePresence>
                     {rows}
-                </div>}
+                </div></AnimatePresence>}
             {dataFetched &&
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <Pagination sx={{ marginBottom: 5, marginTop: 5 }} count={pages.length} page={page} onChange={handleChange} />
