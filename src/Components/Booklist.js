@@ -170,6 +170,7 @@ function Booklist() {
 
     const handleChange = (event, value) => {
         sestPage(value);
+        window.scrollTo(0, 0);
     }
 
     const { setSignupMessage, setSignupSuccess, setActionReset, actionReset, typeReset, setTypeReset, msgReset, setMsgReset, setBgrColor, bookDeleted, setBookDeleted, setSecondDrawerOpen, fetchIds, takenIds, setTakenIds, fetchIdsNotLogged } = useContext(AuthContext);
@@ -350,9 +351,9 @@ function Booklist() {
         <AnimatePresence>
             <motion.div key={index} style={mainStyle}
                 layout
-                initial={{ scale: 0.5, height: 0, width: 0 }}
-                animate={{ scale: 1, height: 'auto', width: 'auto' }}
-                exit={{ scale: 0.5, height: 0, width: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{ duration: 0.5 }}
             >
                 {filteredBooks.map((book, indexs) =>
@@ -382,8 +383,6 @@ function Booklist() {
 
                                 </div>
                             </CardActionArea>
-
-
                         </Card>
                         {((sessionStorage.getItem('authorizedUsername') === null && sessionStorage.getItem('cartId') === null) || !takenIds.includes(book.id)) && <Button onClick={() => addToCart(book.id)} endIcon={<AddShoppingCartIcon />} sx={buttonStyle} component={Paper} elevation={10} >
                             Add to Cart
