@@ -169,11 +169,7 @@ function Cart() {
             .then(response => response.json())
             .then(data => {
                 if (data !== null) {
-                    if (data.length === 0) {
-                        setTotal(0);
-                    } else {
-                        setTotal(data[0].total);
-                    }
+                    setTotal(data.total);
                     fetchUser(userId);
                 }
             })
@@ -211,11 +207,7 @@ function Cart() {
             .then(response => response.json())
             .then(data => {
                 if (data !== null) {
-                    if (data.length === 0) {
-                        setTotal(0);
-                    } else {
-                        setTotal(data[0].total);
-                    }
+                    setTotal(data.total);
                     setAddressInfo({
                         firstname: '',
                         lastname: '',

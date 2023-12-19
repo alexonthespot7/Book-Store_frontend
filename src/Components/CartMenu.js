@@ -74,11 +74,7 @@ function CartMenu() {
             .then(response => response.json())
             .then(data => {
                 if (data !== null) {
-                    if (data.length === 0) {
-                        setTotal(0);
-                    } else {
-                        setTotal(data[0].total);
-                    }
+                    setTotal(data.total);
                     setInfoLoaded(true);
                 }
             })
@@ -116,11 +112,7 @@ function CartMenu() {
             .then(response => response.json())
             .then(data => {
                 if (data !== null) {
-                    if (data.length === 0) {
-                        setTotal(0);
-                    } else {
-                        setTotal(data[0].total);
-                    }
+                    setTotal(data.total);
                     setInfoLoaded(true);
                 }
             })
