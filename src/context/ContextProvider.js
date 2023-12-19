@@ -27,7 +27,7 @@ function ContextProvider(props) {
 
     const fetchIds = () => {
         const token = sessionStorage.getItem('jwt');
-        fetch(process.env.REACT_APP_API_URL + 'listids',
+        fetch(process.env.REACT_APP_API_URL + 'booksids',
             {
                 method: 'GET',
                 headers: { 'Authorization': token }
@@ -38,7 +38,7 @@ function ContextProvider(props) {
     }
 
     const fetchIdsNotLogged = (backetid) => {
-        fetch(process.env.REACT_APP_API_URL + 'listids/' + backetid,
+        fetch(process.env.REACT_APP_API_URL + 'booksids/' + backetid,
             {
                 method: 'GET'
             })

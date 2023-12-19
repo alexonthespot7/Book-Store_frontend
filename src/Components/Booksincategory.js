@@ -93,8 +93,8 @@ export default function BooksinCategory({ category, setCartUpdated }) {
     }
 
     const fetchBooksByCat = () => {
-        fetch(process.env.REACT_APP_API_URL + 'books', {
-            method: 'POST',
+        fetch(process.env.REACT_APP_API_URL + 'booksbycategory', {
+            method: 'GET',
             headers:
             {
                 'Content-Type': 'application/json'

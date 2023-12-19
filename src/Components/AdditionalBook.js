@@ -73,7 +73,9 @@ function AdditionalBook({ additionalBook, setAdditionalBook, openAdditional, set
     }
 
     const createCart = (bookid) => {
-        fetch(process.env.REACT_APP_API_URL + 'createbacket')
+        fetch(process.env.REACT_APP_API_URL + 'createbacket', {
+            method: 'POST'
+        })
             .then(response => response.json())
             .then(data => {
                 sessionStorage.setItem('cartId', data.bookid);

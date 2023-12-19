@@ -207,7 +207,7 @@ function Myorders() {
                     </div>
                 </div>}
                 {(dataFetched && orders.length === 0) && <Typography variant='h6' textAlign='left' sx={{ marginTop: 2, marginBottom: 2, marginLeft: 27 }}>You have no orders</Typography>}
-                {!dataFetched && <div style={{ display: 'flex', justifyContent: 'left', alignItems: 'center', marginTop: 100, marginBottom: 100 }}><CircularProgress color="inherit" /></div>}
+                {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 100, marginBottom: 100 }}><CircularProgress color="inherit" /></div>}
             </motion.div>
         </AnimatePresence>
     );

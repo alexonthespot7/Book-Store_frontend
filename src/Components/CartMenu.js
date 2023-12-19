@@ -123,7 +123,7 @@ function CartMenu() {
         const backetId = sessionStorage.getItem('cartId');
         const password = sessionStorage.getItem('cartPass');
         fetch(process.env.REACT_APP_API_URL + 'showcart', {
-            method: 'POST',
+            method: 'GET',
             headers:
             {
                 'Content-Type': 'application/json'
