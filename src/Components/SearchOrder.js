@@ -70,11 +70,11 @@ export default function SearchOrder() {
 
     const findOrder = () => {
         fetch(process.env.REACT_APP_API_URL + 'checkordernumber', {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ bookid: orderInfo.orderNumber, password: orderInfo.orderPassword })
+            body: JSON.stringify({ orderid: orderInfo.orderNumber, password: orderInfo.orderPassword })
         })
             .then(response => {
                 if (response.ok) {

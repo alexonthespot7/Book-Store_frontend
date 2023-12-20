@@ -196,13 +196,13 @@ function Cart() {
     }
 
     const fetchTotalNotLogged = (backetId, password) => {
-        fetch(process.env.REACT_APP_API_URL + 'gettotal', {
-            method: 'POST',
+        fetch(process.env.REACT_APP_API_URL + 'totalofbacket', {
+            method: 'GET',
             headers:
             {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ bookid: backetId, password: password })
+            body: JSON.stringify({ id: backetId, password: password })
         })
             .then(response => response.json())
             .then(data => {
@@ -233,7 +233,7 @@ function Cart() {
             {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ bookid: backetId, password: password })
+            body: JSON.stringify({ id: backetId, password: password })
         })
             .then(response => response.json())
             .then(data => {

@@ -14,12 +14,12 @@ export default function OrderByNumber() {
     const { setBgrColor } = useContext(AuthContext);
 
     const fetchOrder = () => {
-        fetch(process.env.REACT_APP_API_URL + 'ordersbypassword', {
+        fetch(process.env.REACT_APP_API_URL + 'orderbypassword', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ bookid: orderid, password: sessionStorage.getItem('orderPass') })
+            body: JSON.stringify({ orderid: orderid, password: sessionStorage.getItem('orderPass') })
         })
             .then(response => response.json())
             .then(data => {

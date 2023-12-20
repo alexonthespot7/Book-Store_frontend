@@ -22,7 +22,7 @@ function ResetPassword({ openReset, setOpenReset, emailInfo, setEmailInfo, email
 
     const fetchResetPassword = (emailForm) => {
         fetch(process.env.REACT_APP_API_URL + 'resetpassword', {
-            method: 'POST',
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(emailForm)
         })

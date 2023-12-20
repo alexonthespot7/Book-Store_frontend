@@ -193,7 +193,7 @@ function Booklist() {
         quant += 1;
         const tokenInfo = { 'token': token };
         fetch(process.env.REACT_APP_API_URL + 'verify', {
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -277,7 +277,7 @@ function Booklist() {
         })
             .then(response => response.json())
             .then(data => {
-                sessionStorage.setItem('cartId', data.bookid);
+                sessionStorage.setItem('cartId', data.id);
                 sessionStorage.setItem('cartPass', data.password);
                 addBookForNotLogged(bookid);
             })

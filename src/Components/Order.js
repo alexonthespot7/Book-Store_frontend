@@ -92,7 +92,7 @@ function Order({ order, alignProp, marginProp }) {
     }
 
     const fetchProductsInOrder = () => {
-        fetch(process.env.REACT_APP_API_URL + 'booksinbacket/' + order.orderid,
+        fetch(process.env.REACT_APP_API_URL + 'booksinorder/' + order.orderid,
             {
                 method: 'GET'
             })

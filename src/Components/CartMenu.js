@@ -101,13 +101,13 @@ function CartMenu() {
     }
 
     const fetchTotalNotLogged = (backetId, password) => {
-        fetch(process.env.REACT_APP_API_URL + 'gettotal', {
-            method: 'POST',
+        fetch(process.env.REACT_APP_API_URL + 'totalofbacket', {
+            method: 'GET',
             headers:
             {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ bookid: backetId, password: password })
+            body: JSON.stringify({ id: backetId, password: password })
         })
             .then(response => response.json())
             .then(data => {
@@ -128,7 +128,7 @@ function CartMenu() {
             {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ bookid: backetId, password: password })
+            body: JSON.stringify({ id: backetId, password: password })
         })
             .then(response => response.json())
             .then(data => {
@@ -163,7 +163,7 @@ function CartMenu() {
             {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ bookid: id, password: password })
+                body: JSON.stringify({ id: id, password: password })
             })
             .then(response => {
                 if (response.ok) {
@@ -287,13 +287,13 @@ function CartMenu() {
         const backetId = sessionStorage.getItem('cartId');
         const password = sessionStorage.getItem('cartPass');
 
-        fetch(process.env.REACT_APP_API_URL + 'reduceitem/' + backetId, {
-            method: 'POST',
+        fetch(process.env.REACT_APP_API_URL + 'reduceitemnoauth/' + backetId, {
+            method: 'PUT',
             headers:
             {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ bookid: id, password: password })
+            body: JSON.stringify({ id: id, password: password })
         })
             .then(response => {
                 if (response.ok) {

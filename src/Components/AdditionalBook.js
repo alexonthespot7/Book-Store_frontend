@@ -78,7 +78,7 @@ function AdditionalBook({ additionalBook, setAdditionalBook, openAdditional, set
         })
             .then(response => response.json())
             .then(data => {
-                sessionStorage.setItem('cartId', data.bookid);
+                sessionStorage.setItem('cartId', data.id);
                 sessionStorage.setItem('cartPass', data.password);
                 addBookForNotLogged(bookid);
             })
