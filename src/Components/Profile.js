@@ -216,7 +216,7 @@ function Profile() {
         const token = sessionStorage.getItem('jwt');
 
         fetch(process.env.REACT_APP_API_URL + 'changepassword', {
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': token

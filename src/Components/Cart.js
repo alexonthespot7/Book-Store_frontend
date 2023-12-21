@@ -160,7 +160,7 @@ function Cart() {
     }
 
     const fetchTotal = (token, userId) => {
-        fetch(process.env.REACT_APP_API_URL + 'getcurrtotal',
+        fetch(process.env.REACT_APP_API_URL + 'getcurrenttotal',
             {
                 method: 'GET',
                 headers: { 'Authorization': token }

@@ -65,7 +65,7 @@ function CartMenu() {
     const authorTitleSize = defineAuthorTitleSize();
 
     const fetchTotal = (token) => {
-        fetch(process.env.REACT_APP_API_URL + 'getcurrtotal',
+        fetch(process.env.REACT_APP_API_URL + 'getcurrenttotal',
             {
                 method: 'GET',
                 headers: { 'Authorization': token }
@@ -190,7 +190,7 @@ function CartMenu() {
 
             fetch(process.env.REACT_APP_API_URL + 'deleteitem/' + id,
                 {
-                    method: 'GET',
+                    method: 'DELETE',
                     headers: { 'Authorization': token }
                 })
                 .then(response => {
@@ -314,7 +314,7 @@ function CartMenu() {
         if (sessionStorage.getItem('authorizedUsernmae') !== null) {
             const token = sessionStorage.getItem('jwt');
             fetch(process.env.REACT_APP_API_URL + 'reduceitem/' + id, {
-                method: 'GET',
+                method: 'PUT',
                 headers:
                 {
                     'Authorization': token
