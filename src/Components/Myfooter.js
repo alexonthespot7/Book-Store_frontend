@@ -28,7 +28,7 @@ function Bottom() {
   const pSize = definePSize();
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 0, marginTop: -20, color: 'white' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 0, marginTop: 0, color: 'white' }}>
       <p style={{ fontSize: pSize }}>©Axos inc. 2023</p>
       <p style={{ fontSize: pSize }}>aleksei.shevelenkov@gmail.com</p>
     </div>

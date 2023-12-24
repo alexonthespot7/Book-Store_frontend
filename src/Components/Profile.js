@@ -264,7 +264,7 @@ function Profile() {
         if (check) {
             changePassword(passwordInfo);
             setPasswordInfo({
-                username: sessionStorage.getItem('authorizedUsername'),
+                username: sessionStorage.getItem('authorizedId'),
                 oldPassword: '',
                 newPassword: ''
             });

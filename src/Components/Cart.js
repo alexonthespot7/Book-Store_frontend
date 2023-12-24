@@ -197,7 +197,7 @@ function Cart() {
 
     const fetchTotalNotLogged = (backetId, password) => {
         fetch(process.env.REACT_APP_API_URL + 'totalofbacket', {
-            method: 'GET',
+            method: 'POST',
             headers:
             {
                 'Content-Type': 'application/json'
@@ -228,7 +228,7 @@ function Cart() {
         const backetId = sessionStorage.getItem('cartId');
         const password = sessionStorage.getItem('cartPass');
         fetch(process.env.REACT_APP_API_URL + 'showcart', {
-            method: 'GET',
+            method: 'POST',
             headers:
             {
                 'Content-Type': 'application/json'

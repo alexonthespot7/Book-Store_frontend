@@ -135,8 +135,8 @@ function Allcategories() {
 
     const content = filteredCategories.map((category, index) => {
         return (
-            <AnimatePresence>
-                <motion.div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: salesMargin }}
+            <AnimatePresence key={index}>
+                <motion.div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: salesMargin }}
                     layout
                     initial={{ scale: 0.5, height: 0 }}
                     animate={{ scale: 1, height: 'auto' }}
@@ -184,7 +184,7 @@ function Allcategories() {
                 <div style={{ display: 'flex', gap: 8 }}>
                     <Typography
                         variant={typoSize}
-                        style={{ background: "-webkit-linear-gradient(45deg, #fff 70%, #000000 10%)", webkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+                        style={{ background: "-webkit-linear-gradient(45deg, #fff 70%, #000000 10%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
                     >
                         All
                     </Typography>
@@ -238,13 +238,12 @@ function Allcategories() {
 
                         }
                         {(filteredCategories.length > 0) && content}
-                        {(filteredCategories.length === 0 && openSearch) && <Typography color='white' variant='h6' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}>No categories were found for your query: "{searchQuery}"</Typography>}
-                        {(filteredCategories.length === 0 && !openSearch) && <Typography color='white' variant='h6' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}>Please reload the page or visit the website later</Typography>}
+                        {(filteredCategories.length === 0 && openSearch) && <Typography color='white' variant='h6' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '30vh' }}>No categories were found for your query: "{searchQuery}"</Typography>}
+                        {(filteredCategories.length === 0 && !openSearch) && <Typography color='white' variant='h6' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '30vh' }}>Please reload the page or visit the website later</Typography>}
                     </div>
                 </AnimatePresence>
             }
-            {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="thirdary" /></div>}
-
+            {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '30vh' }}><CircularProgress color="thirdary" /></div>}
             <Snackbar open={cartUpdated} autoHideDuration={3000} onClose={() => setCartUpdated(false)}>
                 <Alert onClose={() => setCartUpdated(false)} severity='sidish' sx={{ width: '100%' }}>
                     Book was added to your cart

@@ -94,7 +94,7 @@ export default function BooksinCategory({ category, setCartUpdated }) {
 
     const fetchBooksByCat = () => {
         fetch(process.env.REACT_APP_API_URL + 'booksbycategory', {
-            method: 'GET',
+            method: 'POST',
             headers:
             {
                 'Content-Type': 'application/json'
@@ -170,7 +170,7 @@ export default function BooksinCategory({ category, setCartUpdated }) {
                     <AdditionalBook setCartUpdated={setCartUpdated} additionalBook={additionalBook} setAdditionalBook={setAdditionalBook} openAdditional={openAdditional} setOpenAdditional={setOpenAdditional} />
                 </div >
             )}
-            {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 22, marginBottom: 22 }}><CircularProgress color="thirdary" /></div>}
+            {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2.5vh', marginBottom: '2.5vh' }}><CircularProgress color="thirdary" /></div>}
         </Carousel>
     )
 }

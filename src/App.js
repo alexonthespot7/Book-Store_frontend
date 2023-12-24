@@ -120,7 +120,7 @@ function App() {
 
   return (
     <div className="App">
-      <Box sx={{ display: 'flex' }} >
+      <Box sx={{ display: 'flex', minHeight: '75vh' }} >
         <MuiAppBar position="fixed" sx={{ backgroundColor: 'black' }}>
           <Toolbar style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
             <div style={{ position: 'absolute', left: myIndent - indentMinus, display: 'flex', alignItems: 'center' }}>
@@ -166,7 +166,7 @@ function App() {
           <Divider />
           <List>
             {pages.map((value, index) => (
-              <ListItem button onClick={handleDrawerClose} component={Link} to={setLink(value)} >
+              <ListItem key={index} onClick={handleDrawerClose} component={Link} to={setLink(value)} >
                 <ListItemIcon>
                   {index === 0 && <MenuBookIcon color='sidish' />}
                   {index === 1 && <CategoryIcon color='sidish' />}
@@ -178,7 +178,7 @@ function App() {
           <Divider />
           <List>
             {adminPages.map((value, index) => (
-              <ListItem button onClick={handleDrawerClose} component={Link} to={setLink(value)} >
+              <ListItem key={index} onClick={handleDrawerClose} component={Link} to={setLink(value)} >
                 <ListItemIcon>
                   {index === 0 && <CategoryIcon color='sidish' />}
                   {index === 1 && <GroupIcon color='sidish' />}

@@ -159,7 +159,7 @@ export default function Book() {
         slideCount,
         slidesToShow,
     }) => {
-        if (!(currentSlide + slidesToShow === slideCount)) {
+        if (!(currentSlide + slidesToShow === slideCount) && (topSales.length >= slidesToShow)) {
             return (
                 <IconButton
                     style={{ right: arrowMargin }}
@@ -438,6 +438,8 @@ export default function Book() {
         }
     }
 
+    const carouselStyle = (topSales.length < slidesToShow) ? { display: 'flex', justifyContent: 'center', width: '60vw' } : { width: '60vw' };
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -492,26 +494,25 @@ export default function Book() {
                     </div>
                 </div>
                 {topSales.length > 0 && <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: salesMargin }}>
-                    <Typography variant={titleSize} sx={{ color: 'white', fontFamily: 'serif', marginBottom: 2.5 }} >Top Sales</Typography>
-                    <div style={{ width: carouselWidth }}>
-                        <Carousel
-                            dragging={false}
-                            slidesToShow={slidesToShow}
-                            speed={1250}
-                            renderCenterRightControls={renderCenterRightControls}
-                            renderCenterLeftControls={renderCenterLeftControls}
-                            defaultControlsConfig={{
-                                pagingDotsStyle: {
-                                    display: 'none'
-                                }
-                            }}
-                        >
-                            {newRows}
-                        </Carousel>
-                    </div>
+                    <Typography variant={titleSize} sx={{ color: 'white', fontFamily: 'serif', marginBottom: '2.5vh' }} >Top Sales</Typography>
+                    <Carousel
+                        dragging={false}
+                        slidesToShow={slidesToShow}
+                        speed={1250}
+                        renderCenterRightControls={renderCenterRightControls}
+                        renderCenterLeftControls={renderCenterLeftControls}
+                        defaultControlsConfig={{
+                            pagingDotsStyle: {
+                                display: 'none'
+                            }
+                        }}
+                        style={carouselStyle}
+                    >
+                        {newRows}
+                    </Carousel>
                 </div >}
             </div >}
-            {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 100, marginBottom: 100 }}><CircularProgress color="inherit" /></div>}
+            {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '30vh' }}><CircularProgress color="inherit" /></div>}
             <Snackbar open={bookEdited} autoHideDuration={3000} onClose={() => setBookEdited(false)}>
                 <Alert onClose={() => setBookEdited(false)} severity="success" sx={{ width: '100%' }}>
                     Book info was updated successfully!

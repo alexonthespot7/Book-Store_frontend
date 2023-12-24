@@ -70,7 +70,7 @@ export default function SearchOrder() {
 
     const findOrder = () => {
         fetch(process.env.REACT_APP_API_URL + 'checkordernumber', {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },

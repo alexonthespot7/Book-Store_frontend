@@ -102,7 +102,7 @@ function CartMenu() {
 
     const fetchTotalNotLogged = (backetId, password) => {
         fetch(process.env.REACT_APP_API_URL + 'totalofbacket', {
-            method: 'GET',
+            method: 'POST',
             headers:
             {
                 'Content-Type': 'application/json'
@@ -123,7 +123,7 @@ function CartMenu() {
         const backetId = sessionStorage.getItem('cartId');
         const password = sessionStorage.getItem('cartPass');
         fetch(process.env.REACT_APP_API_URL + 'showcart', {
-            method: 'GET',
+            method: 'POST',
             headers:
             {
                 'Content-Type': 'application/json'
@@ -159,11 +159,11 @@ function CartMenu() {
     const deleteBookNotLogged = (id) => {
         const backetId = sessionStorage.getItem('cartId');
         const password = sessionStorage.getItem('cartPass');
-        fetch(process.env.REACT_APP_API_URL + 'deletebook/' + backetId,
+        fetch(process.env.REACT_APP_API_URL + 'deletebook/' + id,
             {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: id, password: password })
+                body: JSON.stringify({ id: backetId, password: password })
             })
             .then(response => {
                 if (response.ok) {
@@ -287,13 +287,13 @@ function CartMenu() {
         const backetId = sessionStorage.getItem('cartId');
         const password = sessionStorage.getItem('cartPass');
 
-        fetch(process.env.REACT_APP_API_URL + 'reduceitemnoauth/' + backetId, {
+        fetch(process.env.REACT_APP_API_URL + 'reduceitemnoauth/' + id, {
             method: 'PUT',
             headers:
             {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ id: id, password: password })
+            body: JSON.stringify({ id: backetId, password: password })
         })
             .then(response => {
                 if (response.ok) {

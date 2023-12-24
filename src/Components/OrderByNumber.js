@@ -15,7 +15,7 @@ export default function OrderByNumber() {
 
     const fetchOrder = () => {
         fetch(process.env.REACT_APP_API_URL + 'orderbypassword', {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },

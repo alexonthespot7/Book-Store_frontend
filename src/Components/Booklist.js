@@ -350,8 +350,8 @@ function Booklist() {
 
     const rows = divs.map((number, index) =>
         (divsPerPage * (page - 1) <= index && index < divsPerPage * page) &&
-        <AnimatePresence>
-            <motion.div key={index} style={mainStyle}
+        <AnimatePresence key={index}>
+            <motion.div style={mainStyle}
                 layout
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -360,7 +360,7 @@ function Booklist() {
             >
                 {filteredBooks.map((book, indexs) =>
                     (itemsPerDiv * number <= indexs && indexs < itemsPerDiv * (number + 1)) &&
-                    <div>
+                    <div key={indexs}>
                         <Card
                             style={cardStyle}
                             elevation={10}
@@ -494,8 +494,7 @@ function Booklist() {
                     <Pagination sx={{ marginBottom: 5, marginTop: 5 }} count={pages.length} page={page} onChange={handleChange} />
                 </div>
             }
-            {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="inherit" /></div>}
-
+            {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20vh' }}><CircularProgress color="inherit" /></div>}
             <Snackbar
                 open={bookDeleted}
                 autoHideDuration={3000}

@@ -45,7 +45,7 @@ function Login({ open, setOpen, usernameError, setUsernameError,
 
     const loginUser = (creds) => {
         fetch(process.env.REACT_APP_API_URL + 'login', {
-            method: 'GET',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(creds)
         })
