@@ -13,9 +13,9 @@ function ContextProvider(props) {
 
     const [takenIds, setTakenIds] = useState([]);
 
-    const matchesSmall = useMediaQuery("(min-width: 550px)");
+    const matches550px = useMediaQuery("(min-width: 550px)");
 
-    const dialogueWidth = matchesSmall ? 419 : '86%';
+    const dialogueWidth = matches550px ? 419 : '86%';
 
     const fetchIds = () => {
         const token = sessionStorage.getItem('jwt');

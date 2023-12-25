@@ -51,16 +51,9 @@ function ResetPassword({ openReset, setOpenReset }) {
         } else {
             alert('Something is wrong with the server');
         }
-        return null;
     }
 
     const handleGoodResponse = (response) => {
-        if (response.status === 206) {
-            setOpenSnackbar(true);
-            setSnackbarMessage('The email service is not working at the moment');
-            closeResetDialog();
-            return null;
-        }
         setOpenSnackbar(true);
         setSnackbarMessage('A temporary password was sent to your email address');
         closeResetDialog();
@@ -75,6 +68,7 @@ function ResetPassword({ openReset, setOpenReset }) {
             });
             if (!response.ok) {
                 handleBadResponse(response);
+                return null;
             }
             handleGoodResponse(response);
         } catch (error) {

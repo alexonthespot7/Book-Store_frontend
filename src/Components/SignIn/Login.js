@@ -20,15 +20,10 @@ const initialIsError = {
     password: false,
 }
 
-const initialErrorText = {
-    username: '',
-    password: ''
-}
-
-function Login({ loginButtonSize }) {
+function Login({ buttonSize }) {
     const [user, setUser] = useState(initialUser);
     const [isError, setIsError] = useState(initialIsError);
-    const [errorText, setErrorText] = useState(initialErrorText);
+    const [errorText, setErrorText] = useState(initialUser);
     const [openLoginDialog, setOpenLoginDialog] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [openReset, setOpenReset] = useState(false);
@@ -45,7 +40,7 @@ function Login({ loginButtonSize }) {
         setErrorText({ ...errorText, [event.target.name]: '' });
     }
 
-    const badResponseHandling = (response) => {
+    const handleBadResponse = (response) => {
         if (response.status === 404) {
             setLoading(false);
             setIsError({ ...isError, username: true });
@@ -61,15 +56,9 @@ function Login({ loginButtonSize }) {
         } else {
             alert('Something is wrong with the server');
         }
-        return null;
     }
 
     const handleGoodResponse = (response) => {
-        if (response.status === 206) {
-            setOpenSnackbar(true);
-            setSnackbarMessage('Your account was verified automatically, you can login now');
-            return null;
-        }
         sessionStorage.clear();
         const jwtToken = response.headers.get('Authorization');
         const authenticatedId = response.headers.get('Host');
@@ -92,7 +81,8 @@ function Login({ loginButtonSize }) {
                 body: JSON.stringify(user)
             });
             if (!response.ok) {
-                badResponseHandling(response);
+                handleBadResponse(response);
+                return null;
             }
 
             handleGoodResponse(response);
@@ -111,7 +101,7 @@ function Login({ loginButtonSize }) {
             }
         }
         setIsError(initialIsError);
-        setErrorText(initialErrorText);
+        setErrorText(initialUser);
         setLoading(true);
         fetchLoginUser();
     }
@@ -131,12 +121,13 @@ function Login({ loginButtonSize }) {
         setOpenLoginDialog(true);
         setUser(initialUser);
         setIsError(initialIsError);
-        setErrorText(initialErrorText);
+        setErrorText(initialUser);
+        setShowPassword(false);
     }
 
     return (
         <div>
-            <Button size={loginButtonSize} onClick={handleOpenLoginDialog} startIcon={<LoginIcon />} color="inherit">
+            <Button size={buttonSize} onClick={handleOpenLoginDialog} startIcon={<LoginIcon />} color="inherit">
                 Login
             </Button>
             {!loading &&

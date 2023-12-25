@@ -212,6 +212,7 @@ function Booklist() {
     }
 
     useEffect(() => {
+        // sessionStorage.clear();
         setBgrColor('#FFFAFA');
         fetchBooks();
         if (sessionStorage.getItem('authorizedUsername') !== null) {
