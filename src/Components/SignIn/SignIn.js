@@ -32,50 +32,27 @@ export default function SignIn() {
     const [pwdErrorSignup, setPwdErrorSignup] = useState(false);
     const [pwdHelperSignup, setPwdHelperSignup] = useState('');
     const [openSignup, setOpenSignup] = useState(false);
-
-    const [user, setUser] = useState({
-        username: '',
-        password: '',
-    });
-    const [open, setOpen] = useState(false);
-    const [usernameError, setUsernameError] = useState(false);
-    const [usernameHelper, setUsernameHelper] = useState('');
-    const [pwdError, setPwdError] = useState(false);
-    const [pwdHelper, setPwdHelper] = useState('');
+    const [anchorEl, setAnchorEl] = React.useState(null);
 
     const { setCartDrawerOpen } = useContext(AuthContext);
 
-    const [anchorEl, setAnchorEl] = React.useState(null);
     const openMenu = Boolean(anchorEl);
 
-    const matchesFirst = useMediaQuery("(min-width: 1028px)");
+    const matches1028px = useMediaQuery("(min-width: 1028px)");
+    const matches870px = useMediaQuery("(min-width: 870px)");
+    const matches450px = useMediaQuery("(min-width: 450px)");
+    const matches300px = useMediaQuery("(min-width: 300px)");
 
-    const matchesSecond = useMediaQuery("(min-width: 870px)");
+    const myGap = matches1028px ? 8 : 0;
 
-    const matchesFourth = useMediaQuery("(min-width: 450px)");
-
-    const matchesFifth = useMediaQuery("(min-width: 300px)");
-
-    const myGap = matchesFirst ? 8 : 0;
+    const loginButtonSize = matches870px ? 'medium' : 'small';
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
-    };
+    }
 
     const handleClose = () => {
         setAnchorEl(null);
-    };
-
-    const handleClickOpen = () => {
-        setOpen(true);
-        setUser({
-            username: '',
-            password: ''
-        });
-        setPwdError(false);
-        setPwdHelper('');
-        setUsernameError(false);
-        setUsernameHelper('');
     }
 
     const handleClickOpenSignup = () => {
@@ -100,19 +77,11 @@ export default function SignIn() {
         setPwdCheck('');
     }
 
-    if (matchesSecond) {
+    if (matches870px) {
         return (
             <div style={{ display: 'flex', flexDirection: 'row', gap: myGap }}>
                 <div>
-                    <Button size='medium' onClick={handleClickOpen} startIcon={<LoginIcon />} color="inherit">
-                        Login
-                    </Button>
-                    <Login open={open} setOpen={setOpen} usernameError={usernameError}
-                        setUsernameError={setUsernameError} usernameHelper={usernameHelper}
-                        setUsernameHelper={setUsernameHelper} pwdError={pwdError}
-                        setPwdError={setPwdError} pwdHelper={pwdHelper} setPwdHelper={setPwdHelper}
-                        user={user} setUser={setUser}
-                    />
+                    <Login loginButtonSize={loginButtonSize} />
                 </div>
                 <div>
                     <Button size='medium' onClick={handleClickOpenSignup} startIcon={<ExitToAppIcon />} color="inherit">
@@ -140,15 +109,14 @@ export default function SignIn() {
     } else {
         return (
             <div style={{ display: 'flex', flexDirection: 'row' }}>
-                <Button sx={{ marginRight: matchesFifth ? 0 : -1 }} onClick={handleClick} variant='text' endIcon={<ExitToAppIcon />} color='inherit'>
-                    {matchesFourth && 'Sign in'}
+                <Button sx={{ marginRight: matches300px ? 0 : -1 }} onClick={handleClick} variant='text' endIcon={<ExitToAppIcon />} color='inherit'>
+                    {matches450px && 'Sign in'}
                 </Button>
                 <Menu
                     anchorEl={anchorEl}
                     id="account-menu"
                     open={openMenu}
                     onClose={handleClose}
-                    onClick={handleClose}
                     PaperProps={{
                         elevation: 0,
                         sx: {
@@ -179,38 +147,29 @@ export default function SignIn() {
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
                     <MenuItem>
-                        <Button size='small' onClick={handleClickOpen} startIcon={<LoginIcon />} color="inherit">
-                            Login
-                        </Button>
-
+                        <Login loginButtonSize={loginButtonSize} />
                     </MenuItem>
                     <MenuItem>
                         <Button size='small' onClick={handleClickOpenSignup} startIcon={<ExitToAppIcon />} color="inherit">
                             Sign up
                         </Button>
-
+                        <Signup userSignup={userSignup} setUserSignup={setUserSignup} pwdCheck={pwdCheck}
+                            setPwdCheck={setPwdCheck} firstnameError={firstnameError} setFirstnameError={setFirstnameError}
+                            firstnameHelper={firstnameHelper} setFirstnameHelper={setFirstnameHelper} usernameErrorSignup={usernameErrorSignup}
+                            lastnameError={lastnameError} setLastnameError={setLastnameError} lastnameHelper={lastnameHelper}
+                            setLastnameHelper={setLastnameHelper} emailError={emailError} setEmailError={setEmailError}
+                            emailHelper={emailHelper} setEmailHelper={setEmailHelper}
+                            setUsernameErrorSignup={setUsernameErrorSignup} usernameHelperSignup={usernameHelperSignup}
+                            setUsernameHelperSignup={setUsernameHelperSignup} pwdErrorSignup={pwdErrorSignup}
+                            setPwdErrorSignup={setPwdErrorSignup} pwdHelperSignup={pwdHelperSignup}
+                            setPwdHelperSignup={setPwdHelperSignup} openSignup={openSignup} setOpenSignup={setOpenSignup}
+                        />
                     </MenuItem>
                 </Menu>
                 <IconButton size='small' onClick={() => setCartDrawerOpen(true)}>
                     <ShoppingCartOutlinedIcon color='thirdary' />
                 </IconButton>
-                <Login open={open} setOpen={setOpen} usernameError={usernameError}
-                    setUsernameError={setUsernameError} usernameHelper={usernameHelper}
-                    setUsernameHelper={setUsernameHelper} pwdError={pwdError}
-                    setPwdError={setPwdError} pwdHelper={pwdHelper} setPwdHelper={setPwdHelper}
-                    user={user} setUser={setUser}
-                />
-                <Signup userSignup={userSignup} setUserSignup={setUserSignup} pwdCheck={pwdCheck}
-                    setPwdCheck={setPwdCheck} firstnameError={firstnameError} setFirstnameError={setFirstnameError}
-                    firstnameHelper={firstnameHelper} setFirstnameHelper={setFirstnameHelper} usernameErrorSignup={usernameErrorSignup}
-                    lastnameError={lastnameError} setLastnameError={setLastnameError} lastnameHelper={lastnameHelper}
-                    setLastnameHelper={setLastnameHelper} emailError={emailError} setEmailError={setEmailError}
-                    emailHelper={emailHelper} setEmailHelper={setEmailHelper}
-                    setUsernameErrorSignup={setUsernameErrorSignup} usernameHelperSignup={usernameHelperSignup}
-                    setUsernameHelperSignup={setUsernameHelperSignup} pwdErrorSignup={pwdErrorSignup}
-                    setPwdErrorSignup={setPwdErrorSignup} pwdHelperSignup={pwdHelperSignup}
-                    setPwdHelperSignup={setPwdHelperSignup} openSignup={openSignup} setOpenSignup={setOpenSignup}
-                />
+
             </div>
         );
     }

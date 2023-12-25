@@ -10,6 +10,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import AuthContext from "../../context/AuthContext";
 import useMediaQuery from "../../Hooks/useMediaQuery";
+import LoadingDialog from "../LoadingDialog";
 
 function Signup({ userSignup, setUserSignup, pwdCheck, setPwdCheck, firstnameError, setFirstnameError,
     firstnameHelper, setFirstnameHelper, usernameErrorSignup, lastnameError, setLastnameError,
@@ -265,12 +266,9 @@ function Signup({ userSignup, setUserSignup, pwdCheck, setPwdCheck, firstnameErr
                     <Button color='sidish' sx={{ "&:hover": { filter: 'brightness(40%)' }, transition: '0.45s' }} variant='outlined' onClick={handleClose}>Cancel</Button>
                 </DialogActions>
             </Dialog>}
-            {progress && <Dialog style={{ margin: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }} open={openSignup} onClose={handleClose} >
-                <DialogTitle>Sign up</DialogTitle>
-                <DialogContent style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: dialogueWidth, height: 300 }}>
-                    <CircularProgress color='sidish' size={80} />
-                </DialogContent>
-            </Dialog>}
+            {progress &&
+                <LoadingDialog title='Sign up' open={openSignup} onClose={handleClose} />
+            }
         </div>
 
     )
