@@ -8,8 +8,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-import AuthContext from "../context/AuthContext";
-import useMediaQuery from "../Hooks/useMediaQuery";
+import AuthContext from "../../context/AuthContext";
+import useMediaQuery from "../../Hooks/useMediaQuery";
 
 function Signup({ userSignup, setUserSignup, pwdCheck, setPwdCheck, firstnameError, setFirstnameError,
     firstnameHelper, setFirstnameHelper, usernameErrorSignup, lastnameError, setLastnameError,

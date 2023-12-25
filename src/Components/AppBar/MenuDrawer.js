@@ -8,8 +8,8 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 
 import { Link } from 'react-router-dom';
 
-export default function MenuDrawer({ DrawerHeader, matchesFirstSize, menuDrawerOpen, setMenuDrawerOpen }) {
-    const drawerWidth = matchesFirstSize ? 300 : '100%';
+export default function MenuDrawer({ DrawerHeader, matches400px, menuDrawerOpen, setMenuDrawerOpen }) {
+    const drawerWidth = matches400px ? 300 : '100%';
 
     const handleDrawerClose = () => {
         setMenuDrawerOpen(false);

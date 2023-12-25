@@ -1,7 +1,7 @@
 import { DialogActions, DialogContent, IconButton, InputAdornment, Paper, TextField } from "@mui/material";
 import { useContext, useState } from "react";
 
-import AuthContext from "../context/AuthContext";
+import AuthContext from "../../context/AuthContext";
 
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -9,8 +9,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CircularProgress from '@mui/material/CircularProgress';
 
-import ResetPassword from "./ResetPassword";
-import useMediaQuery from "../Hooks/useMediaQuery";
+import ResetPassword from "../ResetPassword";
+import useMediaQuery from "../../Hooks/useMediaQuery";
 
 function Login({ open, setOpen, usernameError, setUsernameError,
     usernameHelper, setUsernameHelper, pwdError, setPwdError, pwdHelper, setPwdHelper,
@@ -26,9 +26,9 @@ function Login({ open, setOpen, usernameError, setUsernameError,
 
     const [progress, setProgress] = useState(false);
 
-    const matches350 = useMediaQuery("(min-width: 350px)");
+    const matches350px = useMediaQuery("(min-width: 350px)");
 
-    const inputSize = matches350 ? 'medium' : 'small';
+    const inputSize = matches350px ? 'medium' : 'small';
 
     const { setOpenSnackbar, setSnackbarMessage, dialogueWidth } = useContext(AuthContext);
 
@@ -136,57 +136,59 @@ function Login({ open, setOpen, usernameError, setUsernameError,
 
     return (
         <div>
-            {!progress && <Dialog style={{ margin: 'auto', width: '100%', height: '100%' }} open={open} onClose={handleClose}>
-                <DialogTitle>Login</DialogTitle>
-                <DialogContent style={{ display: 'flex', flexDirection: 'column' }}>
-                    <TextField
-                        size={inputSize}
-                        color="sidish"
-                        fullWidth
-                        value={user.username}
-                        type='text'
-                        margin='dense'
-                        error={usernameError}
-                        helperText={usernameHelper}
-                        name='username'
-                        label="Username or Email"
-                        variant='outlined'
-                        onChange={inputChanged}
-                    />
-                    <TextField
-                        size={inputSize}
-                        color="sidish"
-                        fullWidth
-                        value={user.password}
-                        margin='dense'
-                        error={pwdError}
-                        helperText={pwdHelper}
-                        type={showPassword ? 'text' : 'password'}
-                        name='password'
-                        label='Password'
-                        variant='outlined'
-                        onChange={inputChanged}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        onClick={handleClickShowPassword}
-                                        onMouseDown={handleMouseDownPassword}
-                                        edge="end"
-                                    >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                </DialogContent>
-                <DialogActions style={{ marginTop: -20 }}>
-                    <Button size='small' color='sidish' variant="text" onClick={handleReset}>forgot password?</Button>
-                    <Button size="small" color='sidish' sx={{ color: 'white', "&:hover": { filter: 'brightness(50%)', backgroundColor: '#303030' }, transition: '0.45s' }} variant='contained' onClick={login}>Login</Button>
-                    <Button size='small' color='sidish' sx={{ "&:hover": { filter: 'brightness(40%)' }, transition: '0.45s' }} variant='outlined' onClick={handleClose}>Cancel</Button>
-                </DialogActions>
-            </Dialog>}
+            {!progress &&
+                <Dialog style={{ margin: 'auto', width: '100%', height: '100%' }} open={open} onClose={handleClose}>
+                    <DialogTitle>Login</DialogTitle>
+                    <DialogContent style={{ display: 'flex', flexDirection: 'column' }}>
+                        <TextField
+                            size={inputSize}
+                            color="sidish"
+                            fullWidth
+                            value={user.username}
+                            type='text'
+                            margin='dense'
+                            error={usernameError}
+                            helperText={usernameHelper}
+                            name='username'
+                            label="Username or Email"
+                            variant='outlined'
+                            onChange={inputChanged}
+                        />
+                        <TextField
+                            size={inputSize}
+                            color="sidish"
+                            fullWidth
+                            value={user.password}
+                            margin='dense'
+                            error={pwdError}
+                            helperText={pwdHelper}
+                            type={showPassword ? 'text' : 'password'}
+                            name='password'
+                            label='Password'
+                            variant='outlined'
+                            onChange={inputChanged}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={handleClickShowPassword}
+                                            onMouseDown={handleMouseDownPassword}
+                                            edge="end"
+                                        >
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+                    </DialogContent>
+                    <DialogActions style={{ marginTop: -20 }}>
+                        <Button size='small' color='sidish' variant="text" onClick={handleReset}>forgot password?</Button>
+                        <Button size="small" color='sidish' sx={{ color: 'white', "&:hover": { filter: 'brightness(50%)', backgroundColor: '#303030' }, transition: '0.45s' }} variant='contained' onClick={login}>Login</Button>
+                        <Button size='small' color='sidish' sx={{ "&:hover": { filter: 'brightness(40%)' }, transition: '0.45s' }} variant='outlined' onClick={handleClose}>Cancel</Button>
+                    </DialogActions>
+                </Dialog>
+            }
             {progress && <Dialog style={{ margin: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }} open={open} onClose={handleClose} >
                 <DialogTitle>Login</DialogTitle>
                 <DialogContent style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: dialogueWidth, height: 300 }}>

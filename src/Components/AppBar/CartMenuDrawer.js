@@ -8,10 +8,10 @@ import AuthContext from '../../context/AuthContext';
 import CartMenu from '../CartMenu';
 
 
-export default function CartMenuDrawer({ DrawerHeader, matchesFirstSize }) {
+export default function CartMenuDrawer({ DrawerHeader, matches400px }) {
     const { cartDrawerOpen, setCartDrawerOpen } = useContext(AuthContext);
 
-    const secondDrawerWidth = matchesFirstSize ? 350 : '100%';
+    const secondDrawerWidth = matches400px ? 350 : '100%';
 
     return (
         <Drawer

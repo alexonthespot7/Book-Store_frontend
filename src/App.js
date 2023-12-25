@@ -35,8 +35,8 @@ function App() {
 
   const { openSnackbar, setOpenSnackbar, snackbarMessage, bgrColor } = useContext(AuthContext);
 
-  const matchesFirstSize = useMediaQuery("(min-width: 400px)");
-  const matchesSecondSize = useMediaQuery("(min-width: 350px)");
+  const matches400px = useMediaQuery("(min-width: 400px)");
+  const matches350px = useMediaQuery("(min-width: 350px)");
 
   // useEffect(() => {
   //   sessionStorage.clear();
@@ -47,20 +47,20 @@ function App() {
     <div className="App">
       <Box sx={{ display: 'flex', minHeight: '75vh' }} >
         <MyAppBar
-          matchesFirstSize={matchesFirstSize}
-          matchesSecondSize={matchesSecondSize}
+          matches400px={matches400px}
+          matches350px={matches350px}
           menuDrawerOpen={menuDrawerOpen}
           setMenuDrawerOpen={setMenuDrawerOpen}
         />
         <MenuDrawer
           DrawerHeader={DrawerHeader}
-          matchesFirstSize={matchesFirstSize}
+          matches400px={matches400px}
           menuDrawerOpen={menuDrawerOpen}
           setMenuDrawerOpen={setMenuDrawerOpen}
         />
         <CartMenuDrawer
           DrawerHeader={DrawerHeader}
-          matchesFirstSize={matchesFirstSize}
+          matches400px={matches400px}
         />
         <Main style={{ display: 'flex', flexDirection: 'column', backgroundColor: bgrColor }} >
           <DrawerHeader />

@@ -9,8 +9,8 @@ import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import Login from './Login';
 import Signup from './Signup';
 
-import useMediaQuery from '../Hooks/useMediaQuery';
-import AuthContext from '../context/AuthContext';
+import useMediaQuery from '../../Hooks/useMediaQuery';
+import AuthContext from '../../context/AuthContext';
 
 export default function SignIn() {
     const [userSignup, setUserSignup] = useState({
@@ -182,11 +182,13 @@ export default function SignIn() {
                         <Button size='small' onClick={handleClickOpen} startIcon={<LoginIcon />} color="inherit">
                             Login
                         </Button>
+
                     </MenuItem>
                     <MenuItem>
                         <Button size='small' onClick={handleClickOpenSignup} startIcon={<ExitToAppIcon />} color="inherit">
                             Sign up
                         </Button>
+
                     </MenuItem>
                 </Menu>
                 <IconButton size='small' onClick={() => setCartDrawerOpen(true)}>
@@ -210,6 +212,6 @@ export default function SignIn() {
                     setPwdHelperSignup={setPwdHelperSignup} openSignup={openSignup} setOpenSignup={setOpenSignup}
                 />
             </div>
-        )
+        );
     }
 }

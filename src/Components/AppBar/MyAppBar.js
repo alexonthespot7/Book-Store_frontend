@@ -7,16 +7,17 @@ import { useNavigate } from 'react-router-dom';
 
 import SearchOrder from '../SearchOrder';
 import Logout from '../Logout';
-import SignIn from '../SignIn';
+import SignIn from '../SignIn/SignIn';
+
 
 export default function MyAppBar({
-    matchesFirstSize, matchesSecondSize,
+    matches400px, matches350px,
     menuDrawerOpen, setMenuDrawerOpen
 }) {
     const navigate = useNavigate();
 
-    const barElementsHorizontalIndent = matchesFirstSize ? 25 : matchesSecondSize ? 20 : 5;
-    const headerSize = matchesFirstSize ? 'h5' : 'h6';
+    const barElementsHorizontalIndent = matches400px ? 25 : matches350px ? 20 : 5;
+    const headerSize = matches400px ? 'h5' : 'h6';
 
     const handleDrawerOpen = () => {
         setMenuDrawerOpen(true);
