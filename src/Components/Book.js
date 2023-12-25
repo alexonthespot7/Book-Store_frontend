@@ -217,16 +217,14 @@ export default function Book() {
         category: null
     });
     const [dataFetched, setDataFetched] = useState(false);
-    const [bookEdited, setBookEdited] = useState(false);
     const [topSales, setTopSales] = useState([]);
-    const [cartUpdated, setCartUpdated] = useState(false);
 
     const [openAdditional, setOpenAdditional] = useState(false);
     const [additionalBook, setAdditionalBook] = useState(null);
 
     const [quantity, setQuantity] = useState(1);
 
-    const { setBgrColor, setBookDeleted, setCartDrawerOpen } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, setBgrColor, setCartDrawerOpen } = useContext(AuthContext);
 
     let { bookid } = useParams();
 
@@ -296,7 +294,8 @@ export default function Book() {
             .then(response => {
                 if (response.ok) {
                     fetchBook();
-                    setBookEdited(true);
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('The book was updated');
                 } else {
                     alert('Something went wrong during the book update');
                 }
@@ -323,7 +322,8 @@ export default function Book() {
                         let previousPictureRef = ref(storage, book.url);
                         deleteObject(previousPictureRef)
                             .then(() => {
-                                setBookDeleted(true);
+                                setOpenSnackbar(true);
+                                setSnackbarMessage('The book was deleted successfully');
                                 navigate("/");
                             })
                             .catch(err => console.error(err));
@@ -363,7 +363,7 @@ export default function Book() {
             <Paper style={newPriceHolder} elevation={0}>
                 {currencyFormatter(sale.price, '€')}
             </Paper>
-            <AdditionalBook setCartUpdated={setCartUpdated} additionalBook={additionalBook} setAdditionalBook={setAdditionalBook} openAdditional={openAdditional} setOpenAdditional={setOpenAdditional} />
+            <AdditionalBook additionalBook={additionalBook} setAdditionalBook={setAdditionalBook} openAdditional={openAdditional} setOpenAdditional={setOpenAdditional} />
         </div >
     );
 
@@ -381,7 +381,8 @@ export default function Book() {
             .then(response => {
                 if (response.ok) {
                     setCartDrawerOpen(true);
-                    setCartUpdated(true);
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('The book was added to your cart');
                 } else {
                     alert('Something went wrong during adding book into the cart');
                 }
@@ -427,7 +428,8 @@ export default function Book() {
                 .then(response => {
                     if (response.ok) {
                         setCartDrawerOpen(true);
-                        setCartUpdated(true);
+                        setOpenSnackbar(true);
+                        setSnackbarMessage('Book was added to your cart');
                     } else {
                         alert('Something went wrong during adding the book into cart');
                     }
@@ -513,16 +515,6 @@ export default function Book() {
                 </div >}
             </div >}
             {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '30vh' }}><CircularProgress color="inherit" /></div>}
-            <Snackbar open={bookEdited} autoHideDuration={3000} onClose={() => setBookEdited(false)}>
-                <Alert onClose={() => setBookEdited(false)} severity="success" sx={{ width: '100%' }}>
-                    Book info was updated successfully!
-                </Alert>
-            </Snackbar>
-            <Snackbar open={cartUpdated} autoHideDuration={3000} onClose={() => setCartUpdated(false)}>
-                <Alert onClose={() => setCartUpdated(false)} severity='sidish' sx={{ width: '100%' }}>
-                    Book was added to your cart
-                </Alert>
-            </Snackbar>
         </motion.div>
     )
 }

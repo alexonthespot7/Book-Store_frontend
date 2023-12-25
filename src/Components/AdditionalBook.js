@@ -43,7 +43,7 @@ function AdditionalBook({ additionalBook, setAdditionalBook, openAdditional, set
     const [dataFetched, setDataFetched] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
-    const { setCartDrawerOpen, setAction, setActionMsg } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, setCartDrawerOpen } = useContext(AuthContext);
 
     useEffect(() => {
         if (additionalBook !== null) {
@@ -100,8 +100,8 @@ function AdditionalBook({ additionalBook, setAdditionalBook, openAdditional, set
                 if (response.ok) {
                     handleClose();
                     setCartDrawerOpen(true);
-                    setAction(true);
-                    setActionMsg('The book was added to cart')
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('The book was added to cart')
                 } else {
                     alert('Something went wrong during adding book into the cart');
                 }
@@ -135,8 +135,8 @@ function AdditionalBook({ additionalBook, setAdditionalBook, openAdditional, set
                     if (response.ok) {
                         handleClose();
                         setCartDrawerOpen(true);
-                        setAction(true);
-                        setActionMsg('The book was added to cart');
+                        setOpenSnackbar(true);
+                        setSnackbarMessage('The book was added to cart');
                     } else {
                         alert('Something went wrong during adding new category');
                     }

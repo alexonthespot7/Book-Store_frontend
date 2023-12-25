@@ -13,7 +13,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
 const newPriceHolder = { borderRadius: '25px', width: 78, height: 24, backgroundColor: 'white', color: 'black', display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: 'display', fontSize: 14 };
 
-export default function BooksinCategory({ category, setCartUpdated }) {
+export default function BooksinCategory({ category }) {
     const [books, setBooks] = useState([]);
     const [dataFetched, setDataFetched] = useState(false);
 
@@ -167,7 +167,7 @@ export default function BooksinCategory({ category, setCartUpdated }) {
                     <Paper style={newPriceHolder} elevation={0}>
                         {currencyFormatter(book.price, '€')}
                     </Paper>
-                    <AdditionalBook setCartUpdated={setCartUpdated} additionalBook={additionalBook} setAdditionalBook={setAdditionalBook} openAdditional={openAdditional} setOpenAdditional={setOpenAdditional} />
+                    <AdditionalBook additionalBook={additionalBook} setAdditionalBook={setAdditionalBook} openAdditional={openAdditional} setOpenAdditional={setOpenAdditional} />
                 </div >
             )}
             {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2.5vh', marginBottom: '2.5vh' }}><CircularProgress color="thirdary" /></div>}

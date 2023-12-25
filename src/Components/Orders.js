@@ -19,9 +19,8 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 export default function Orders() {
     const [orders, setOrders] = useState([]);
-    const [orderEdited, setOrderEdited] = useState(false);
 
-    const { setBgrColor } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, setBgrColor } = useContext(AuthContext);
 
     const gridRef = useRef();
 
@@ -60,7 +59,8 @@ export default function Orders() {
             .then(response => {
                 if (response.ok) {
                     fetchOrders();
-                    setOrderEdited(true);
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('The order info was updated')
                 } else {
                     alert('Something went wrong during the order update');
                 }
@@ -182,11 +182,6 @@ export default function Orders() {
                 suppressCellFocus={true}
                 animateRows="true"
             />
-            <Snackbar open={orderEdited} autoHideDuration={3000} onClose={() => setOrderEdited(false)}>
-                <Alert onClose={() => setOrderEdited(false)} severity="sidish" sx={{ width: '100%' }}>
-                    Order info was updated successfully!
-                </Alert>
-            </Snackbar>
         </motion.div>
     )
 }

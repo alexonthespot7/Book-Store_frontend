@@ -8,19 +8,8 @@ function ContextProvider(props) {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
 
-    const [authorize, setAuthorize] = useState(null);
-    const [authorizedUsername, setAuthorizedUsername] = useState('');
-    const [signupMessage, setSignupMessage] = useState('');
-    const [signupSuccess, setSignupSuccess] = useState(false);
-
-    const [actionReset, setActionReset] = useState(false);
-    const [typeReset, setTypeReset] = useState('');
-    const [msgReset, setMsgReset] = useState('');
     const [bgrColor, setBgrColor] = useState('#FFFAFA');
-    const [bookDeleted, setBookDeleted] = useState(false);
     const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
-    const [action, setAction] = useState(false);
-    const [actionMsg, setActionMsg] = useState('');
 
     const [takenIds, setTakenIds] = useState([]);
 
@@ -53,12 +42,8 @@ function ContextProvider(props) {
     return (
         <AuthContext.Provider value={{
             openSnackbar, setOpenSnackbar, snackbarMessage, setSnackbarMessage,
-            authorize, setAuthorize, authorizedUsername, setAuthorizedUsername,
-            signupMessage, setSignupMessage, signupSuccess, setSignupSuccess, dialogueWidth,
-            actionReset, setActionReset, typeReset, setTypeReset, msgReset, setMsgReset,
-            bgrColor, setBgrColor, bookDeleted, setBookDeleted, cartDrawerOpen, setCartDrawerOpen,
-            fetchIds, takenIds, setTakenIds, action, setAction, actionMsg, setActionMsg, fetchIdsNotLogged
-
+            dialogueWidth, bgrColor, setBgrColor, cartDrawerOpen, setCartDrawerOpen,
+            fetchIds, takenIds, setTakenIds, fetchIdsNotLogged
         }}>
             {props.children}
         </AuthContext.Provider>

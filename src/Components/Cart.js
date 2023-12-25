@@ -4,7 +4,7 @@ import React, { useContext, useState, useEffect, useMemo } from 'react';
 
 import MuiAlert from '@mui/material/Alert';
 
-import { Button, Card, CardActionArea, CircularProgress, Divider, Paper, Snackbar, TextField, Typography } from '@mui/material';
+import { Button, Card, CardActionArea, CircularProgress, Divider, Paper, TextField, Typography } from '@mui/material';
 
 import EastIcon from '@mui/icons-material/East';
 
@@ -21,10 +21,6 @@ import { createSearchParams, Navigate } from 'react-router-dom';
 import useMediaQuery from '../Hooks/useMediaQuery';
 
 const defaultFont = 16;
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
 
 const buttonProceedStyle = {
     transition: '0.4s',
@@ -62,12 +58,10 @@ function Cart() {
     const [openInCart, setOpenInCart] = useState(false);
 
     const [method, setMethod] = useState('');
-    const [error, setError] = useState(false);
-    const [errorMsg, setErrorMsg] = useState('');
 
     const options = useMemo(() => countryList().getData(), []);
 
-    const { setBgrColor } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, setBgrColor } = useContext(AuthContext);
 
     const matchesM = useMediaQuery("(min-width: 850px)");
     const matchesS = useMediaQuery("(min-width: 440px)");
@@ -291,38 +285,38 @@ function Cart() {
 
         if (addressInfo.firstname === '') {
             check = false;
-            setError(true);
-            setErrorMsg('Please fill in the firstname');
+            setOpenSnackbar(true);
+            setSnackbarMessage('Please fill in the firstname');
         }
         if (addressInfo.lastname === '') {
             check = false;
-            setError(true);
-            setErrorMsg('Please fill in the lastname to proceed')
+            setOpenSnackbar(true);
+            setSnackbarMessage('Please fill in the lastname to proceed')
         }
         if (addressInfo.email === '') {
             check = false;
-            setError(true);
-            setErrorMsg('Please fill in the email to proceed')
+            setOpenSnackbar(true);
+            setSnackbarMessage('Please fill in the email to proceed')
         }
         if (addressInfo.country === '' && country.label === '') {
             check = false;
-            setError(true);
-            setErrorMsg('Please fill in the country to proceed')
+            setOpenSnackbar(true);
+            setSnackbarMessage('Please fill in the country to proceed')
         }
         if (addressInfo.city === '') {
             check = false;
-            setError(true);
-            setErrorMsg('Please fill in the city to proceed')
+            setOpenSnackbar(true);
+            setSnackbarMessage('Please fill in the city to proceed')
         }
         if (addressInfo.street === '') {
             check = false;
-            setError(true);
-            setErrorMsg('Please fill in the address to proceed')
+            setOpenSnackbar(true);
+            setSnackbarMessage('Please fill in the address to proceed')
         }
         if (addressInfo.postcode === '') {
             check = false;
-            setError(true);
-            setErrorMsg('Please fill in the postocode to proceed')
+            setOpenSnackbar(true);
+            setSnackbarMessage('Please fill in the postocode to proceed')
         }
 
         if (check) {
@@ -399,8 +393,8 @@ function Cart() {
 
         if (method === '') {
             check = false;
-            setError(true);
-            setErrorMsg('Please choose payment method');
+            setOpenSnackbar(true);
+            setSnackbarMessage('Please choose payment method');
         }
         if (check);
         setInfoLoaded(false);
@@ -621,11 +615,6 @@ function Cart() {
                     />
                 }
                 {!infoLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="inherit" /></div>}
-                <Snackbar open={error} autoHideDuration={3000} onClose={() => setError(false)}>
-                    <Alert onClose={() => setError(false)} severity='sidish' sx={{ width: '100%' }}>
-                        {errorMsg}
-                    </Alert>
-                </Snackbar>
             </motion.div>
         </AnimatePresence >
     );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 
 import MuiAlert from '@mui/material/Alert';
-import { Button, CircularProgress, IconButton, InputAdornment, Paper, Snackbar, TextField, Typography } from "@mui/material";
+import { Button, CircularProgress, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
 
 import SearchIcon from '@mui/icons-material/Search';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
@@ -12,16 +12,9 @@ import useMediaQuery from "../Hooks/useMediaQuery";
 import AuthContext from "../context/AuthContext";
 import BooksinCategory from "./Booksincategory";
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
 function Allcategories() {
     const [categories, setCategories] = useState([]);
     const [dataFetched, setDataFetched] = useState(false);
-
-    const [cartUpdated, setCartUpdated] = useState(false);
-
 
     const [searchNow, setSearchNow] = useState('');
     const [openSearch, setOpenSearch] = useState(false);
@@ -145,7 +138,7 @@ function Allcategories() {
                 >
                     <Typography variant={titleSize} sx={{ color: 'white', fontFamily: 'serif', marginBottom: 2.5 }} >{category.name}</Typography>
                     <div style={{ width: carouselWidth }}>
-                        <BooksinCategory category={category} setCartUpdated={setCartUpdated} />
+                        <BooksinCategory category={category} />
                     </div>
                 </motion.div>
             </AnimatePresence>
@@ -244,11 +237,6 @@ function Allcategories() {
                 </AnimatePresence>
             }
             {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '30vh' }}><CircularProgress color="thirdary" /></div>}
-            <Snackbar open={cartUpdated} autoHideDuration={3000} onClose={() => setCartUpdated(false)}>
-                <Alert onClose={() => setCartUpdated(false)} severity='sidish' sx={{ width: '100%' }}>
-                    Book was added to your cart
-                </Alert>
-            </Snackbar>
         </motion.div >
 
     );

@@ -24,7 +24,7 @@ function Signup({ userSignup, setUserSignup, pwdCheck, setPwdCheck, firstnameErr
 
     const inputSize = matches350 ? 'medium' : 'small';
 
-    const { setSignupMessage, setSignupSuccess, dialogueWidth } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, dialogueWidth } = useContext(AuthContext);
 
     const inputChanged = (event) => {
         if (event.target.name === 'pwdcheck') {
@@ -70,8 +70,8 @@ function Signup({ userSignup, setUserSignup, pwdCheck, setPwdCheck, firstnameErr
                         password: '',
                     });
                     setProgress(false);
-                    setSignupSuccess(true);
-                    setSignupMessage('The verification link has been sent to your email');
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('The verification link has been sent to your email');
                     setOpenSignup(false);
                 } else if (response.status === 409) {
                     setProgress(false);

@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import MuiAlert from '@mui/material/Alert';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
@@ -74,16 +72,9 @@ const imageDiv = {
     marginTop: 15
 }
 
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
 function Booklist() {
     const [dataFetched, setDataFetched] = useState(false);
     const [books, setBooks] = useState([]);
-    const [bookAdded, setBookAdded] = useState(false);
-    const [cartUpdated, setCartUpdated] = useState(false);
     const [page, setPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchNow, setSearchNow] = useState('');
@@ -170,14 +161,14 @@ function Booklist() {
         window.scrollTo(0, 0);
     }
 
-    const { setSignupMessage, setSignupSuccess, setActionReset, actionReset, typeReset, setTypeReset, msgReset, setMsgReset, setBgrColor, bookDeleted, setBookDeleted, setCartDrawerOpen, fetchIds, takenIds, setTakenIds, fetchIdsNotLogged } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, setBgrColor, setCartDrawerOpen, fetchIds, takenIds, setTakenIds, fetchIdsNotLogged } = useContext(AuthContext);
 
     const fetchBooks = async () => {
         try {
             const response = await fetch(process.env.REACT_APP_API_URL + 'books');
             if (!response.ok) {
-                setSignupMessage('Something went wrong');
-                setSignupSuccess(true);
+                setSnackbarMessage('Something went wrong');
+                setOpenSnackbar(true);
                 return null;
             }
             response.json()
@@ -187,8 +178,8 @@ function Booklist() {
                 })
                 .catch(err => console.error(err));
         } catch (error) {
-            setSignupMessage('Something went wrong');
-            setSignupSuccess(true);
+            setSnackbarMessage('Something went wrong');
+            setOpenSnackbar(true);
         }
     }
 
@@ -209,11 +200,11 @@ function Booklist() {
             .then(response => {
                 if (response.ok) {
                     navigate('/');
-                    setSignupSuccess(true);
-                    setSignupMessage('Your account was successfully verified. You can login now!');
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('Your account was successfully verified. You can login now!');
                 } else {
-                    setSignupSuccess(true);
-                    setSignupMessage('Verification code is incorrect or you are already verified');
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('Verification code is incorrect or you are already verified');
                     navigate('/');
                 }
             })
@@ -234,9 +225,8 @@ function Booklist() {
             checkToken(searchParams.get('token'));
         }
         if (searchParams.get('cart')) {
-            setActionReset(true);
-            setTypeReset('sidish');
-            setMsgReset('Your cart is empty now!');
+            setOpenSnackbar(true);
+            setSnackbarMessage('Your cart is empty now!');
             navigate('/');
         }
     }, []);
@@ -270,7 +260,8 @@ function Booklist() {
             .then(response => {
                 if (response.ok) {
                     fetchBooks();
-                    setBookAdded(true);
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('New book was added successfully');
                 } else {
                     alert('Something went wrong during adding the book');
                 }
@@ -307,7 +298,8 @@ function Booklist() {
                     fetchBooks();
                     fetchIdsNotLogged(backetId);
                     setCartDrawerOpen(true);
-                    setCartUpdated(true);
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('The book was added to your cart');
                 } else {
                     alert('Something went wrong during adding book into the cart');
                 }
@@ -342,7 +334,8 @@ function Booklist() {
                         fetchBooks();
                         fetchIds();
                         setCartDrawerOpen(true);
-                        setCartUpdated(true);
+                        setOpenSnackbar(true);
+                        setSnackbarMessage('The book was added to your cart');
                     } else {
                         alert('Something went wrong during adding book into the cart');
                     }
@@ -502,28 +495,6 @@ function Booklist() {
                 </div>
             }
             {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20vh' }}><CircularProgress color="inherit" /></div>}
-            <Snackbar
-                open={bookDeleted}
-                autoHideDuration={3000}
-                onClose={() => setBookDeleted(false)}
-                message='Book was deleted successfully'
-            />
-            <Snackbar open={bookAdded} autoHideDuration={3000} onClose={() => setBookAdded(false)}>
-                <Alert onClose={() => setBookAdded(false)} severity="success" sx={{ width: '100%' }}>
-                    New book was added successfully!
-                </Alert>
-            </Snackbar>
-
-            <Snackbar open={actionReset} autoHideDuration={3000} onClose={() => setActionReset(false)}>
-                <Alert onClose={() => setActionReset(false)} severity={typeReset} sx={{ width: '100%' }}>
-                    {msgReset}
-                </Alert>
-            </Snackbar>
-            <Snackbar open={cartUpdated} autoHideDuration={3000} onClose={() => setCartUpdated(false)}>
-                <Alert onClose={() => setCartUpdated(false)} severity='sidish' sx={{ width: '100%' }}>
-                    Book was added to your cart
-                </Alert>
-            </Snackbar>
         </motion.div>
     );
 }

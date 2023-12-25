@@ -41,7 +41,7 @@ function CartMenu() {
     const [bookInCart, setBookInCart] = useState(null);
     const [openInCart, setOpenInCart] = useState(false);
 
-    const { action, setAction, actionMsg, setActionMsg, setActionReset, setTypeReset, setMsgReset, setCartDrawerOpen, fetchIds, fetchIdsNotLogged } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, setCartDrawerOpen, fetchIds, fetchIdsNotLogged } = useContext(AuthContext);
 
     const matchesFifth = useMediaQuery("(min-width: 310px)");
     const matchesSixth = useMediaQuery("(min-width: 305px)");
@@ -167,19 +167,19 @@ function CartMenu() {
             })
             .then(response => {
                 if (response.ok) {
-                    setAction(true);
-                    setActionMsg('Book was deleted from your cart');
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('Book was deleted from your cart');
                     fetchCartByBacketId();
                     fetchIdsNotLogged(backetId);
                     fetchTotalNotLogged(backetId, password);
                 } else {
-                    setAction(true);
-                    setActionMsg('Cannot delete book right now');
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('Cannot delete book right now');
                 }
             })
             .catch(err => {
-                setAction(true);
-                setActionMsg(err);
+                setOpenSnackbar(true);
+                setSnackbarMessage(err);
             });
     }
 
@@ -195,19 +195,19 @@ function CartMenu() {
                 })
                 .then(response => {
                     if (response.ok) {
-                        setAction(true);
-                        setActionMsg('Book was deleted from your cart');
+                        setOpenSnackbar(true);
+                        setSnackbarMessage('Book was deleted from your cart');
                         fetchCartByUserId();
                         fetchIds();
                         fetchTotal(sessionStorage.getItem('jwt'));
                     } else {
-                        setAction(true);
-                        setActionMsg('Cannot delete book right now');
+                        setOpenSnackbar(true);
+                        setSnackbarMessage('Cannot delete book right now');
                     }
                 })
                 .catch(err => {
-                    setAction(true);
-                    setActionMsg(err);
+                    setOpenSnackbar(true);
+                    setSnackbarMessage(err);
                 });
 
         } else if (sessionStorage.getItem('cartId')) {
@@ -219,8 +219,8 @@ function CartMenu() {
 
     const checkout = () => {
         if (total === 0) {
-            setAction(true);
-            setActionMsg('There are no products in the cart');
+            setOpenSnackbar(true);
+            setSnackbarMessage('There are no products in the cart');
         } else {
             setCartDrawerOpen(false);
             navigate('/cart');
@@ -244,8 +244,8 @@ function CartMenu() {
                     fetchIdsNotLogged(backetId);
                     fetchTotalNotLogged(backetId, password);
                     setQuantityChanges(false);
-                    setAction(true);
-                    setActionMsg('Item in your cart was changed');
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('Item in your cart was changed');
                 } else {
                     alert('Something went wrong during adding book quantity');
                 }
@@ -271,8 +271,8 @@ function CartMenu() {
                         fetchCartByUserId();
                         fetchTotal(sessionStorage.getItem('jwt'));
                         setQuantityChanges(false);
-                        setAction(true);
-                        setActionMsg('Item in your cart was changed');
+                        setOpenSnackbar(true);
+                        setSnackbarMessage('Item in your cart was changed');
                     } else {
                         alert('Something went wrong during adding book quantity');
                     }
@@ -301,8 +301,8 @@ function CartMenu() {
                     fetchIdsNotLogged(backetId);
                     fetchTotalNotLogged(backetId, password);
                     setQuantityChanges(false);
-                    setAction(true);
-                    setActionMsg('Item in your cart was changed');
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('Item in your cart was changed');
                 } else {
                     alert('Something went wrong during reducing the book quantity');
                 }
@@ -326,8 +326,8 @@ function CartMenu() {
                         fetchCartByUserId();
                         fetchTotal(sessionStorage.getItem('jwt'));
                         setQuantityChanges(false);
-                        setAction(true);
-                        setActionMsg('Item in your cart was changed');
+                        setOpenSnackbar(true);
+                        setSnackbarMessage('Item in your cart was changed');
                     } else {
                         alert('Something went wrong during reducing the book quantity');
                     }
@@ -429,11 +429,6 @@ function CartMenu() {
                 </div>
             }
             {!infoLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 10, marginBottom: 10 }}><CircularProgress color="sidish" /></div>}
-            <Snackbar open={action} autoHideDuration={3000} onClose={() => setAction(false)}>
-                <Alert onClose={() => setAction(false)} severity='sidish' sx={{ width: '100%' }}>
-                    {actionMsg}
-                </Alert>
-            </Snackbar>
         </div>
     )
 }

@@ -25,10 +25,9 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 function Users() {
     const [users, setUsers] = useState([]);
-    const [userEdited, setUserEdited] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    const { setBgrColor } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, setBgrColor } = useContext(AuthContext);
 
     const gridRef = useRef();
 
@@ -71,7 +70,8 @@ function Users() {
             .then(response => {
                 if (response.ok) {
                     fetchUsers()
-                    setUserEdited(true);
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('User info was updated successfully');
                 } else {
                     alert('Something went wrong during the user role update');
                 }
@@ -177,11 +177,6 @@ function Users() {
                 />
             }
             {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="inherit" /></div>}
-            <Snackbar open={userEdited} autoHideDuration={3000} onClose={() => setUserEdited(false)}>
-                <Alert onClose={() => setUserEdited(false)} severity="sidish" sx={{ width: '100%' }}>
-                    User info was updated successfully!
-                </Alert>
-            </Snackbar>
         </motion.div>
     )
 }

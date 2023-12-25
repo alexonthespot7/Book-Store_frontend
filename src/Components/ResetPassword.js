@@ -7,7 +7,7 @@ function ResetPassword({ openReset, setOpenReset, emailInfo, setEmailInfo, email
 
     const [loading, setLoading] = useState(false);
 
-    const { setMsgReset, setActionReset, setTypeReset } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage } = useContext(AuthContext);
 
     const inputChanged = (event) => {
         setEmailInfo({ ...emailInfo, [event.target.name]: event.target.value });
@@ -28,31 +28,27 @@ function ResetPassword({ openReset, setOpenReset, emailInfo, setEmailInfo, email
         })
             .then(response => {
                 if (response.ok) {
-                    setActionReset(true);
-                    setTypeReset('success');
-                    setMsgReset('A temporary password was sent to your email address');
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('A temporary password was sent to your email address');
                     setEmailInfo({
                         email: ''
                     });
                     handleClose();
                 } else if (response.status === 401) {
-                    setActionReset(true);
-                    setTypeReset('warning');
-                    setMsgReset(`User with this email (${emailInfo.email}) doesn\'t exist`);
+                    setOpenSnackbar(true);
+                    setSnackbarMessage(`User with this email (${emailInfo.email}) doesn\'t exist`);
                     setEmailError(true);
                     setEmailHelper(`User with this email (${emailInfo.email}) doesn\'t exist`);
                     setLoading(false);
                 } else if (response.status === 409) {
-                    setActionReset(true);
-                    setTypeReset('warning');
-                    setMsgReset(`User with this email (${emailInfo.email}) is not verified`);
+                    setOpenSnackbar(true);
+                    setSnackbarMessage(`User with this email (${emailInfo.email}) is not verified`);
                     setEmailError(true);
                     setEmailHelper(`User with this email (${emailInfo.email}) is not verified`);
                     setLoading(false);
                 } else {
-                    setActionReset(true);
-                    setTypeReset('error');
-                    setMsgReset('Something went wrong');
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('Something went wrong');
                     handleClose();
                 }
             })

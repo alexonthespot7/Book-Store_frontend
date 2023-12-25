@@ -2,8 +2,6 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -11,7 +9,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
 import AuthContext from "../context/AuthContext";
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 import '../App.css'
 
@@ -19,18 +17,11 @@ import Editcategory from './Editcategory';
 import Addcategory from './Addcategory';
 import { CircularProgress } from '@mui/material';
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
 function Categories() {
     const [categories, setCategories] = useState([]);
-    const [categoryDeleted, setCategoryDeleted] = useState(false);
-    const [categoryAdded, setCategoryAdded] = useState(false);
-    const [categoryEdited, setCategoryEdited] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    const { dialogueWidth, setBgrColor } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, dialogueWidth, setBgrColor } = useContext(AuthContext);
 
     useEffect(() => {
         fetchCategories();
@@ -62,7 +53,8 @@ function Categories() {
                     }
                     else {
                         fetchCategories();
-                        setCategoryDeleted(true);
+                        setOpenSnackbar(true);
+                        setSnackbarMessage('The category was deleted');
                     }
                 })
                 .catch(err => console.error(err))
@@ -83,7 +75,8 @@ function Categories() {
             .then(response => {
                 if (response.ok) {
                     fetchCategories();
-                    setCategoryAdded(true);
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('The category was added');
                 } else {
                     alert('Something went wrong during adding new category');
                 }
@@ -104,7 +97,8 @@ function Categories() {
             .then(response => {
                 if (response.ok) {
                     fetchCategories();
-                    setCategoryEdited(true);
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('The category was updated');
                 } else {
                     alert('Something went wrong during the category update');
                 }
@@ -167,22 +161,6 @@ function Categories() {
             <div style={{ display: 'flex', justifyContent: 'end', marginRight: 15 }}>
                 <Addcategory addCategory={addCategory} />
             </div>
-            <Snackbar
-                open={categoryDeleted}
-                autoHideDuration={3000}
-                onClose={() => setCategoryDeleted(false)}
-                message='Category was deleted successfully'
-            />
-            <Snackbar open={categoryAdded} autoHideDuration={3000} onClose={() => setCategoryAdded(false)}>
-                <Alert onClose={() => setCategoryAdded(false)} severity="sidish" sx={{ width: '100%' }}>
-                    New category was added successfully!
-                </Alert>
-            </Snackbar>
-            <Snackbar open={categoryEdited} autoHideDuration={3000} onClose={() => setCategoryEdited(false)}>
-                <Alert onClose={() => setCategoryEdited(false)} severity="sidish" sx={{ width: '100%' }}>
-                    Category info was updated successfully!
-                </Alert>
-            </Snackbar>
         </motion.div>
     )
 }

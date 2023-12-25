@@ -4,8 +4,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import MuiAlert from '@mui/material/Alert';
 import EastIcon from '@mui/icons-material/East';
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AuthContext from "../context/AuthContext";
 
 const thirdDiv = { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginBottom: 8, marginTop: -16 }
 const buttonProceedStyle = {
@@ -28,8 +29,8 @@ export default function SearchOrder() {
         orderPassword: ''
     });
     const [open, setOpen] = useState(false);
-    const [openAlert, setOpenAlert] = useState(false);
-    const [message, setMessage] = useState('');
+
+    const { setOpenSnackbar, setSnackbarMessage } = useContext(AuthContext);
 
     const matchesSecond = useMediaQuery("(min-width: 550px)");
     const matchesS = useMediaQuery("(min-width: 430px)");
@@ -82,8 +83,8 @@ export default function SearchOrder() {
                     navigate('/orders/' + orderInfo.orderNumber);
                     setOpen(false);
                 } else {
-                    setOpenAlert(true);
-                    setMessage('There is no order with that number!');
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('There is no order with that number!');
                 }
             })
             .catch(err => console.error(err));
@@ -93,18 +94,18 @@ export default function SearchOrder() {
         let check = true;
         if (orderInfo.orderNumber === '') {
             check = false;
-            setOpenAlert(true);
-            setMessage('Please type in order number');
+            setOpenSnackbar(true);
+            setSnackbarMessage('Please type in order number');
         }
         if (isNaN(parseInt(orderInfo.orderNumber))) {
             check = false;
-            setOpenAlert(true);
-            setMessage('Order numbers can include only digits');
+            setOpenSnackbar(true);
+            setSnackbarMessage('Order numbers can include only digits');
         }
         if (orderInfo.orderPassword === '') {
             check = false;
-            setOpenAlert(true);
-            setMessage('Please type in order password');
+            setOpenSnackbar(true);
+            setSnackbarMessage('Please type in order password');
         }
         if (check) {
             findOrder();
@@ -159,11 +160,6 @@ export default function SearchOrder() {
                         </div>
                     </div>
                 </DialogContent>
-                <Snackbar open={openAlert} autoHideDuration={3000} onClose={() => setOpenAlert(false)}>
-                    <Alert onClose={() => setOpenAlert(false)} severity='sidish' sx={{ width: '100%' }}>
-                        {message}
-                    </Alert>
-                </Snackbar>
             </Dialog>
         </div>
     );

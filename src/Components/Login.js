@@ -30,7 +30,7 @@ function Login({ open, setOpen, usernameError, setUsernameError,
 
     const inputSize = matches350 ? 'medium' : 'small';
 
-    const { setOpenSnackbar, setSnackbarMessage, setAuthorize, setAuthorizedUsername, dialogueWidth } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, dialogueWidth } = useContext(AuthContext);
 
     const inputChanged = (event) => {
         setUser({ ...user, [event.target.name]: event.target.value });
@@ -62,18 +62,15 @@ function Login({ open, setOpen, usernameError, setUsernameError,
                             username: '',
                             password: ''
                         });
-                        setAuthorize(role);
                         setOpen(false);
                         sessionStorage.removeItem('cartId');
                         sessionStorage.removeItem('cartPass');
                         sessionStorage.setItem('authorizedUsername', creds.username);
-                        setAuthorizedUsername(creds.username);
                         setOpenSnackbar(true);
                         setSnackbarMessage('Login process went successfully');
                         if (sessionStorage.getItem('role') !== null && sessionStorage.getItem('authorizedUsername') !== null && sessionStorage.getItem('authorizedId') !== null) {
                             window.location.reload();
                         }
-
                     }
                 } else if (response.status === 401) {
                     setProgress(false);

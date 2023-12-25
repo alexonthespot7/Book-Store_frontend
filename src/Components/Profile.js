@@ -6,8 +6,6 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
 import RemoveIcon from '@mui/icons-material/Remove';
 
 import AuthContext from "../context/AuthContext";
@@ -22,9 +20,6 @@ import { useMemo } from "react";
 import Myorders from "./Myorders";
 import DialogInfo from "./DialogInfo";
 
-const Alert = forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
 
 function Profile() {
     const [user, setUser] = useState({});
@@ -51,9 +46,6 @@ function Profile() {
 
     const [division, setDivision] = useState('personalData');
 
-    const [errorPersonal, setErrorPersonal] = useState(false);
-    const [textErrorPersonal, setTextErrorPersonal] = useState('');
-
     const [passwordInfo, setPasswordInfo] = useState({
         username: sessionStorage.getItem('authorizedUsername'),
         oldPassword: '',
@@ -66,10 +58,7 @@ function Profile() {
     const [oldPasswordHelper, setOldPasswordHelper] = useState('');
     const [passwordError, setPasswordError] = useState(false);
     const [passwordHelper, setPasswordHelper] = useState('');
-    const [open, setOpen] = useState(false);
-    const [action, setAction] = useState(false);
-    const [msg, setMsg] = useState('');
-    const [type, setType] = useState('sidish');
+    const [openChangePasswordDialog, setOpenChangePasswordDialog] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showCheck, setShowCheck] = useState(false);
     const [showOld, setShowOld] = useState(false);
@@ -139,7 +128,7 @@ function Profile() {
     const widthMinusPannel = matchesX ? 0 : 50;
     const buttonPasswordSize = matchesX ? 'medium' : 'small';
 
-    const { setBgrColor } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, setBgrColor } = useContext(AuthContext);
 
     const options = useMemo(() => countryList().getData(), []);
 
@@ -177,12 +166,12 @@ function Profile() {
         }
     }, []);
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleCloseChangePasswordDialog = () => {
+        setOpenChangePasswordDialog(false);
     }
 
-    const handleOpen = () => {
-        setOpen(true);
+    const handleOpenChangePasswordDialog = () => {
+        setOpenChangePasswordDialog(true);
         setPasswordInfo({
             username: sessionStorage.getItem('authorizedUsername'),
             oldPassword: '',
@@ -227,18 +216,16 @@ function Profile() {
             .then(response => {
                 if (response.ok) {
                     fetchUser();
-                    setAction(true);
-                    setMsg('Password was changed successfully');
-                    setType('sidish');
-                    setOpen(false);
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('Password was changed successfully');
+                    setOpenChangePasswordDialog(false);
                 } else if (response.status === 409) {
                     setOldPasswordError(true);
                     setOldPasswordHelper('Old password is incorrect');
                 } else {
-                    setOpen(false);
-                    setAction(true);
-                    setMsg('You cannot change password at the moment');
-                    setType('sidish');
+                    setOpenChangePasswordDialog(false);
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('You cannot change password at the moment');
                 }
             })
             .catch(err => console.error(err))
@@ -300,9 +287,8 @@ function Profile() {
         })
             .then(response => {
                 if (response.ok) {
-                    setAction(true);
-                    setMsg('Your personal information was updated');
-                    setType('sidish');
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('Your personal information was updated');
                     setAllowChangePersonal(false);
                     setAllowChangeAddress(false);
                     fetchUser();
@@ -315,8 +301,8 @@ function Profile() {
 
     const handleChangePersonal = (event) => {
         if (allowChangePersonal) {
-            setErrorPersonal(false);
-            setTextErrorPersonal('');
+            setOpenSnackbar(false);
+            setSnackbarMessage('');
             setUserUpdate({ ...userUpdate, [event.target.name]: event.target.value });
         }
     }
@@ -326,16 +312,16 @@ function Profile() {
 
         if (userUpdate.firstname === '' && userUpdate.lastname !== '') {
             check = false;
-            setErrorPersonal(true);
-            setTextErrorPersonal('Firstname must not be empty');
+            setOpenSnackbar(true);
+            setSnackbarMessage('Firstname must not be empty');
         } else if (userUpdate.lastname === '' && userUpdate.firstname !== '') {
             check = false;
-            setErrorPersonal(true);
-            setTextErrorPersonal('Lastname must not be empty');
+            setOpenSnackbar(true);
+            setSnackbarMessage('Lastname must not be empty');
         } else if (userUpdate.lastname === '' && userUpdate.firstname === '') {
             check = false;
-            setErrorPersonal(true);
-            setTextErrorPersonal('Please fill in lastname and firstname');
+            setOpenSnackbar(true);
+            setSnackbarMessage('Please fill in lastname and firstname');
         }
         if (check) {
             updateUser();
@@ -644,12 +630,12 @@ function Profile() {
                 </Box>}
                 {(division === 'myOrders') && <Box sx={{ gridArea: 'main', display: 'flex', flexDirection: 'column', gap: 5, alignItems: alignMain }}><Myorders /></Box>}
                 {division !== 'myOrders' && <Box sx={{ gridArea: 'footer', display: 'flex', justifyContent: 'center' }}>
-                    <Button size={buttonPasswordSize} sx={{ borderRadius: '20px', width: 200 - widthMinusFields, height: 35, marginTop: footerMargin, marginBottom: 2.5, "&:hover": { filter: 'brightness(70%)' }, transition: '0.45s' }} variant='contained' color='sidish' onClick={handleOpen}>Change password</Button>
+                    <Button size={buttonPasswordSize} sx={{ borderRadius: '20px', width: 200 - widthMinusFields, height: 35, marginTop: footerMargin, marginBottom: 2.5, "&:hover": { filter: 'brightness(70%)' }, transition: '0.45s' }} variant='contained' color='sidish' onClick={handleOpenChangePasswordDialog}>Change password</Button>
                 </Box>}
             </Box >}
             {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="inherit" /></div>}
 
-            <Dialog open={open} onClose={handleClose}>
+            <Dialog open={openChangePasswordDialog} onClose={handleCloseChangePasswordDialog}>
                 <DialogTitle>Change password</DialogTitle>
                 <DialogContent style={{ display: 'flex', flexDirection: 'column' }}>
                     <TextField
@@ -729,21 +715,11 @@ function Profile() {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button sx={{ transition: '0.45s' }} color='sidish' onClick={handleClose}>Cancel</Button>
+                    <Button sx={{ transition: '0.45s' }} color='sidish' onClick={handleCloseChangePasswordDialog}>Cancel</Button>
                     <Button sx={{ "&:hover": { filter: 'brightness(70%)' }, transition: '0.45s' }} color='sidish' variant='contained' onClick={handleSave}>Save</Button>
                 </DialogActions>
             </Dialog>
             <DialogInfo openInfo={openInfo} setOpenInfo={setOpenInfo} textInfo={textInfo} setTextInfo={setTextInfo} infoField={infoField} setInfoField={setInfoField} />
-            <Snackbar open={action} autoHideDuration={3000} onClose={() => setAction(false)}>
-                <Alert onClose={() => setAction(false)} severity={type} sx={{ width: '100%' }}>
-                    {msg}
-                </Alert>
-            </Snackbar>
-            <Snackbar open={errorPersonal} autoHideDuration={3000} onClose={() => setErrorPersonal(false)}>
-                <Alert onClose={() => setErrorPersonal(false)} severity={type} sx={{ width: '100%' }}>
-                    {textErrorPersonal}
-                </Alert>
-            </Snackbar>
         </motion.div>
     );
 }
