@@ -226,7 +226,7 @@ export default function Book() {
 
     const [quantity, setQuantity] = useState(1);
 
-    const { setBgrColor, setBookDeleted, setSecondDrawerOpen } = useContext(AuthContext);
+    const { setBgrColor, setBookDeleted, setCartDrawerOpen } = useContext(AuthContext);
 
     let { bookid } = useParams();
 
@@ -380,7 +380,7 @@ export default function Book() {
         })
             .then(response => {
                 if (response.ok) {
-                    setSecondDrawerOpen(true);
+                    setCartDrawerOpen(true);
                     setCartUpdated(true);
                 } else {
                     alert('Something went wrong during adding book into the cart');
@@ -426,7 +426,7 @@ export default function Book() {
             })
                 .then(response => {
                     if (response.ok) {
-                        setSecondDrawerOpen(true);
+                        setCartDrawerOpen(true);
                         setCartUpdated(true);
                     } else {
                         alert('Something went wrong during adding the book into cart');

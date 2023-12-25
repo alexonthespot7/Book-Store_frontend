@@ -14,7 +14,7 @@ import useMediaQuery from "../Hooks/useMediaQuery";
 
 function Login({ open, setOpen, usernameError, setUsernameError,
     usernameHelper, setUsernameHelper, pwdError, setPwdError, pwdHelper, setPwdHelper,
-    user, setUser, setAuthorizedSuccess }) {
+    user, setUser }) {
 
     const [showPassword, setShowPassword] = useState(false);
     const [openReset, setOpenReset] = useState(false);
@@ -30,7 +30,7 @@ function Login({ open, setOpen, usernameError, setUsernameError,
 
     const inputSize = matches350 ? 'medium' : 'small';
 
-    const { setAuthorize, setAuthorizedUsername, dialogueWidth } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, setAuthorize, setAuthorizedUsername, dialogueWidth } = useContext(AuthContext);
 
     const inputChanged = (event) => {
         setUser({ ...user, [event.target.name]: event.target.value });
@@ -66,9 +66,10 @@ function Login({ open, setOpen, usernameError, setUsernameError,
                         setOpen(false);
                         sessionStorage.removeItem('cartId');
                         sessionStorage.removeItem('cartPass');
-                        setAuthorizedSuccess(true);
                         sessionStorage.setItem('authorizedUsername', creds.username);
                         setAuthorizedUsername(creds.username);
+                        setOpenSnackbar(true);
+                        setSnackbarMessage('Login process went successfully');
                         if (sessionStorage.getItem('role') !== null && sessionStorage.getItem('authorizedUsername') !== null && sessionStorage.getItem('authorizedId') !== null) {
                             window.location.reload();
                         }

@@ -5,6 +5,9 @@ import AuthContext from "./AuthContext";
 import useMediaQuery from '../Hooks/useMediaQuery';
 
 function ContextProvider(props) {
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+
     const [authorize, setAuthorize] = useState(null);
     const [authorizedUsername, setAuthorizedUsername] = useState('');
     const [signupMessage, setSignupMessage] = useState('');
@@ -15,7 +18,7 @@ function ContextProvider(props) {
     const [msgReset, setMsgReset] = useState('');
     const [bgrColor, setBgrColor] = useState('#FFFAFA');
     const [bookDeleted, setBookDeleted] = useState(false);
-    const [secondDrawerOpen, setSecondDrawerOpen] = useState(false);
+    const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
     const [action, setAction] = useState(false);
     const [actionMsg, setActionMsg] = useState('');
 
@@ -49,10 +52,11 @@ function ContextProvider(props) {
 
     return (
         <AuthContext.Provider value={{
+            openSnackbar, setOpenSnackbar, snackbarMessage, setSnackbarMessage,
             authorize, setAuthorize, authorizedUsername, setAuthorizedUsername,
             signupMessage, setSignupMessage, signupSuccess, setSignupSuccess, dialogueWidth,
             actionReset, setActionReset, typeReset, setTypeReset, msgReset, setMsgReset,
-            bgrColor, setBgrColor, bookDeleted, setBookDeleted, secondDrawerOpen, setSecondDrawerOpen,
+            bgrColor, setBgrColor, bookDeleted, setBookDeleted, cartDrawerOpen, setCartDrawerOpen,
             fetchIds, takenIds, setTakenIds, action, setAction, actionMsg, setActionMsg, fetchIdsNotLogged
 
         }}>

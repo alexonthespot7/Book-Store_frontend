@@ -12,7 +12,7 @@ import Signup from './Signup';
 import useMediaQuery from '../Hooks/useMediaQuery';
 import AuthContext from '../context/AuthContext';
 
-export default function SignIn({ setAuthorizedSuccess }) {
+export default function SignIn() {
     const [userSignup, setUserSignup] = useState({
         firstname: '',
         lastname: '',
@@ -43,7 +43,7 @@ export default function SignIn({ setAuthorizedSuccess }) {
     const [pwdError, setPwdError] = useState(false);
     const [pwdHelper, setPwdHelper] = useState('');
 
-    const { setSecondDrawerOpen } = useContext(AuthContext);
+    const { setCartDrawerOpen } = useContext(AuthContext);
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const openMenu = Boolean(anchorEl);
@@ -111,7 +111,7 @@ export default function SignIn({ setAuthorizedSuccess }) {
                         setUsernameError={setUsernameError} usernameHelper={usernameHelper}
                         setUsernameHelper={setUsernameHelper} pwdError={pwdError}
                         setPwdError={setPwdError} pwdHelper={pwdHelper} setPwdHelper={setPwdHelper}
-                        user={user} setUser={setUser} setAuthorizedSuccess={setAuthorizedSuccess}
+                        user={user} setUser={setUser}
                     />
                 </div>
                 <div>
@@ -131,7 +131,7 @@ export default function SignIn({ setAuthorizedSuccess }) {
                     />
                 </div>
                 <div>
-                    <IconButton size='small' onClick={() => setSecondDrawerOpen(true)}>
+                    <IconButton size='small' onClick={() => setCartDrawerOpen(true)}>
                         <ShoppingCartOutlinedIcon color='thirdary' />
                     </IconButton>
                 </div>
@@ -189,14 +189,14 @@ export default function SignIn({ setAuthorizedSuccess }) {
                         </Button>
                     </MenuItem>
                 </Menu>
-                <IconButton size='small' onClick={() => setSecondDrawerOpen(true)}>
+                <IconButton size='small' onClick={() => setCartDrawerOpen(true)}>
                     <ShoppingCartOutlinedIcon color='thirdary' />
                 </IconButton>
                 <Login open={open} setOpen={setOpen} usernameError={usernameError}
                     setUsernameError={setUsernameError} usernameHelper={usernameHelper}
                     setUsernameHelper={setUsernameHelper} pwdError={pwdError}
                     setPwdError={setPwdError} pwdHelper={pwdHelper} setPwdHelper={setPwdHelper}
-                    user={user} setUser={setUser} setAuthorizedSuccess={setAuthorizedSuccess}
+                    user={user} setUser={setUser}
                 />
                 <Signup userSignup={userSignup} setUserSignup={setUserSignup} pwdCheck={pwdCheck}
                     setPwdCheck={setPwdCheck} firstnameError={firstnameError} setFirstnameError={setFirstnameError}

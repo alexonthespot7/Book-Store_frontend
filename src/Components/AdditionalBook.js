@@ -43,7 +43,7 @@ function AdditionalBook({ additionalBook, setAdditionalBook, openAdditional, set
     const [dataFetched, setDataFetched] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
-    const { setSecondDrawerOpen, setAction, setActionMsg } = useContext(AuthContext);
+    const { setCartDrawerOpen, setAction, setActionMsg } = useContext(AuthContext);
 
     useEffect(() => {
         if (additionalBook !== null) {
@@ -99,7 +99,7 @@ function AdditionalBook({ additionalBook, setAdditionalBook, openAdditional, set
             .then(response => {
                 if (response.ok) {
                     handleClose();
-                    setSecondDrawerOpen(true);
+                    setCartDrawerOpen(true);
                     setAction(true);
                     setActionMsg('The book was added to cart')
                 } else {
@@ -134,7 +134,7 @@ function AdditionalBook({ additionalBook, setAdditionalBook, openAdditional, set
                 .then(response => {
                     if (response.ok) {
                         handleClose();
-                        setSecondDrawerOpen(true);
+                        setCartDrawerOpen(true);
                         setAction(true);
                         setActionMsg('The book was added to cart');
                     } else {

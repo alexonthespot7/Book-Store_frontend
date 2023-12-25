@@ -36,7 +36,7 @@ function BookInCart({ bookInCart, setBookInCart, openInCart, setOpenInCart }) {
 
     const [dataFetched, setDataFetched] = useState(false);
 
-    const { setSecondDrawerOpen } = useContext(AuthContext);
+    const { setCartDrawerOpen } = useContext(AuthContext);
 
     useEffect(() => {
         if (bookInCart !== null) {
@@ -45,7 +45,7 @@ function BookInCart({ bookInCart, setBookInCart, openInCart, setOpenInCart }) {
     }, [bookInCart]);
 
     const handleClose = () => {
-        setSecondDrawerOpen(false);
+        setCartDrawerOpen(false);
         setOpenInCart(false);
         setBookInCart(null);
     }

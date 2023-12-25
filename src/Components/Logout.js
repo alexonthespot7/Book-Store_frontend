@@ -9,13 +9,17 @@ import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import AuthContext from '../context/AuthContext';
 
 import useMediaQuery from '../Hooks/useMediaQuery';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-export default function Logout({ logout }) {
+export default function Logout() {
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const openMenu = Boolean(anchorEl);
 
-    const { authorizedUsername, setSecondDrawerOpen } = useContext(AuthContext);
+    const { setCartDrawerOpen, setOpenSnackbar, setSnackbarMessage } = useContext(AuthContext);
+
+    const navigate = useNavigate();
+
+    const openMenu = Boolean(anchorEl);
+    const username = sessionStorage.getItem('authorizedUsername');
 
     const matchesXXL = useMediaQuery("(min-width: 1700px)");
     const matchesXL = useMediaQuery("(min-width: 1400px)");
@@ -37,26 +41,36 @@ export default function Logout({ logout }) {
         setAnchorEl(null);
     };
 
+    const logout = () => {
+        sessionStorage.removeItem('role');
+        sessionStorage.removeItem('jwt');
+        sessionStorage.removeItem('authorizedUsername');
+        sessionStorage.removeItem('authorizedId');
+        setOpenSnackbar(true);
+        setSnackbarMessage('You\'ve just logged out');
+        navigate('/');
+    }
+
     const showName = () => {
-        if (authorizedUsername.length <= 'ADMIN22'.length) {
+        if (username.length <= 7) {
             if (matchesThird) {
                 return true;
             } else {
                 return false;
             }
-        } else if (authorizedUsername.length <= 'alexonthespot'.length) {
+        } else if (username.length <= 13) {
             if (matchesM) {
                 return true;
             } else {
                 return false;
             }
-        } else if (authorizedUsername.length < 'xxxxxxxxx.xx@xxx.xxxxxx.xx'.length) {
+        } else if (username.length < 26) {
             if (matchesL) {
                 return true;
             } else {
                 return false;
             }
-        } else if (authorizedUsername.length < 'xxxxxxxxxxxxxxx.xx@xxx.xxxxxx.xx'.length) {
+        } else if (username.length < 32) {
             if (matchesXL) {
                 return true;
             } else {
@@ -75,7 +89,7 @@ export default function Logout({ logout }) {
         return (
             <div style={{ display: 'flex', flexDirection: 'row', gap: myGap }}>
                 {showName() && <Button onClick={handleClick} variant='text' startIcon={<AccountCircleIcon />} color='inherit'>
-                    {authorizedUsername}
+                    {username}
                 </Button>}
                 {!showName() && <IconButton onClick={handleClick} color='thirdary'><AccountCircleIcon /></IconButton>}
                 <Menu
@@ -123,7 +137,7 @@ export default function Logout({ logout }) {
                 <Button onClick={logout} endIcon={<LogoutIcon />} color="inherit">
                     Logout
                 </Button>
-                <IconButton onClick={() => setSecondDrawerOpen(true)}>
+                <IconButton onClick={() => setCartDrawerOpen(true)}>
                     <ShoppingCartOutlinedIcon color='thirdary' />
                 </IconButton>
             </div >
@@ -132,7 +146,7 @@ export default function Logout({ logout }) {
         return (
             <div>
                 {matchesThird && showName() && <Button size='small' sx={{ marginRight: !showName() ? 0 : marginSmall }} onClick={handleClick} variant='text' startIcon={<AccountCircleIcon />} color='inherit'>
-                    {authorizedUsername}
+                    {username}
                 </Button>}
                 {!(matchesThird && showName()) && <IconButton size="small" sx={{ marginRight: !showName() ? 0 : marginSmall }} onClick={handleClick} color='thirdary'><AccountCircleIcon /></IconButton>}
                 <Menu
@@ -184,7 +198,7 @@ export default function Logout({ logout }) {
                         </ListItemIcon>
                     </MenuItem>
                 </Menu>
-                <IconButton size='small' onClick={() => setSecondDrawerOpen(true)}>
+                <IconButton size='small' onClick={() => setCartDrawerOpen(true)}>
                     <ShoppingCartOutlinedIcon color='thirdary' />
                 </IconButton>
             </div>

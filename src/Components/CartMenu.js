@@ -41,7 +41,7 @@ function CartMenu() {
     const [bookInCart, setBookInCart] = useState(null);
     const [openInCart, setOpenInCart] = useState(false);
 
-    const { action, setAction, actionMsg, setActionMsg, setActionReset, setTypeReset, setMsgReset, setSecondDrawerOpen, fetchIds, fetchIdsNotLogged } = useContext(AuthContext);
+    const { action, setAction, actionMsg, setActionMsg, setActionReset, setTypeReset, setMsgReset, setCartDrawerOpen, fetchIds, fetchIdsNotLogged } = useContext(AuthContext);
 
     const matchesFifth = useMediaQuery("(min-width: 310px)");
     const matchesSixth = useMediaQuery("(min-width: 305px)");
@@ -222,7 +222,7 @@ function CartMenu() {
             setAction(true);
             setActionMsg('There are no products in the cart');
         } else {
-            setSecondDrawerOpen(false);
+            setCartDrawerOpen(false);
             navigate('/cart');
         }
     }

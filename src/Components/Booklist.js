@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -84,7 +84,7 @@ function Booklist() {
     const [books, setBooks] = useState([]);
     const [bookAdded, setBookAdded] = useState(false);
     const [cartUpdated, setCartUpdated] = useState(false);
-    const [page, sestPage] = useState(1);
+    const [page, setPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchNow, setSearchNow] = useState('');
     const [openSearch, setOpenSearch] = useState(false);
@@ -130,8 +130,6 @@ function Booklist() {
         }
     }
 
-    let truthly = true;
-
     const typoSize = matchesM ? 'h4' : 'h5';
 
     const marg = matchesMidM ? 0 : 10
@@ -164,33 +162,42 @@ function Booklist() {
 
     const divsPerPage = 4;
 
-    //used to use raw books here
     const pages = Array.from({ length: Math.ceil(filteredBooks.length / (divsPerPage * itemsPerDiv)) }, (_, i) => i + 1);
     const divs = Array.from(Array(Math.ceil(filteredBooks.length / itemsPerDiv)).keys());
 
     const handleChange = (event, value) => {
-        sestPage(value);
+        setPage(value);
         window.scrollTo(0, 0);
     }
 
-    const { setSignupMessage, setSignupSuccess, setActionReset, actionReset, typeReset, setTypeReset, msgReset, setMsgReset, setBgrColor, bookDeleted, setBookDeleted, setSecondDrawerOpen, fetchIds, takenIds, setTakenIds, fetchIdsNotLogged } = useContext(AuthContext);
+    const { setSignupMessage, setSignupSuccess, setActionReset, actionReset, typeReset, setTypeReset, msgReset, setMsgReset, setBgrColor, bookDeleted, setBookDeleted, setCartDrawerOpen, fetchIds, takenIds, setTakenIds, fetchIdsNotLogged } = useContext(AuthContext);
 
-    const fetchBooks = () => {
-        fetch(process.env.REACT_APP_API_URL + 'books')
-            .then(response => response.json())
-            .then(data => {
-                setBooks(data);
-                setDataFetched(true);
-            })
-            .catch(err => console.error(err));
+    const fetchBooks = async () => {
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'books');
+            if (!response.ok) {
+                setSignupMessage('Something went wrong');
+                setSignupSuccess(true);
+                return null;
+            }
+            response.json()
+                .then(data => {
+                    setBooks(data);
+                    setDataFetched(true);
+                })
+                .catch(err => console.error(err));
+        } catch (error) {
+            setSignupMessage('Something went wrong');
+            setSignupSuccess(true);
+        }
     }
 
     const navigate = useNavigate();
 
-    let quant = 1;
+    let quantity = 1;
 
     const checkToken = (token) => {
-        quant += 1;
+        quantity += 1;
         const tokenInfo = { 'token': token };
         fetch(process.env.REACT_APP_API_URL + 'verify', {
             method: 'PUT',
@@ -202,7 +209,6 @@ function Booklist() {
             .then(response => {
                 if (response.ok) {
                     navigate('/');
-                    console.log('VERIFICATION: ', quant);
                     setSignupSuccess(true);
                     setSignupMessage('Your account was successfully verified. You can login now!');
                 } else {
@@ -224,7 +230,7 @@ function Booklist() {
         } else {
             setTakenIds([]);
         }
-        if (searchParams.get('token') && quant === 1) {
+        if (searchParams.get('token') && quantity === 1) {
             checkToken(searchParams.get('token'));
         }
         if (searchParams.get('cart')) {
@@ -235,13 +241,14 @@ function Booklist() {
         }
     }, []);
 
-    //used to use raw books here
+    let truthly = true;
+
     if (filteredBooks.length > 0 && truthly) {
         truthly = false;
     }
 
     if (page > pages.length && !truthly) {
-        sestPage(1);
+        setPage(1);
     }
 
     const currencyFormatter = (currency, sign) => {
@@ -299,7 +306,7 @@ function Booklist() {
                 if (response.ok) {
                     fetchBooks();
                     fetchIdsNotLogged(backetId);
-                    setSecondDrawerOpen(true);
+                    setCartDrawerOpen(true);
                     setCartUpdated(true);
                 } else {
                     alert('Something went wrong during adding book into the cart');
@@ -334,7 +341,7 @@ function Booklist() {
                     if (response.ok) {
                         fetchBooks();
                         fetchIds();
-                        setSecondDrawerOpen(true);
+                        setCartDrawerOpen(true);
                         setCartUpdated(true);
                     } else {
                         alert('Something went wrong during adding book into the cart');
@@ -345,8 +352,6 @@ function Booklist() {
             addToNonuserCart(bookid);
         }
     }
-
-    //used to use raw books
 
     const rows = divs.map((number, index) =>
         (divsPerPage * (page - 1) <= index && index < divsPerPage * page) &&
@@ -389,9 +394,11 @@ function Booklist() {
                         {((sessionStorage.getItem('authorizedUsername') === null && sessionStorage.getItem('cartId') === null) || !takenIds.includes(book.id)) && <Button onClick={() => addToCart(book.id)} endIcon={<AddShoppingCartIcon />} sx={buttonStyle} component={Paper} elevation={10} >
                             Add to Cart
                         </Button>}
-                        {takenIds.includes(book.id) && <Button onClick={() => setSecondDrawerOpen(true)} endIcon={<ShoppingCartIcon />} sx={buttonTakenStyle} component={Paper} elevation={10} >
-                            Open Cart
-                        </Button>}
+                        {takenIds.includes(book.id) &&
+                            <Button onClick={() => setCartDrawerOpen(true)} endIcon={<ShoppingCartIcon />} sx={buttonTakenStyle} component={Paper} elevation={10} >
+                                Open Cart
+                            </Button>
+                        }
                     </div>
                 )}
             </motion.div>

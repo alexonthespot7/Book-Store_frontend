@@ -115,7 +115,8 @@ function Profile() {
         gridColumnGap: '1em',
         gridRowGap: '20px',
         gridTemplateColumns: '2fr 6fr',
-        gridTemplateAreas: `"header header"
+        gridTemplateAreas:
+            `"header header"
             "sidebar main"
             "footer footer"`,
     } : {
