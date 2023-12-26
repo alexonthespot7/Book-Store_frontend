@@ -100,7 +100,6 @@ export default function SignIn() {
                 <IconButton size='small' onClick={() => setCartDrawerOpen(true)}>
                     <ShoppingCartOutlinedIcon color='thirdary' />
                 </IconButton>
-
             </div>
         );
     }

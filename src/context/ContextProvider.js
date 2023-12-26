@@ -17,6 +17,12 @@ function ContextProvider(props) {
 
     const dialogueWidth = matches550px ? 419 : '86%';
 
+    const currencyFormatter = (currency, sign) => {
+        let sansDec = currency.toFixed(2);
+        let formatted = sansDec.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return sign + `${formatted}`;
+    }
+
     const fetchIds = () => {
         const token = sessionStorage.getItem('jwt');
         fetch(process.env.REACT_APP_API_URL + 'booksids',
@@ -41,7 +47,7 @@ function ContextProvider(props) {
 
     return (
         <AuthContext.Provider value={{
-            openSnackbar, setOpenSnackbar, snackbarMessage, setSnackbarMessage,
+            currencyFormatter, openSnackbar, setOpenSnackbar, snackbarMessage, setSnackbarMessage,
             dialogueWidth, bgrColor, setBgrColor, cartDrawerOpen, setCartDrawerOpen,
             fetchIds, takenIds, setTakenIds, fetchIdsNotLogged
         }}>

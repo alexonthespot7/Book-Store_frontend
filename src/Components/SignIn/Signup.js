@@ -136,7 +136,7 @@ function Signup({ buttonSize }) {
         }
         if (!isValidEmail(signupForm.email)) {
             setIsError({ ...isError, email: true });
-            setErrorText({ ...errorText, email: 'Please provide a valid email' });
+            setErrorText({ ...errorText, email: 'Please provide a valid email no longer than 34 symbols' });
             return null;
         }
         if (signupForm.username.includes(' ')) {
@@ -146,7 +146,7 @@ function Signup({ buttonSize }) {
         }
         if (signupForm.username.length > 34) {
             setIsError({ ...isError, username: true });
-            setErrorText({ ...errorText, username: 'Username can\'t be that long' });
+            setErrorText({ ...errorText, username: 'Username can\'t be longer than 34 symbols' });
             return null;
         }
 

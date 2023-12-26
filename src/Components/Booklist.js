@@ -1,21 +1,19 @@
-import React, { useState, useEffect, useContext } from 'react';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+import { useState, useEffect, useContext } from 'react';
+
+import { Button, Card, CardActionArea, CircularProgress, IconButton, InputAdornment, Pagination, Paper, TextField, Typography } from '@mui/material';
+
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 
-import useMediaQuery from '../Hooks/useMediaQuery';
-
-import AuthContext from '../context/AuthContext';
-
-import Addbook from './Addbook';
-import '../App.css';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Card, CardActionArea, CircularProgress, IconButton, InputAdornment, Pagination, Paper, TextField } from '@mui/material';
 
 import { AnimatePresence, motion } from 'framer-motion';
+
+import useMediaQuery from '../Hooks/useMediaQuery';
+import AuthContext from '../context/AuthContext';
+import Addbook from './Addbook';
 
 const buttonStyle = {
     transition: '0.4s',
@@ -50,7 +48,6 @@ const cardStyle = {
     borderRadius: '25px',
     display: 'flex',
     flexDirection: 'column',
-
     backgroundColor: 'white',
     width: 200,
     height: 300,
@@ -77,66 +74,163 @@ function Booklist() {
     const [books, setBooks] = useState([]);
     const [page, setPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchNow, setSearchNow] = useState('');
+    const [searchQueryHolder, setSearchQueryHolder] = useState('');
     const [openSearch, setOpenSearch] = useState(false);
 
     const [searchParams, setSearchParams] = useSearchParams({});
 
+    const { currencyFormatter, setOpenSnackbar, setSnackbarMessage, setBgrColor, setCartDrawerOpen, fetchIds, takenIds, setTakenIds, fetchIdsNotLogged } = useContext(AuthContext);
 
-    const matchesXL = useMediaQuery("(min-width: 1200px)");
-    const matchesL = useMediaQuery("(min-width: 1000px)");
-    const matchesM = useMediaQuery("(min-width: 800px)");
-    const matchesMidM = useMediaQuery("(min-width: 600px)");
-    const matchesS = useMediaQuery("(min-width: 500px)");
-    const matchesXS = useMediaQuery("(min-width: 400px)");
-    const matchesXXS = useMediaQuery("(min-width: 300px)");
+    const navigate = useNavigate();
 
-    const defineMarginSearch = () => {
-        if (matchesS) {
-            return 70;
-        } else if (matchesXS) {
-            return 40;
-        } else if (matchesXXS) {
-            return 20;
+    const isAdmin = sessionStorage.getItem('role') === 'ADMIN';
+    const jwtToken = sessionStorage.getItem('jwt');
+    const authorized = sessionStorage.getItem('authorizedUsername') ? true : false;
+
+    const matches1200px = useMediaQuery("(min-width: 1200px)");
+    const matches1000px = useMediaQuery("(min-width: 1000px)");
+    const matches800px = useMediaQuery("(min-width: 800px)");
+    const matches600px = useMediaQuery("(min-width: 600px)");
+    const matches500px = useMediaQuery("(min-width: 500px)");
+    const matches400px = useMediaQuery("(min-width: 400px)");
+    const matches300px = useMediaQuery("(min-width: 300px)");
+
+    const handleBadResponseAddBook = (response) => {
+        if (response.status === 409) {
+            setOpenSnackbar(true);
+            setSnackbarMessage('The duplicate ISBN value is not allowed');
+        } else if (response.status === 500) {
+            sessionStorage.clear();
+            setOpenSnackbar(true);
+            setSnackbarMessage('Please login again to prove your identity');
+            navigate('/');
         } else {
-            return 10;
+            setDataFetched(false);
+            alert('Something is wrong with the server');
         }
     }
 
-    const marginSearch = defineMarginSearch();
+    // Function to add the new book for administrator:
+    const addBook = async (newBook) => {
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'api/books', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': jwtToken
+                },
+                body: JSON.stringify(newBook)
+            });
 
-    const searchSize = matchesS ? 'medium' : 'small';
-
-    const defineItemsPerDiv = () => {
-        if (matchesXL) {
-            return 5;
-        } else if (matchesL) {
-            return 4;
-        } else if (matchesM) {
-            return 3;
-        } else if (matchesS) {
-            return 2;
-        } else {
-            return 1;
+            if (!response.ok) {
+                handleBadResponseAddBook(response);
+                return null;
+            }
+            setDataFetched(false);
+            fetchBooks();
+            setOpenSnackbar(true);
+            setSnackbarMessage('New book was added successfully');
+        } catch (error) {
+            setDataFetched(false);
+            console.error(error);
+            alert('Something is wrong with the server');
         }
     }
 
-    const typoSize = matchesM ? 'h4' : 'h5';
-
-    const marg = matchesMidM ? 0 : 10
-
-    const mainStyle = {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        marginTop: 20,
-        marginBottom: 20,
-        marginLeft: 20 - marg,
-        marginRight: 20 - marg,
+    const fetchBooks = async () => {
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'books');
+            if (!response.ok) {
+                setSnackbarMessage('Something is wrong with the server');
+                setOpenSnackbar(true);
+                return null;
+            }
+            response.json()
+                .then(data => {
+                    setBooks(data);
+                    setDataFetched(true);
+                })
+                .catch(err => {
+                    console.error(err);
+                    setSnackbarMessage('Something is wrong with the server');
+                    setOpenSnackbar(true);
+                });
+        } catch (error) {
+            setSnackbarMessage('Something is wrong with the server');
+            setOpenSnackbar(true);
+        }
     }
 
-    const itemsPerDiv = defineItemsPerDiv();
+    const handleBadResponseVerification = (response) => {
+        if (response.status === 404) {
+            setOpenSnackbar(true);
+            setSnackbarMessage('Verification code is incorrect');
+            navigate('/');
+        } else if (response.status === 409) {
+            setOpenSnackbar(true);
+            setSnackbarMessage('The user is already verified');
+            navigate('/');
+        } else {
+            setDataFetched(false);
+            setOpenSnackbar(true);
+            setSnackbarMessage('Something is wrong with the server');
+            navigate('/');
+        }
+    }
+
+    const fetchVerifyUser = async (token) => {
+        try {
+            const tokenInfo = { 'token': token };
+            const response = await fetch(process.env.REACT_APP_API_URL + 'verify', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(tokenInfo)
+            });
+            if (!response.ok) {
+                handleBadResponseVerification(response);
+                return null;
+            }
+            setOpenSnackbar(true);
+            setSnackbarMessage('Your account was successfully verified. You can login now!');
+            navigate('/');
+        } catch (error) {
+            console.error(error);
+            setOpenSnackbar(true);
+            setSnackbarMessage('Something is wrong with the server');
+            setDataFetched(false);
+            navigate('/');
+        }
+    }
+
+    useEffect(() => {
+        // sessionStorage.clear();
+        setBgrColor('#FFFAFA');
+        setDataFetched(false);
+        fetchBooks();
+
+        //fetching ids of books which are already in the cart based on the user authentication status:
+        if (authorized) {
+            fetchIds();
+        } else if (sessionStorage.getItem('cartId') !== null) {
+            fetchIdsNotLogged(sessionStorage.getItem('cartId'));
+        } else {
+            setTakenIds([]);
+        }
+
+        //verify user case
+        if (searchParams.get('token')) {
+            fetchVerifyUser(searchParams.get('token'));
+        }
+
+        // Case when the cart is empty and the user is redirected to the main page with ?cart=updated param
+        if (searchParams.get('cart')) {
+            setOpenSnackbar(true);
+            setSnackbarMessage('Your cart is empty now!');
+            navigate('/');
+        }
+    }, [authorized]);
 
     const filteredBooks = books.filter(
         book => {
@@ -151,348 +245,327 @@ function Booklist() {
         }
     );
 
-    const divsPerPage = 4;
+    const defineAmountOfBooksPerRow = () => {
+        if (matches1200px) {
+            return 5;
+        } else if (matches1000px) {
+            return 4;
+        } else if (matches800px) {
+            return 3;
+        } else if (matches500px) {
+            return 2;
+        } else {
+            return 1;
+        }
+    }
+    const amountOfBooksPerRow = defineAmountOfBooksPerRow();
+    const amountOfRowsPerPage = 4;
+    const pages = Array.from({ length: Math.ceil(filteredBooks.length / (amountOfRowsPerPage * amountOfBooksPerRow)) }, (_, i) => i + 1);
+    const totalAmountOfRows = Array.from(Array(Math.ceil(filteredBooks.length / amountOfBooksPerRow)).keys());
 
-    const pages = Array.from({ length: Math.ceil(filteredBooks.length / (divsPerPage * itemsPerDiv)) }, (_, i) => i + 1);
-    const divs = Array.from(Array(Math.ceil(filteredBooks.length / itemsPerDiv)).keys());
-
-    const handleChange = (event, value) => {
+    const handleChangePage = (event, value) => {
         setPage(value);
         window.scrollTo(0, 0);
     }
 
-    const { setOpenSnackbar, setSnackbarMessage, setBgrColor, setCartDrawerOpen, fetchIds, takenIds, setTakenIds, fetchIdsNotLogged } = useContext(AuthContext);
-
-    const fetchBooks = async () => {
-        try {
-            const response = await fetch(process.env.REACT_APP_API_URL + 'books');
-            if (!response.ok) {
-                setSnackbarMessage('Something went wrong');
-                setOpenSnackbar(true);
-                return null;
-            }
-            response.json()
-                .then(data => {
-                    setBooks(data);
-                    setDataFetched(true);
-                })
-                .catch(err => console.error(err));
-        } catch (error) {
-            setSnackbarMessage('Something went wrong');
-            setOpenSnackbar(true);
-        }
-    }
-
-    const navigate = useNavigate();
-
-    let quantity = 1;
-
-    const checkToken = (token) => {
-        quantity += 1;
-        const tokenInfo = { 'token': token };
-        fetch(process.env.REACT_APP_API_URL + 'verify', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(tokenInfo)
-        })
-            .then(response => {
-                if (response.ok) {
-                    navigate('/');
-                    setOpenSnackbar(true);
-                    setSnackbarMessage('Your account was successfully verified. You can login now!');
-                } else {
-                    setOpenSnackbar(true);
-                    setSnackbarMessage('Verification code is incorrect or you are already verified');
-                    navigate('/');
-                }
-            })
-            .catch(err => console.error(err));
-    }
-
+    // Case when the books are filtered and the current page is beyond the edge
     useEffect(() => {
-        // sessionStorage.clear();
-        setBgrColor('#FFFAFA');
-        fetchBooks();
-        if (sessionStorage.getItem('authorizedUsername') !== null) {
-            fetchIds(); //fetching ids of books which are already in the cart
-        } else if (sessionStorage.getItem('cartId') !== null) {
-            fetchIdsNotLogged(sessionStorage.getItem('cartId'));
-        } else {
-            setTakenIds([]);
-        }
-        if (searchParams.get('token') && quantity === 1) {
-            checkToken(searchParams.get('token'));
-        }
-        if (searchParams.get('cart')) {
-            setOpenSnackbar(true);
-            setSnackbarMessage('Your cart is empty now!');
-            navigate('/');
-        }
-    }, []);
+        if (page > pages.length) setPage(1);
+    }, [pages]);
 
-    let truthly = true;
-
-    if (filteredBooks.length > 0 && truthly) {
-        truthly = false;
+    const horizontalMarginOfMainDiv = matches600px ? 20 : 10
+    const mainDivStyle = {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        marginTop: 20,
+        marginBottom: 20,
+        marginLeft: horizontalMarginOfMainDiv,
+        marginRight: horizontalMarginOfMainDiv,
     }
 
-    if (page > pages.length && !truthly) {
-        setPage(1);
-    }
-
-    const currencyFormatter = (currency, sign) => {
-        let sansDec = currency.toFixed(2);
-        let formatted = sansDec.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        return sign + `${formatted}`;
-    }
-
-    const addBook = (newBook) => {
-        const token = sessionStorage.getItem('jwt');
-        fetch(process.env.REACT_APP_API_URL + 'api/books', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': token
-            },
-            body: JSON.stringify(newBook)
-        })
-            .then(response => {
-                if (response.ok) {
-                    fetchBooks();
-                    setOpenSnackbar(true);
-                    setSnackbarMessage('New book was added successfully');
-                } else {
-                    alert('Something went wrong during adding the book');
-                }
-            })
-            .catch(err => console.error(err));
-    }
-
-    const createCart = (bookid) => {
-        fetch(process.env.REACT_APP_API_URL + 'createbacket', {
-            method: 'POST'
-        })
-            .then(response => response.json())
-            .then(data => {
-                sessionStorage.setItem('cartId', data.id);
-                sessionStorage.setItem('cartPass', data.password);
-                addBookForNotLogged(bookid);
-            })
-            .catch(err => console.error(err));
-    }
-
-    const addBookForNotLogged = (bookid) => {
-        const backetId = sessionStorage.getItem('cartId');
-        const password = sessionStorage.getItem('cartPass');
-        fetch(process.env.REACT_APP_API_URL + 'addbook/' + backetId, {
-            method: 'POST',
-            headers:
-            {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ quantity: 1, bookid: bookid, password: password })
-        })
-            .then(response => {
-                if (response.ok) {
-                    fetchBooks();
-                    fetchIdsNotLogged(backetId);
-                    setCartDrawerOpen(true);
-                    setOpenSnackbar(true);
-                    setSnackbarMessage('The book was added to your cart');
-                } else {
-                    alert('Something went wrong during adding book into the cart');
-                }
-            })
-            .catch(err => console.error(err));
-    }
-
-    const addToNonuserCart = (bookid) => {
-        if (sessionStorage.getItem('authorizedUsername') === null) {
-            if (!sessionStorage.getItem('cartId')) {
-                createCart(bookid);
-            } else {
-                addBookForNotLogged(bookid);
-            }
-        }
-    }
-
-    const addToCart = (bookid) => {
-        if (sessionStorage.getItem('authorizedUsername') !== null) {
-            const token = sessionStorage.getItem('jwt');
-            fetch(process.env.REACT_APP_API_URL + 'additem/' + bookid, {
+    const fetchAddBookToCartAuthenticated = async (bookId) => {
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'additem/' + bookId, {
                 method: 'POST',
                 headers:
                 {
                     'Content-Type': 'application/json',
-                    'Authorization': token
+                    'Authorization': jwtToken
                 },
                 body: JSON.stringify({ quantity: 1 })
-            })
-                .then(response => {
-                    if (response.ok) {
-                        fetchBooks();
-                        fetchIds();
-                        setCartDrawerOpen(true);
-                        setOpenSnackbar(true);
-                        setSnackbarMessage('The book was added to your cart');
-                    } else {
-                        alert('Something went wrong during adding book into the cart');
-                    }
-                })
-                .catch(err => console.error(err));
-        } else {
-            addToNonuserCart(bookid);
+            });
+            if (!response.ok) {
+                setOpenSnackbar(true);
+                setSnackbarMessage('Something is wrong with the server');
+                return null;
+            }
+            fetchBooks();
+            fetchIds();
+            setCartDrawerOpen(true);
+            setOpenSnackbar(true);
+            setSnackbarMessage('The book was added to your cart');
+        } catch (error) {
+            console.error(error);
+            setOpenSnackbar(true);
+            setSnackbarMessage('Something is wrong with the server');
         }
     }
 
-    const rows = divs.map((number, index) =>
-        (divsPerPage * (page - 1) <= index && index < divsPerPage * page) &&
-        <AnimatePresence key={index}>
-            <motion.div style={mainStyle}
-                layout
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-            >
-                {filteredBooks.map((book, indexs) =>
-                    (itemsPerDiv * number <= indexs && indexs < itemsPerDiv * (number + 1)) &&
-                    <div key={indexs}>
-                        <Card
-                            style={cardStyle}
-                            elevation={10}
-                        >
-                            <div style={{ display: 'flex', justifyContent: 'left', marginTop: 0 }}>
-                                <Paper style={priceHolder} elevation={0}>
-                                    {currencyFormatter(book.price, "€")}
-                                </Paper>
-                            </div>
-                            <CardActionArea
-                                component={Link}
-                                to={`/book/${book.id}`}
-                                sx={cardAction}
+    const fetchCreateCartNoAuthentication = async (bookid) => {
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'createbacket', {
+                method: 'POST'
+            });
+            if (!response.ok) {
+                setOpenSnackbar(true);
+                setSnackbarMessage('Something is wrong with the server');
+                return null;
+            }
+            response.json()
+                .then(data => {
+                    sessionStorage.setItem('cartId', data.id);
+                    sessionStorage.setItem('cartPass', data.password);
+                    fetchAddBookToCartNoAuthentication(bookid);
+                })
+                .catch(err => console.error(err));
+        } catch (error) {
+            console.error(error);
+            setOpenSnackbar(true);
+            setSnackbarMessage('Something is wrong with the server');
+        }
+    }
+
+    const handleBadResponseAddBookToCartNoAuth = (response) => {
+        if ([400, 401, 404, 409].includes(response.status)) {
+            sessionStorage.clear();
+            setDataFetched(false);
+            fetchBooks();
+            setOpenSnackbar(true);
+            setSnackbarMessage('Please try again');
+        } else {
+            setOpenSnackbar(true);
+            setSnackbarMessage('Something is wrong with the server');
+        }
+    }
+
+    const fetchAddBookToCartNoAuthentication = async (bookid) => {
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'addbook/' + sessionStorage.getItem('cartId'), {
+                method: 'POST',
+                headers:
+                {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ quantity: 1, bookid: bookid, password: sessionStorage.getItem('cartPass') })
+            });
+
+            if (!response.ok) {
+                handleBadResponseAddBookToCartNoAuth(response);
+                return null;
+            }
+            fetchBooks();
+            fetchIdsNotLogged(sessionStorage.getItem('cartId'));
+            setCartDrawerOpen(true);
+            setOpenSnackbar(true);
+            setSnackbarMessage('The book was added to your cart');
+        } catch (error) {
+            console.error(error);
+            setOpenSnackbar(true);
+            setSnackbarMessage('Something is wrong with the server');
+        }
+    }
+
+    const addBookToCartNoAuthentication = (bookid) => {
+        if (!sessionStorage.getItem('cartId')) {
+            fetchCreateCartNoAuthentication(bookid);
+        } else {
+            fetchAddBookToCartNoAuthentication(bookid);
+        }
+    }
+
+    const addBookToCart = async (bookid) => {
+        if (authorized) {
+            fetchAddBookToCartAuthenticated(bookid);
+        } else {
+            addBookToCartNoAuthentication(bookid);
+        }
+    }
+
+    const rowsOfBooks = totalAmountOfRows.map((value, rowIndex) => {
+        return (
+            (amountOfRowsPerPage * (page - 1) <= rowIndex && rowIndex < amountOfRowsPerPage * page) &&
+            <AnimatePresence key={rowIndex}>
+                <motion.div style={mainDivStyle}
+                    layout
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    {filteredBooks.map((book, columnIndex) =>
+                        (amountOfBooksPerRow * rowIndex <= columnIndex && columnIndex < amountOfBooksPerRow * (rowIndex + 1)) &&
+                        <div key={columnIndex}>
+                            <Card
+                                style={cardStyle}
+                                elevation={10}
                             >
-                                <div style={imageDiv}>
-                                    <img
-                                        height={240}
-                                        width='80%'
-                                        src={book.url}
-                                        alt={book.title}
-                                    />
-
+                                <div style={{ display: 'flex', justifyContent: 'left', marginTop: 0 }}>
+                                    <Paper style={priceHolder} elevation={0}>
+                                        {currencyFormatter(book.price, "€")}
+                                    </Paper>
                                 </div>
-                            </CardActionArea>
-                        </Card>
-                        {((sessionStorage.getItem('authorizedUsername') === null && sessionStorage.getItem('cartId') === null) || !takenIds.includes(book.id)) && <Button onClick={() => addToCart(book.id)} endIcon={<AddShoppingCartIcon />} sx={buttonStyle} component={Paper} elevation={10} >
-                            Add to Cart
-                        </Button>}
-                        {takenIds.includes(book.id) &&
-                            <Button onClick={() => setCartDrawerOpen(true)} endIcon={<ShoppingCartIcon />} sx={buttonTakenStyle} component={Paper} elevation={10} >
-                                Open Cart
-                            </Button>
-                        }
-                    </div>
-                )}
-            </motion.div>
-        </AnimatePresence>
-    );
+                                <CardActionArea
+                                    component={Link}
+                                    to={`/book/${book.id}`}
+                                    sx={cardAction}
+                                >
+                                    <div style={imageDiv}>
+                                        <img
+                                            height={240}
+                                            width='80%'
+                                            src={book.url}
+                                            alt={book.title}
+                                        />
+                                    </div>
+                                </CardActionArea>
+                            </Card>
+                            {!takenIds.includes(book.id) && <Button onClick={() => addBookToCart(book.id)} endIcon={<AddShoppingCartIcon />} sx={buttonStyle} component={Paper} elevation={10} >
+                                Add to Cart
+                            </Button>}
+                            {takenIds.includes(book.id) &&
+                                <Button onClick={() => setCartDrawerOpen(true)} endIcon={<ShoppingCartIcon />} sx={buttonTakenStyle} component={Paper} elevation={10} >
+                                    Open Cart
+                                </Button>
+                            }
+                        </div>
+                    )}
+                </motion.div>
+            </AnimatePresence>
+        );
+    });
 
-    const handleLocalChange = (event) => {
-        setSearchNow(event.target.value);
+    const handleSearchQueryChange = (event) => {
+        setSearchQueryHolder(event.target.value);
     }
 
     const search = () => {
-        setSearchQuery(searchNow);
+        setSearchQuery(searchQueryHolder);
     }
 
-    const stopSearch = () => {
-        setSearchQuery('');
-        setOpenSearch(false);
-        setSearchNow('');
+    function AllBooksHeader() {
+        const horizontalGapForElements = isAdmin ? 20 : 0;
+        const horizontalMarginForElements = isAdmin ? -2.5 : 0;
+        const typographySize = matches800px ? 'h4' : 'h5';
+
+        const startSearch = () => {
+            setOpenSearch(true);
+        }
+        const stopSearch = () => {
+            setSearchQuery('');
+            setOpenSearch(false);
+            setSearchQueryHolder('');
+        }
+        function ConditionalSearchIcon() {
+            return (
+                <IconButton onClick={openSearch ? stopSearch : startSearch} sx={{ marginRight: horizontalMarginForElements }}>
+                    {openSearch && <SearchOffIcon color='sidish' />}
+                    {!openSearch && <SearchIcon color='sidish' />}
+                </IconButton>
+            );
+        }
+        return (
+            <div style={{ marginBottom: -20, display: 'flex', justifyContent: 'center', gap: horizontalGapForElements }}>
+                {dataFetched && <ConditionalSearchIcon />}
+                <div style={{ display: 'flex', gap: 8 }}>
+                    {isAdmin && <>
+                        <Typography variant={typographySize}>All books</Typography>
+                        <Addbook addBook={addBook} />
+                    </>}
+                    {!isAdmin && <>
+                        <Typography variant={typographySize}>All</Typography>
+                        <Typography sx={{ backgroundColor: 'black', color: 'white', paddingLeft: 1, paddingRight: 1 }} variant={typographySize}>Books</Typography>
+                    </>}
+                </div>
+            </div>
+        );
     }
+
+    const defineMarginSearch = () => {
+        if (matches500px) {
+            return 70;
+        } else if (matches400px) {
+            return 40;
+        } else if (matches300px) {
+            return 20;
+        } else {
+            return 10;
+        }
+    }
+    const horizontalMarginSearchField = defineMarginSearch();
+    const searchSize = matches500px ? 'medium' : 'small';
 
     return (
-
         <motion.div
             style={{ display: 'flex', flexDirection: 'column', gap: 30 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
         >
-            {sessionStorage.getItem('role') === 'ADMIN' &&
-                <div style={{ marginBottom: -20, display: 'flex', justifyContent: 'center', gap: 20 }}>
-                    {!openSearch && <IconButton onClick={() => setOpenSearch(true)} sx={{ marginRight: -2.5 }}>
-                        <SearchIcon color='sidish' />
-                    </IconButton>}
-                    {openSearch && <IconButton onClick={stopSearch} sx={{ marginRight: -2.5 }}>
-                        <SearchOffIcon color='sidish' />
-                    </IconButton>}
-                    <Typography variant={typoSize}>All books</Typography>
-                    <Addbook addBook={addBook} />
-                </div>}
-            {sessionStorage.getItem('role') !== 'ADMIN' &&
-                <div style={{ marginBottom: -20, display: 'flex', justifyContent: 'center', gap: 0 }}>
-                    {!openSearch && <IconButton onClick={() => setOpenSearch(true)}>
-                        <SearchIcon color='sidish' />
-                    </IconButton>}
-                    {openSearch && <IconButton onClick={stopSearch}>
-                        <SearchOffIcon color='sidish' />
-                    </IconButton>}
-                    <div style={{ display: 'flex', gap: 8 }}>
-                        <Typography variant={typoSize}>All</Typography>
-                        <Typography sx={{ backgroundColor: 'black', color: 'white', paddingLeft: 1, paddingRight: 1 }} variant={typoSize}>Books</Typography>
-                    </div>
-                </div>}
+            <AllBooksHeader />
             {dataFetched &&
-                <AnimatePresence><div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
-                    <AnimatePresence>{openSearch &&
-                        <motion.div
-                            style={{ display: 'flex', marginLeft: marginSearch, marginRight: marginSearch, gap: 15, marginBottom: -20 }}
-                            initial={{ opacity: 0, scale: 0.5, height: 0 }}
-                            animate={{ opacity: 1, scale: 1, height: 'auto' }}
-                            exit={{ opacity: 0, scale: 0.5, height: 0 }}
-                            transition={{ duration: 0.5 }}
-                        >
-                            <TextField
-                                size={searchSize}
-                                fullWidth
-                                value={searchNow}
-                                onChange={handleLocalChange}
-                                type='search'
-                                placeholder="Search for books..."
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SearchIcon color='sidish' />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                                variant="outlined"
-                                color='sidish'
-                            />
-                            <Button
-                                size={searchSize}
-                                onClick={search}
-                                variant='contained'
-                                sx={{
-                                    color: 'white',
-                                    backgroundColor: 'black',
-                                    "&:hover": { backgroundColor: 'gray' },
-                                    transition: '0.45s'
-                                }}
-                            >
-                                Search
-                            </Button>
-                        </motion.div>
-                    }
-                    </AnimatePresence>
-                    {rows}
-                </div></AnimatePresence>}
+                <AnimatePresence>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
+                        <AnimatePresence>
+                            {openSearch &&
+                                <motion.div
+                                    style={{ display: 'flex', marginLeft: horizontalMarginSearchField, marginRight: horizontalMarginSearchField, gap: 15, marginBottom: -20 }}
+                                    initial={{ opacity: 0, scale: 0.5, height: 0 }}
+                                    animate={{ opacity: 1, scale: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, scale: 0.5, height: 0 }}
+                                    transition={{ duration: 0.5 }}
+                                >
+                                    <TextField
+                                        size={searchSize}
+                                        fullWidth
+                                        value={searchQueryHolder}
+                                        onChange={handleSearchQueryChange}
+                                        type='search'
+                                        placeholder="Search for books..."
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <SearchIcon color='sidish' />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                        variant="outlined"
+                                        color='sidish'
+                                    />
+                                    <Button
+                                        size={searchSize}
+                                        onClick={search}
+                                        variant='contained'
+                                        sx={{
+                                            color: 'white',
+                                            backgroundColor: 'black',
+                                            "&:hover": { backgroundColor: 'gray' },
+                                            transition: '0.45s'
+                                        }}
+                                    >
+                                        Search
+                                    </Button>
+                                </motion.div>
+                            }
+                        </AnimatePresence>
+                        {rowsOfBooks}
+                    </div>
+                </AnimatePresence>
+            }
             {dataFetched &&
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    <Pagination sx={{ marginBottom: 5, marginTop: 5 }} count={pages.length} page={page} onChange={handleChange} />
+                    <Pagination sx={{ marginBottom: 5, marginTop: 5 }} count={pages.length} page={page} onChange={handleChangePage} />
                 </div>
             }
             {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20vh' }}><CircularProgress color="inherit" /></div>}

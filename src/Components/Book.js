@@ -224,7 +224,7 @@ export default function Book() {
 
     const [quantity, setQuantity] = useState(1);
 
-    const { setOpenSnackbar, setSnackbarMessage, setBgrColor, setCartDrawerOpen } = useContext(AuthContext);
+    const { currencyFormatter, setOpenSnackbar, setSnackbarMessage, setBgrColor, setCartDrawerOpen } = useContext(AuthContext);
 
     let { bookid } = useParams();
 
@@ -274,12 +274,6 @@ export default function Book() {
         setBgrColor('#1c1c1c');
         fetchBook();
     }, []);
-
-    const currencyFormatter = (currency, sign) => {
-        let sansDec = currency.toFixed(2);
-        let formatted = sansDec.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        return sign + `${formatted}`;
-    }
 
     const updateBook = (updatedBook, link) => {
         const token = sessionStorage.getItem('jwt');

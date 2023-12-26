@@ -10,11 +10,9 @@ import Logout from '../Logout';
 import SignIn from '../SignIn/SignIn';
 
 
-export default function MyAppBar({
-    matches400px, matches350px,
-    menuDrawerOpen, setMenuDrawerOpen
-}) {
+export default function MyAppBar({ matches400px, matches350px, menuDrawerOpen, setMenuDrawerOpen }) {
     const navigate = useNavigate();
+    const authorized = sessionStorage.getItem('jwt') ? true : false;
 
     const barElementsHorizontalIndent = matches400px ? 25 : matches350px ? 20 : 5;
     const headerSize = matches400px ? 'h5' : 'h6';
@@ -42,8 +40,8 @@ export default function MyAppBar({
                     Book Store
                 </Typography>
                 <div style={{ position: 'absolute', right: barElementsHorizontalIndent }}>
-                    {sessionStorage.getItem('jwt') && <Logout />}
-                    {!sessionStorage.getItem('jwt') && <SignIn />}
+                    {authorized && <Logout />}
+                    {!authorized && <SignIn />}
                 </div>
             </Toolbar>
         </MuiAppBar>
