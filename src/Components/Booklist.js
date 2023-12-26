@@ -79,7 +79,7 @@ function Booklist() {
 
     const [searchParams, setSearchParams] = useSearchParams({});
 
-    const { currencyFormatter, setOpenSnackbar, setSnackbarMessage, setBgrColor, setCartDrawerOpen, fetchIds, takenIds, setTakenIds, fetchIdsNotLogged } = useContext(AuthContext);
+    const { currencyFormatter, setOpenSnackbar, setSnackbarMessage, setBgrColor, setCartDrawerOpen, fetchIdsOfBooksInCartAuthenticated, idsOfBooksInCart, setIdsOfBooksInCart, fetchIdsOfBooksInCartNoAuth, resetAuthentication } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
@@ -100,9 +100,7 @@ function Booklist() {
             setOpenSnackbar(true);
             setSnackbarMessage('The duplicate ISBN value is not allowed');
         } else if (response.status === 500) {
-            sessionStorage.clear();
-            setOpenSnackbar(true);
-            setSnackbarMessage('Please login again to prove your identity');
+            resetAuthentication();
             navigate('/');
         } else {
             setDataFetched(false);
@@ -212,11 +210,11 @@ function Booklist() {
 
         //fetching ids of books which are already in the cart based on the user authentication status:
         if (authorized) {
-            fetchIds();
+            fetchIdsOfBooksInCartAuthenticated();
         } else if (sessionStorage.getItem('cartId') !== null) {
-            fetchIdsNotLogged(sessionStorage.getItem('cartId'));
+            fetchIdsOfBooksInCartNoAuth(sessionStorage.getItem('cartId'));
         } else {
-            setTakenIds([]);
+            setIdsOfBooksInCart([]);
         }
 
         //verify user case
@@ -302,7 +300,7 @@ function Booklist() {
                 return null;
             }
             fetchBooks();
-            fetchIds();
+            fetchIdsOfBooksInCartAuthenticated();
             setCartDrawerOpen(true);
             setOpenSnackbar(true);
             setSnackbarMessage('The book was added to your cart');
@@ -366,7 +364,7 @@ function Booklist() {
                 return null;
             }
             fetchBooks();
-            fetchIdsNotLogged(sessionStorage.getItem('cartId'));
+            fetchIdsOfBooksInCartNoAuth(sessionStorage.getItem('cartId'));
             setCartDrawerOpen(true);
             setOpenSnackbar(true);
             setSnackbarMessage('The book was added to your cart');
@@ -431,10 +429,10 @@ function Booklist() {
                                     </div>
                                 </CardActionArea>
                             </Card>
-                            {!takenIds.includes(book.id) && <Button onClick={() => addBookToCart(book.id)} endIcon={<AddShoppingCartIcon />} sx={buttonStyle} component={Paper} elevation={10} >
+                            {!idsOfBooksInCart.includes(book.id) && <Button onClick={() => addBookToCart(book.id)} endIcon={<AddShoppingCartIcon />} sx={buttonStyle} component={Paper} elevation={10} >
                                 Add to Cart
                             </Button>}
-                            {takenIds.includes(book.id) &&
+                            {idsOfBooksInCart.includes(book.id) &&
                                 <Button onClick={() => setCartDrawerOpen(true)} endIcon={<ShoppingCartIcon />} sx={buttonTakenStyle} component={Paper} elevation={10} >
                                     Open Cart
                                 </Button>

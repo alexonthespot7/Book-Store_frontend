@@ -41,7 +41,7 @@ function CartMenu() {
     const [bookInCart, setBookInCart] = useState(null);
     const [openInCart, setOpenInCart] = useState(false);
 
-    const { setOpenSnackbar, setSnackbarMessage, setCartDrawerOpen, fetchIds, fetchIdsNotLogged } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, setCartDrawerOpen, fetchIdsOfBooksInCartAuthenticated, fetchIdsOfBooksInCartNoAuth } = useContext(AuthContext);
 
     const matchesFifth = useMediaQuery("(min-width: 310px)");
     const matchesSixth = useMediaQuery("(min-width: 305px)");
@@ -170,7 +170,7 @@ function CartMenu() {
                     setOpenSnackbar(true);
                     setSnackbarMessage('Book was deleted from your cart');
                     fetchCartByBacketId();
-                    fetchIdsNotLogged(backetId);
+                    fetchIdsOfBooksInCartNoAuth(backetId);
                     fetchTotalNotLogged(backetId, password);
                 } else {
                     setOpenSnackbar(true);
@@ -198,7 +198,7 @@ function CartMenu() {
                         setOpenSnackbar(true);
                         setSnackbarMessage('Book was deleted from your cart');
                         fetchCartByUserId();
-                        fetchIds();
+                        fetchIdsOfBooksInCartAuthenticated();
                         fetchTotal(sessionStorage.getItem('jwt'));
                     } else {
                         setOpenSnackbar(true);
@@ -241,7 +241,7 @@ function CartMenu() {
             .then(response => {
                 if (response.ok) {
                     fetchCartByBacketId();
-                    fetchIdsNotLogged(backetId);
+                    fetchIdsOfBooksInCartNoAuth(backetId);
                     fetchTotalNotLogged(backetId, password);
                     setQuantityChanges(false);
                     setOpenSnackbar(true);
@@ -267,7 +267,7 @@ function CartMenu() {
             })
                 .then(response => {
                     if (response.ok) {
-                        fetchIds();
+                        fetchIdsOfBooksInCartAuthenticated();
                         fetchCartByUserId();
                         fetchTotal(sessionStorage.getItem('jwt'));
                         setQuantityChanges(false);
@@ -298,7 +298,7 @@ function CartMenu() {
             .then(response => {
                 if (response.ok) {
                     fetchCartByBacketId();
-                    fetchIdsNotLogged(backetId);
+                    fetchIdsOfBooksInCartNoAuth(backetId);
                     fetchTotalNotLogged(backetId, password);
                     setQuantityChanges(false);
                     setOpenSnackbar(true);
@@ -322,7 +322,7 @@ function CartMenu() {
             })
                 .then(response => {
                     if (response.ok) {
-                        fetchIds();
+                        fetchIdsOfBooksInCartAuthenticated();
                         fetchCartByUserId();
                         fetchTotal(sessionStorage.getItem('jwt'));
                         setQuantityChanges(false);
