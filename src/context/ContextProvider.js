@@ -29,6 +29,7 @@ function ContextProvider(props) {
         if (response.status === 500) {
             resetAuthentication();
         } else {
+            sessionStorage.clear();
             setOpenSnackbar(true);
             setSnackbarMessage('Something is wrong with the server');
         }
@@ -50,6 +51,7 @@ function ContextProvider(props) {
                 .then(data => setIdsOfBooksInCart(data))
                 .catch(err => console.error(err));
         } catch (error) {
+            sessionStorage.clear();
             console.error(error);
             setOpenSnackbar(true);
             setSnackbarMessage('Something is wrong with the server');
@@ -60,6 +62,7 @@ function ContextProvider(props) {
         if ([401, 404].includes(response.status)) {
             sessionStorage.clear();
         } else {
+            sessionStorage.clear();
             setOpenSnackbar(true);
             setSnackbarMessage('Something is wrong with the server');
         }
@@ -79,6 +82,7 @@ function ContextProvider(props) {
                 .then(data => setIdsOfBooksInCart(data))
                 .catch(err => console.error(err));
         } catch (error) {
+            sessionStorage.clear();
             console.error(error);
             setOpenSnackbar(true);
             setSnackbarMessage('Something is wrong with the server');

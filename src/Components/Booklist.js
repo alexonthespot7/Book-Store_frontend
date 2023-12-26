@@ -83,7 +83,6 @@ function Booklist() {
 
     const navigate = useNavigate();
 
-    const isAdmin = sessionStorage.getItem('role') === 'ADMIN';
     const jwtToken = sessionStorage.getItem('jwt');
     const authorized = sessionStorage.getItem('authorizedUsername') ? true : false;
 
@@ -453,8 +452,8 @@ function Booklist() {
     }
 
     function AllBooksHeader() {
-        const horizontalGapForElements = isAdmin ? 20 : 0;
-        const horizontalMarginForElements = isAdmin ? -2.5 : 0;
+        const horizontalGapForElements = sessionStorage.getItem('role') === 'ADMIN' ? 20 : 0;
+        const horizontalMarginForElements = sessionStorage.getItem('role') === 'ADMIN' ? -2.5 : 0;
         const typographySize = matches800px ? 'h4' : 'h5';
 
         const startSearch = () => {
@@ -477,11 +476,11 @@ function Booklist() {
             <div style={{ marginBottom: -20, display: 'flex', justifyContent: 'center', gap: horizontalGapForElements }}>
                 {dataFetched && <ConditionalSearchIcon />}
                 <div style={{ display: 'flex', gap: 8 }}>
-                    {isAdmin && <>
+                    {sessionStorage.getItem('role') === 'ADMIN' && <>
                         <Typography variant={typographySize}>All books</Typography>
                         <Addbook addBook={addBook} />
                     </>}
-                    {!isAdmin && <>
+                    {sessionStorage.getItem('role') !== 'ADMIN' && <>
                         <Typography variant={typographySize}>All</Typography>
                         <Typography sx={{ backgroundColor: 'black', color: 'white', paddingLeft: 1, paddingRight: 1 }} variant={typographySize}>Books</Typography>
                     </>}
