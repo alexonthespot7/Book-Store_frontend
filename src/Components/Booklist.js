@@ -94,46 +94,6 @@ function Booklist() {
     const matches400px = useMediaQuery("(min-width: 400px)");
     const matches300px = useMediaQuery("(min-width: 300px)");
 
-    const handleBadResponseAddBook = (response) => {
-        if (response.status === 409) {
-            setOpenSnackbar(true);
-            setSnackbarMessage('The duplicate ISBN value is not allowed');
-        } else if (response.status === 500) {
-            resetAuthentication();
-            navigate('/');
-        } else {
-            setDataFetched(false);
-            alert('Something is wrong with the server');
-        }
-    }
-
-    // Function to add the new book for administrator:
-    const addBook = async (newBook) => {
-        try {
-            const response = await fetch(process.env.REACT_APP_API_URL + 'api/books', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': jwtToken
-                },
-                body: JSON.stringify(newBook)
-            });
-
-            if (!response.ok) {
-                handleBadResponseAddBook(response);
-                return null;
-            }
-            setDataFetched(false);
-            fetchBooks();
-            setOpenSnackbar(true);
-            setSnackbarMessage('New book was added successfully');
-        } catch (error) {
-            setDataFetched(false);
-            console.error(error);
-            alert('Something is wrong with the server');
-        }
-    }
-
     const fetchBooks = async () => {
         try {
             const response = await fetch(process.env.REACT_APP_API_URL + 'books');
@@ -478,7 +438,7 @@ function Booklist() {
                 <div style={{ display: 'flex', gap: 8 }}>
                     {sessionStorage.getItem('role') === 'ADMIN' && <>
                         <Typography variant={typographySize}>All books</Typography>
-                        <Addbook addBook={addBook} />
+                        <Addbook fetchBooks={fetchBooks} />
                     </>}
                     {sessionStorage.getItem('role') !== 'ADMIN' && <>
                         <Typography variant={typographySize}>All</Typography>
