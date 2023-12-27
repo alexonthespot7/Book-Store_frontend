@@ -1,25 +1,30 @@
-import { useState } from 'react';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
+import { useContext, useState } from 'react';
+
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+
 import AddIcon from '@mui/icons-material/Add';
 
+import { useNavigate } from 'react-router-dom';
 
-export default function Addcategory({ addCategory }) {
+import AuthContext from '../context/AuthContext';
+
+const initialCategory = {
+    name: ''
+}
+
+export default function Addcategory({ handleData }) {
     const [open, setOpen] = useState(false);
     const [nameErr, setNameErr] = useState(false);
     const [nameHelper, setNameHelper] = useState('');
+    const [category, setCategory] = useState(initialCategory);
 
-    const [category, setCategory] = useState({
-        name: ''
-    });
+    const { setOpenSnackbar, setSnackbarMessage, resetAuthentication, fetchCategories } = useContext(AuthContext);
+
+    const navigate = useNavigate();
 
     const handleClickOpen = () => {
         setOpen(true);
-        setCategory({ name: '' });
+        setCategory(initialCategory);
         setNameErr(false);
         setNameHelper('');
     }
@@ -30,27 +35,48 @@ export default function Addcategory({ addCategory }) {
 
     const inputChanged = (event) => {
         setCategory({ ...category, [event.target.name]: event.target.value });
-        if (event.target.name === 'name') {
-            setNameErr(false);
-            setNameHelper('');
+        setNameErr(false);
+        setNameHelper('');
+    }
+
+    const fetchAddCategory = async (newCategory) => {
+        const token = sessionStorage.getItem('jwt');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'api/categories', {
+                method: 'POST',
+                headers:
+                {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(newCategory)
+            });
+            if (!response.ok) {
+                if (response.status === 500) {
+                    resetAuthentication();
+                    navigate('/');
+                } else {
+                    alert('Something is wrong with the server');
+                }
+            }
+            fetchCategories(handleData);
+            setOpen(false);
+            setCategory(initialCategory);
+            setOpenSnackbar(true);
+            setSnackbarMessage('The category was added');
+        } catch (error) {
+            console.error(error);
+            alert('Something is wrong with the server');
         }
     }
 
     const handleSave = () => {
-        let check = true;
         if (category.name == '') {
-            check = false;
             setNameErr(true);
             setNameHelper('Name cannot be empty');
+            return null;
         }
-        if (check) {
-            addCategory(category);
-            setCategory({
-                name: ''
-            });
-            setOpen(false);
-        }
-
+        fetchAddCategory(category);
     }
 
     return (
@@ -63,6 +89,7 @@ export default function Addcategory({ addCategory }) {
                 <DialogTitle>New category</DialogTitle>
                 <DialogContent>
                     <TextField
+                        color='sidish'
                         error={nameErr}
                         helperText={nameHelper}
                         margin="dense"
@@ -75,10 +102,10 @@ export default function Addcategory({ addCategory }) {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleSave}>Save</Button>
+                    <Button color='sidish' onClick={handleClose}>Cancel</Button>
+                    <Button color='sidish' onClick={handleSave}>Save</Button>
                 </DialogActions>
             </Dialog>
         </div>
-    )
+    );
 }

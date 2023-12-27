@@ -79,11 +79,10 @@ function Booklist() {
 
     const [searchParams, setSearchParams] = useSearchParams({});
 
-    const { currencyFormatter, setOpenSnackbar, setSnackbarMessage, setBgrColor, setCartDrawerOpen, fetchIdsOfBooksInCartAuthenticated, idsOfBooksInCart, setIdsOfBooksInCart, fetchIdsOfBooksInCartNoAuth, resetAuthentication } = useContext(AuthContext);
+    const { currencyFormatter, setOpenSnackbar, setSnackbarMessage, setBgrColor, setCartDrawerOpen, fetchIdsOfBooksInCartAuthenticated, idsOfBooksInCart, setIdsOfBooksInCart, fetchIdsOfBooksInCartNoAuth, addBookToCart } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
-    const jwtToken = sessionStorage.getItem('jwt');
     const authorized = sessionStorage.getItem('authorizedUsername') ? true : false;
 
     const matches1200px = useMediaQuery("(min-width: 1200px)");
@@ -166,7 +165,6 @@ function Booklist() {
         setBgrColor('#FFFAFA');
         setDataFetched(false);
         fetchBooks();
-
         //fetching ids of books which are already in the cart based on the user authentication status:
         if (authorized) {
             fetchIdsOfBooksInCartAuthenticated();
@@ -240,114 +238,6 @@ function Booklist() {
         marginBottom: 20,
         marginLeft: horizontalMarginOfMainDiv,
         marginRight: horizontalMarginOfMainDiv,
-    }
-
-    const fetchAddBookToCartAuthenticated = async (bookId) => {
-        try {
-            const response = await fetch(process.env.REACT_APP_API_URL + 'additem/' + bookId, {
-                method: 'POST',
-                headers:
-                {
-                    'Content-Type': 'application/json',
-                    'Authorization': jwtToken
-                },
-                body: JSON.stringify({ quantity: 1 })
-            });
-            if (!response.ok) {
-                setOpenSnackbar(true);
-                setSnackbarMessage('Something is wrong with the server');
-                return null;
-            }
-            fetchBooks();
-            fetchIdsOfBooksInCartAuthenticated();
-            setCartDrawerOpen(true);
-            setOpenSnackbar(true);
-            setSnackbarMessage('The book was added to your cart');
-        } catch (error) {
-            console.error(error);
-            setOpenSnackbar(true);
-            setSnackbarMessage('Something is wrong with the server');
-        }
-    }
-
-    const fetchCreateCartNoAuthentication = async (bookid) => {
-        try {
-            const response = await fetch(process.env.REACT_APP_API_URL + 'createbacket', {
-                method: 'POST'
-            });
-            if (!response.ok) {
-                setOpenSnackbar(true);
-                setSnackbarMessage('Something is wrong with the server');
-                return null;
-            }
-            response.json()
-                .then(data => {
-                    sessionStorage.setItem('cartId', data.id);
-                    sessionStorage.setItem('cartPass', data.password);
-                    fetchAddBookToCartNoAuthentication(bookid);
-                })
-                .catch(err => console.error(err));
-        } catch (error) {
-            console.error(error);
-            setOpenSnackbar(true);
-            setSnackbarMessage('Something is wrong with the server');
-        }
-    }
-
-    const handleBadResponseAddBookToCartNoAuth = (response) => {
-        if ([400, 401, 404, 409].includes(response.status)) {
-            sessionStorage.clear();
-            setDataFetched(false);
-            fetchBooks();
-            setOpenSnackbar(true);
-            setSnackbarMessage('Please try again');
-        } else {
-            setOpenSnackbar(true);
-            setSnackbarMessage('Something is wrong with the server');
-        }
-    }
-
-    const fetchAddBookToCartNoAuthentication = async (bookid) => {
-        try {
-            const response = await fetch(process.env.REACT_APP_API_URL + 'addbook/' + sessionStorage.getItem('cartId'), {
-                method: 'POST',
-                headers:
-                {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ quantity: 1, bookid: bookid, password: sessionStorage.getItem('cartPass') })
-            });
-
-            if (!response.ok) {
-                handleBadResponseAddBookToCartNoAuth(response);
-                return null;
-            }
-            fetchBooks();
-            fetchIdsOfBooksInCartNoAuth(sessionStorage.getItem('cartId'));
-            setCartDrawerOpen(true);
-            setOpenSnackbar(true);
-            setSnackbarMessage('The book was added to your cart');
-        } catch (error) {
-            console.error(error);
-            setOpenSnackbar(true);
-            setSnackbarMessage('Something is wrong with the server');
-        }
-    }
-
-    const addBookToCartNoAuthentication = (bookid) => {
-        if (!sessionStorage.getItem('cartId')) {
-            fetchCreateCartNoAuthentication(bookid);
-        } else {
-            fetchAddBookToCartNoAuthentication(bookid);
-        }
-    }
-
-    const addBookToCart = async (bookid) => {
-        if (authorized) {
-            fetchAddBookToCartAuthenticated(bookid);
-        } else {
-            addBookToCartNoAuthentication(bookid);
-        }
     }
 
     const rowsOfBooks = totalAmountOfRows.map((value, rowIndex) => {

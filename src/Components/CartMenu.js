@@ -9,8 +9,8 @@ import MuiAlert from '@mui/material/Alert';
 
 import AuthContext from "../context/AuthContext";
 import useMediaQuery from "../Hooks/useMediaQuery";
-import BookInCart from "./BookInCart";
 import { useNavigate } from "react-router-dom";
+import BookDialog from "./BookDialog";
 
 const firstDiv = { transition: '0.45s', display: 'flex', justifyContent: 'flex-start', gap: 10, marginLeft: 30, marginRight: 30 }
 const imgCart = { height: 176, width: 117, border: '0.5px solid #D3D3D3', borderRadius: 2, backgroundColor: '#F8F8F8', display: 'flex', justifyContent: 'center', alignContent: 'center', "&:hover": { filter: 'brightness(90%)' }, transition: '0.45s' }
@@ -425,7 +425,7 @@ function CartMenu() {
                             Checkout
                         </Button>
                     </div>
-                    <BookInCart bookInCart={bookInCart} setBookInCart={setBookInCart} openInCart={openInCart} setOpenInCart={setOpenInCart} />
+                    <BookDialog additionalBook={bookInCart} setAdditionalBook={setBookInCart} openAdditional={openInCart} setOpenAdditional={setOpenInCart} isInCart={true} />
                 </div>
             }
             {!infoLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 10, marginBottom: 10 }}><CircularProgress color="sidish" /></div>}

@@ -48,28 +48,14 @@ function Addbook({ fetchBooks }) {
     const [imageUpload, setImageUpload] = useState(null);
     const [isImageUploaded, setIsImageUploaded] = useState(false);
 
-    const { setOpenSnackbar, setSnackbarMessage, resetAuthentication } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, resetAuthentication, fetchCategories } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
     const jwtToken = sessionStorage.getItem('jwt');
 
-    const fetchCategories = async () => {
-        try {
-            const response = await fetch(process.env.REACT_APP_API_URL + 'categories');
-            if (!response.ok) {
-                return null;
-            }
-            response.json()
-                .then(data => setCategories(data))
-                .catch(err => console.error(err));
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
     useEffect(() => {
-        fetchCategories();
+        fetchCategories(setCategories);
     }, []);
 
     const handleClickOpen = () => {

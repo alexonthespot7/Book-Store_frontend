@@ -1,133 +1,79 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { AgGridReact } from 'ag-grid-react';
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Typography from '@mui/material/Typography';
+import { useState, useEffect, useContext } from 'react';
 
+import { CircularProgress, Typography } from '@mui/material';
+
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-import AuthContext from "../context/AuthContext";
-
 import { motion } from 'framer-motion';
+
+import { useNavigate } from 'react-router-dom';
 
 import '../App.css'
 
+import AuthContext from "../context/AuthContext";
 import Editcategory from './Editcategory';
 import Addcategory from './Addcategory';
-import { CircularProgress } from '@mui/material';
 
 function Categories() {
     const [categories, setCategories] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    const { setOpenSnackbar, setSnackbarMessage, dialogueWidth, setBgrColor } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, dialogueWidth, setBgrColor, resetAuthentication, fetchCategories } = useContext(AuthContext);
+
+    const navigate = useNavigate();
+
+    const handleData = (data) => {
+        setCategories(data);
+        setDataLoaded(true);
+    }
 
     useEffect(() => {
-        fetchCategories();
+        fetchCategories(handleData);
         setBgrColor('#FFFAFA');
     }, []);
 
-    const fetchCategories = () => {
-        fetch(process.env.REACT_APP_API_URL + 'categories')
-            .then(response => response.json())
-            .then(data => {
-                setCategories(data);
-                setDataLoaded(true);
-            })
-            .catch(err => console.error(err))
-    }
-
-    /**const deleteCategory = (link) => {
-        if (window.confirm('Do you want to delete this category?')) {
-            const token = sessionStorage.getItem('jwt');
-            fetch(link,
-                {
-                    method: 'DELETE',
-                    headers: { 'Authorization': token }
+    const updateCategory = async (updatedCategory, link) => {
+        const token = sessionStorage.getItem('jwt');
+        try {
+            const response = await fetch(link, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(updatedCategory)
+            });
+            if (!response.ok) {
+                if (response.status === 500) {
+                    resetAuthentication();
+                    navigate('/');
+                } else {
+                    alert('Something is wrong with the server');
                 }
-            )
-                .then(response => {
-                    if (!response.ok) {
-                        alert('Something went wrong in deletion');
-                    }
-                    else {
-                        fetchCategories();
-                        setOpenSnackbar(true);
-                        setSnackbarMessage('The category was deleted');
-                    }
-                })
-                .catch(err => console.error(err))
+            }
+            fetchCategories(handleData);
+            setOpenSnackbar(true);
+            setSnackbarMessage('The category was updated');
+        } catch (error) {
+            alert('Something is wrong with the server');
         }
-    }*/
-
-    const addCategory = (newCategory) => {
-        const token = sessionStorage.getItem('jwt');
-        fetch(process.env.REACT_APP_API_URL + 'api/categories', {
-            method: 'POST',
-            headers:
-            {
-                'Content-Type': 'application/json',
-                'Authorization': token
-            },
-            body: JSON.stringify(newCategory)
-        })
-            .then(response => {
-                if (response.ok) {
-                    fetchCategories();
-                    setOpenSnackbar(true);
-                    setSnackbarMessage('The category was added');
-                } else {
-                    alert('Something went wrong during adding new category');
-                }
-            })
-            .catch(err => console.error(err));
-    }
-
-    const updateCategory = (updatedCategory, link) => {
-        const token = sessionStorage.getItem('jwt');
-        fetch(link, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': token
-            },
-            body: JSON.stringify(updatedCategory)
-        })
-            .then(response => {
-                if (response.ok) {
-                    fetchCategories();
-                    setOpenSnackbar(true);
-                    setSnackbarMessage('The category was updated');
-                } else {
-                    alert('Something went wrong during the category update');
-                }
-            })
-            .catch(err => console.error(err))
     }
 
     const linkGetter = (params) => {
         return `${process.env.REACT_APP_API_URL}api/categories/${params.data.categoryid}`;
     }
 
-    const [columns, setColumns] = useState([
+    const columns = [
         { field: 'name', sortable: true, filter: true, cellStyle: { 'text-align': 'left' } },
         {
             headerName: '',
             width: '100%',
             valueGetter: linkGetter,
             cellRenderer: params => <Editcategory params={params} updateCategory={updateCategory} />
-        },
-        /**{
-            headerName: '',
-            valueGetter: linkGetter,
-            width: '100%',
-            cellRenderer: params =>
-                <IconButton onClick={() => deleteCategory(params.value)}>
-                    <DeleteIcon color='sidish' />
-                </IconButton>
-        }*/
-    ]);
+        }
+    ];
 
     return (
         <motion.div
@@ -159,10 +105,10 @@ function Categories() {
             }
             {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="inherit" /></div>}
             <div style={{ display: 'flex', justifyContent: 'end', marginRight: 15 }}>
-                <Addcategory addCategory={addCategory} />
+                <Addcategory handleData={handleData} />
             </div>
         </motion.div>
-    )
+    );
 }
 
 export default Categories;

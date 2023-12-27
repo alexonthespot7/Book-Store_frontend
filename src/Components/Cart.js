@@ -12,13 +12,13 @@ import countryList from 'react-select-country-list';
 import Select from 'react-select';
 
 import AuthContext from '../context/AuthContext';
-import BookInCart from './BookInCart';
 
 import visa from '../pictures/visa.png';
 
 import mscard from '../pictures/mscard.png';
 import { createSearchParams, Navigate } from 'react-router-dom';
 import useMediaQuery from '../Hooks/useMediaQuery';
+import BookDialog from './BookDialog';
 
 const defaultFont = 16;
 
@@ -602,7 +602,7 @@ function Cart() {
                         </div>
                         <Divider style={{ width: '100%', marginBottom: 20 }} />
                     </div>
-                    <BookInCart bookInCart={bookInCart} setBookInCart={setBookInCart} openInCart={openInCart} setOpenInCart={setOpenInCart} />
+                    <BookDialog additionalBook={bookInCart} setAdditionalBook={setBookInCart} openAdditional={openInCart} setOpenAdditional={setOpenInCart} isInCart={true} />
                 </div >}
                 {(infoLoaded && total === 0) &&
                     <Navigate

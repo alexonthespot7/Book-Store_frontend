@@ -4,12 +4,11 @@ import { CardActionArea, CircularProgress, IconButton, Paper } from "@mui/materi
 
 import Carousel from "nuka-carousel/lib/carousel";
 
-import AdditionalBook from "./AdditionalBook";
-
 import useMediaQuery from "../Hooks/useMediaQuery";
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import BookDialog from "./BookDialog";
 
 const newPriceHolder = { borderRadius: '25px', width: 78, height: 24, backgroundColor: 'white', color: 'black', display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: 'display', fontSize: 14 };
 
@@ -167,7 +166,7 @@ export default function BooksinCategory({ category }) {
                     <Paper style={newPriceHolder} elevation={0}>
                         {currencyFormatter(book.price, '€')}
                     </Paper>
-                    <AdditionalBook additionalBook={additionalBook} setAdditionalBook={setAdditionalBook} openAdditional={openAdditional} setOpenAdditional={setOpenAdditional} />
+                    <BookDialog additionalBook={additionalBook} setAdditionalBook={setAdditionalBook} openAdditional={openAdditional} setOpenAdditional={setOpenAdditional} />
                 </div >
             )}
             {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2.5vh', marginBottom: '2.5vh' }}><CircularProgress color="thirdary" /></div>}

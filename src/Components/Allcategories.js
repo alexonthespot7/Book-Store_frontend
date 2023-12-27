@@ -20,7 +20,7 @@ function Allcategories() {
     const [openSearch, setOpenSearch] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const { setBgrColor } = useContext(AuthContext);
+    const { setBgrColor, fetchCategories } = useContext(AuthContext);
 
     const matchesSecond = useMediaQuery("(min-width: 870px)");
     const matchesThird = useMediaQuery("(min-width: 500px)");
@@ -107,20 +107,14 @@ function Allcategories() {
         }
     );
 
-    const fetchCategories = () => {
-        fetch(process.env.REACT_APP_API_URL + 'categories')
-            .then(response => response.json())
-            .then(data => {
-                if (data !== null) {
-                    setCategories(data);
-                    setDataFetched(true);
-                }
-            })
-            .catch(err => console.error(err));
+    const handleFetchCategoriesData = (data) => {
+        setCategories(data);
+        setDataFetched(true);
     }
 
     useEffect(() => {
-        fetchCategories();
+        fetchCategories(handleFetchCategoriesData);
+        setDataFetched(true)
         setBgrColor('#1c1c1c');
     }, []);
 
@@ -160,7 +154,6 @@ function Allcategories() {
     }
 
     return (
-
         <motion.div
             style={{ display: 'flex', flexDirection: 'column', gap: 30, marginBottom: 40 }}
             initial={{ opacity: 0 }}
@@ -238,7 +231,6 @@ function Allcategories() {
             }
             {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '30vh' }}><CircularProgress color="thirdary" /></div>}
         </motion.div >
-
     );
 }
 

@@ -6,8 +6,8 @@ import useMediaQuery from "../Hooks/useMediaQuery";
 
 
 
-import BookInCart from "./BookInCart";
 import DialogInfo from "./DialogInfo";
+import BookDialog from "./BookDialog";
 
 
 function Order({ order, alignProp, marginProp }) {
@@ -224,7 +224,7 @@ function Order({ order, alignProp, marginProp }) {
                         </div>
                         <Divider style={{ width: '100%', marginBottom: 20 }} />
                     </div>
-                    <BookInCart bookInCart={bookInCart} setBookInCart={setBookInCart} openInCart={openInCart} setOpenInCart={setOpenInCart} />
+                    <BookDialog additionalBook={bookInCart} setAdditionalBook={setBookInCart} openAdditional={openInCart} setOpenAdditional={setOpenInCart} isInCart={true} />
                 </div >
                 <DialogInfo openInfo={openInfo} setOpenInfo={setOpenInfo} textInfo={textInfo} setTextInfo={setTextInfo} infoField={infoField} setInfoField={setInfoField} />
             </div>}
