@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { Menu, MenuItem, Button, IconButton } from '@mui/material';
 
@@ -9,11 +9,14 @@ import useMediaQuery from '../../Hooks/useMediaQuery';
 import AuthContext from '../../context/AuthContext';
 import Login from './Login';
 import Signup from './Signup';
+import { useLocation } from 'react-router-dom';
 
 export default function SignIn() {
     const [anchorMenu, setAnchorMenu] = useState(null);
 
     const { setCartDrawerOpen } = useContext(AuthContext);
+
+    const location = useLocation();
 
     const openMenu = Boolean(anchorMenu);
 
@@ -97,9 +100,11 @@ export default function SignIn() {
                         <Signup buttonSize={buttonSize} />
                     </MenuItem>
                 </Menu>
-                <IconButton size='small' onClick={() => setCartDrawerOpen(true)}>
-                    <ShoppingCartOutlinedIcon color='thirdary' />
-                </IconButton>
+                {location !== '/cart' &&
+                    <IconButton size='small' onClick={() => setCartDrawerOpen(true)}>
+                        <ShoppingCartOutlinedIcon color='thirdary' />
+                    </IconButton>
+                }
             </div>
         );
     }

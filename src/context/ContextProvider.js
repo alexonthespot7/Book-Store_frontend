@@ -235,12 +235,142 @@ function ContextProvider(props) {
         }
     }
 
+    const fetchTotalAuthentication = async (handleTotal, handleBadResponse) => {
+        const token = sessionStorage.getItem('jwt');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'getcurrenttotal',
+                {
+                    method: 'GET',
+                    headers: { 'Authorization': token }
+                }
+            );
+            if (!response.ok) {
+                handleBadResponse();
+                return null;
+            }
+            await response.json()
+                .then(data => {
+                    if (data !== null) {
+                        handleTotal(data.total);
+                    } else {
+                        handleBadResponse();
+                    }
+                })
+                .catch(err => {
+                    handleTotal(0);
+                });
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const fetchCartByUserId = async (handleBooksInCart, handleTotal, handleBadResponse) => {
+        const token = sessionStorage.getItem('jwt');
+        const id = sessionStorage.getItem('authorizedId');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'showcart/' + id,
+                {
+                    method: 'GET',
+                    headers: { 'Authorization': token }
+                });
+            if (!response.ok) {
+                handleBadResponse();
+                return null;
+            }
+            await response.json()
+                .then(data => {
+                    if (data !== null) {
+                        handleBooksInCart(data);
+                        fetchTotalAuthentication(handleTotal, handleBadResponse);
+                    } else {
+                        handleBadResponse();
+                    }
+                })
+                .catch(err => console.error(err));
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const fetchTotalNoAuthentication = async (handleTotal, handleBadResponse) => {
+        const backetId = sessionStorage.getItem('cartId');
+        const password = sessionStorage.getItem('cartPass');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'totalofbacket', {
+                method: 'POST',
+                headers:
+                {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: backetId, password: password })
+            });
+            if (!response.ok) {
+                handleBadResponse();
+                return null;
+            }
+            await response.json()
+                .then(data => {
+                    if (data !== null) {
+                        handleTotal(data.total);
+                    } else {
+                        handleBadResponse();
+                    }
+                })
+                .catch(err => {
+                    handleTotal(0);
+                });
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const fetchCartByBacketId = async (handleBooksInCart, handleTotal, handleBadResponse) => {
+        const backetId = sessionStorage.getItem('cartId');
+        const password = sessionStorage.getItem('cartPass');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'showcart', {
+                method: 'POST',
+                headers:
+                {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: backetId, password: password })
+            });
+            if (!response.ok) {
+                handleBadResponse();
+                return null;
+            }
+            await response.json()
+                .then(data => {
+                    if (data !== null) {
+                        handleBooksInCart(data);
+                        fetchTotalNoAuthentication(handleTotal, handleBadResponse);
+                    } else {
+                        handleBadResponse();
+                    }
+                })
+                .catch(err => console.error(err));
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const fetchCart = async (handleBooksInCart, handleTotal, handleBadResponse) => {
+        if (sessionStorage.getItem('authorizedUsername') !== null) {
+            await fetchCartByUserId(handleBooksInCart, handleTotal, handleBadResponse);
+        } else if (sessionStorage.getItem('cartId')) {
+            await fetchCartByBacketId(handleBooksInCart, handleTotal, handleBadResponse);
+        } else {
+            handleTotal(0);
+        }
+    }
+
     return (
         <AuthContext.Provider value={{
             currencyFormatter, openSnackbar, setOpenSnackbar, snackbarMessage, setSnackbarMessage,
             dialogueWidth, bgrColor, setBgrColor, cartDrawerOpen, setCartDrawerOpen,
             fetchIdsOfBooksInCart, idsOfBooksInCart, setIdsOfBooksInCart,
-            resetAuthentication, addBookToCart, fetchBook, fetchCategories
+            resetAuthentication, addBookToCart, fetchBook, fetchCategories, fetchCart
         }}>
             {props.children}
         </AuthContext.Provider>

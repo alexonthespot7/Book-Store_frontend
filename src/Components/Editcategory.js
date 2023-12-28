@@ -8,7 +8,7 @@ const initialCategory = {
     name: '',
 }
 
-export default function Editcategory({ params, updateCategory }) {
+export default function EditCategory({ params, updateCategory }) {
     const [open, setOpen] = useState(false);
     const [nameErr, setNameErr] = useState(false);
     const [nameHelper, setNameHelper] = useState('');

@@ -11,7 +11,7 @@ import { AgGridReact } from "ag-grid-react";
 
 import AuthContext from "../context/AuthContext";
 import useMediaQuery from "../Hooks/useMediaQuery";
-import Editorder from "./Editorder";
+import EditOrder from "./EditOrder";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -104,7 +104,7 @@ export default function Orders() {
         {
             headerName: '',
             width: '100%',
-            cellRenderer: params => <Editorder order={params.data} updateOrder={updateOrder} />
+            cellRenderer: params => <EditOrder order={params.data} updateOrder={updateOrder} />
         },
     ]);
 

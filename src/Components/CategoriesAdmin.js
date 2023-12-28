@@ -13,10 +13,10 @@ import { useNavigate } from 'react-router-dom';
 import '../App.css'
 
 import AuthContext from "../context/AuthContext";
-import Editcategory from './Editcategory';
-import Addcategory from './Addcategory';
+import EditCategory from './EditCategory';
+import AddCategory from './AddCategory';
 
-function Categories() {
+function CategoriesAdmin() {
     const [categories, setCategories] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
 
@@ -71,7 +71,7 @@ function Categories() {
             headerName: '',
             width: '100%',
             valueGetter: linkGetter,
-            cellRenderer: params => <Editcategory params={params} updateCategory={updateCategory} />
+            cellRenderer: params => <EditCategory params={params} updateCategory={updateCategory} />
         }
     ];
 
@@ -105,10 +105,10 @@ function Categories() {
             }
             {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="inherit" /></div>}
             <div style={{ display: 'flex', justifyContent: 'end', marginRight: 15 }}>
-                <Addcategory handleData={handleData} />
+                <AddCategory handleData={handleData} />
             </div>
         </motion.div>
     );
 }
 
-export default Categories;
+export default CategoriesAdmin;

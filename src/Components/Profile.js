@@ -17,7 +17,7 @@ import { motion } from 'framer-motion';
 import countryList from 'react-select-country-list';
 import Select from 'react-select';
 import { useMemo } from "react";
-import Myorders from "./Myorders";
+import MyOrders from "./MyOrders";
 import DialogInfo from "./DialogInfo";
 
 
@@ -628,7 +628,7 @@ function Profile() {
                         {allowChangeAddress && <Button size={buttonPasswordSize} sx={{ borderRadius: '20px', width: 200 - widthMinusFields, height: 35, marginTop: 3, "&:hover": { filter: 'brightness(70%)' }, transition: '0.45s' }} variant='contained' color='sidish' onClick={applyChangePersonal} >Apply Changes</Button>}
                     </motion.div>
                 </Box>}
-                {(division === 'myOrders') && <Box sx={{ gridArea: 'main', display: 'flex', flexDirection: 'column', gap: 5, alignItems: alignMain }}><Myorders /></Box>}
+                {(division === 'myOrders') && <Box sx={{ gridArea: 'main', display: 'flex', flexDirection: 'column', gap: 5, alignItems: alignMain }}><MyOrders /></Box>}
                 {division !== 'myOrders' && <Box sx={{ gridArea: 'footer', display: 'flex', justifyContent: 'center' }}>
                     <Button size={buttonPasswordSize} sx={{ borderRadius: '20px', width: 200 - widthMinusFields, height: 35, marginTop: footerMargin, marginBottom: 2.5, "&:hover": { filter: 'brightness(70%)' }, transition: '0.45s' }} variant='contained' color='sidish' onClick={handleOpenChangePasswordDialog}>Change password</Button>
                 </Box>}

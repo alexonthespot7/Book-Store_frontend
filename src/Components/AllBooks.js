@@ -13,7 +13,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import useMediaQuery from '../Hooks/useMediaQuery';
 import AuthContext from '../context/AuthContext';
-import Addbook from './Addbook';
+import AddBook from './AddBook';
 
 const buttonStyle = {
     transition: '0.4s',
@@ -69,7 +69,7 @@ const imageDiv = {
     marginTop: 15
 }
 
-function Booklist() {
+function AllBooks() {
     const [dataFetched, setDataFetched] = useState(false);
     const [books, setBooks] = useState([]);
     const [page, setPage] = useState(1);
@@ -323,7 +323,7 @@ function Booklist() {
                 <div style={{ display: 'flex', gap: 8 }}>
                     {sessionStorage.getItem('role') === 'ADMIN' && <>
                         <Typography variant={typographySize}>All books</Typography>
-                        <Addbook fetchBooks={fetchBooks} />
+                        <AddBook fetchBooks={fetchBooks} />
                     </>}
                     {sessionStorage.getItem('role') !== 'ADMIN' && <>
                         <Typography variant={typographySize}>All</Typography>
@@ -415,5 +415,5 @@ function Booklist() {
     );
 }
 
-export default Booklist;
+export default AllBooks;
 

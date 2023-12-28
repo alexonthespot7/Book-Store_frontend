@@ -13,7 +13,7 @@ import BookDialog from "./BookDialog";
 
 const newPriceHolder = { borderRadius: '25px', width: 78, height: 24, backgroundColor: 'white', color: 'black', display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: 'display', fontSize: 14 };
 
-export default function BooksinCategory({ category }) {
+export default function BooksInCategory({ category }) {
     const [books, setBooks] = useState([]);
     const [dataFetched, setDataFetched] = useState(false);
     const [openAdditional, setOpenAdditional] = useState(false);

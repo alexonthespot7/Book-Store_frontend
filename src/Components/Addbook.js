@@ -39,7 +39,7 @@ const inputType = {
     bookYear: 'number',
 }
 
-function Addbook({ fetchBooks }) {
+function AddBook({ fetchBooks }) {
     const [openAddBookDialog, setOpenAddBookDialog] = useState(false);
     const [categories, setCategories] = useState([]);
     const [book, setBook] = useState(initialBook);
@@ -256,4 +256,4 @@ function Addbook({ fetchBooks }) {
     );
 }
 
-export default Addbook;
+export default AddBook;

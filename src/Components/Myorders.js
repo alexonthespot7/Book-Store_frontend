@@ -17,7 +17,7 @@ const mainStyle = {
     marginBottom: 20,
 }
 
-function Myorders() {
+function MyOrders() {
     const [page, setPage] = useState(1);
     const [openSearch, setOpenSearch] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -213,4 +213,4 @@ function Myorders() {
     );
 }
 
-export default Myorders;
+export default MyOrders;

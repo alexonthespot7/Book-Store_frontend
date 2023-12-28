@@ -1,8 +1,6 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Book from "../Components/Book";
 
-import Booklist from "../Components/Booklist";
-import Categories from "../Components/Categories";
 import Profile from "../Components/Profile";
 import Users from "../Components/Users";
 
@@ -10,11 +8,13 @@ import AdminRoute from "./AdminRoute";
 import PersonalRoute from "./PersonalRoute";
 
 import { AnimatePresence } from 'framer-motion';
-import Allcategories from "../Components/Allcategories";
 import Cart from "../Components/Cart";
 import Orders from "../Components/Orders";
 import OrderByNumber from "../Components/OrderByNumber";
 import OrderAdmin from "../Components/OrderAdmin";
+import AllBooks from "../Components/AllBooks";
+import CategoriesAdmin from "../Components/CategoriesAdmin";
+import AllCategories from "../Components/AllCategories";
 
 
 function BookRoutes() {
@@ -25,8 +25,8 @@ function BookRoutes() {
     return (
         <AnimatePresence>
             <Routes location={location} key={location.pathname} >
-                <Route path="/" element={<Booklist />} />
-                <Route path="/bycategories" element={<Allcategories />} />
+                <Route path="/" element={<AllBooks />} />
+                <Route path="/bycategories" element={<AllCategories />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/orders/:orderid" element={<OrderByNumber />} />
                 <Route
@@ -49,7 +49,7 @@ function BookRoutes() {
                     path="/categories"
                     element={
                         <AdminRoute>
-                            <Categories />
+                            <CategoriesAdmin />
                         </AdminRoute>
                     }
                 />

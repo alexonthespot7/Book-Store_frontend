@@ -37,7 +37,7 @@ function CartMenu() {
     const [bookInCart, setBookInCart] = useState(null);
     const [openInCart, setOpenInCart] = useState(false);
 
-    const { currencyFormatter, setOpenSnackbar, setSnackbarMessage, setCartDrawerOpen, fetchIdsOfBooksInCart, addBookToCart, fetchBook } = useContext(AuthContext);
+    const { currencyFormatter, setOpenSnackbar, setSnackbarMessage, setCartDrawerOpen, fetchIdsOfBooksInCart, addBookToCart, fetchBook, fetchCart } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
@@ -45,148 +45,18 @@ function CartMenu() {
     const matches305px = useMediaQuery("(min-width: 305px)");
     const matches300px = useMediaQuery("(min-width: 300px)");
 
+    const handleTotal = (totalData) => {
+        setTotal(totalData);
+        setInfoLoaded(true);
+    }
+
     const handleBadResponse = () => {
         setCartDrawerOpen(false);
         navigate('/');
     }
 
-    const fetchTotalAuthentication = async () => {
-        const token = sessionStorage.getItem('jwt');
-        try {
-            const response = await fetch(process.env.REACT_APP_API_URL + 'getcurrenttotal',
-                {
-                    method: 'GET',
-                    headers: { 'Authorization': token }
-                }
-            );
-            if (!response.ok) {
-                handleBadResponse();
-                return null;
-            }
-            await response.json()
-                .then(data => {
-                    if (data !== null) {
-                        setTotal(data.total);
-                        setInfoLoaded(true);
-                    } else {
-                        handleBadResponse();
-                    }
-                })
-                .catch(err => {
-                    setTotal(0);
-                    setInfoLoaded(true);
-                });
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    const fetchCartByUserId = async () => {
-        const token = sessionStorage.getItem('jwt');
-        const id = sessionStorage.getItem('authorizedId');
-        try {
-            const response = await fetch(process.env.REACT_APP_API_URL + 'showcart/' + id,
-                {
-                    method: 'GET',
-                    headers: { 'Authorization': token }
-                });
-            if (!response.ok) {
-                handleBadResponse();
-                return null;
-            }
-            await response.json()
-                .then(data => {
-                    if (data !== null) {
-                        setBooksInCart(data);
-                        fetchTotalAuthentication();
-                    } else {
-                        handleBadResponse();
-                    }
-                })
-                .catch(err => console.error(err));
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    const fetchTotalNoAuthentication = async () => {
-        const backetId = sessionStorage.getItem('cartId');
-        const password = sessionStorage.getItem('cartPass');
-        try {
-            const response = await fetch(process.env.REACT_APP_API_URL + 'totalofbacket', {
-                method: 'POST',
-                headers:
-                {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ id: backetId, password: password })
-            });
-            if (!response.ok) {
-                handleBadResponse();
-                return null;
-            }
-            await response.json()
-                .then(data => {
-                    if (data !== null) {
-                        setTotal(data.total);
-                        setInfoLoaded(true);
-                    } else {
-                        handleBadResponse();
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    setTotal(0);
-                    setInfoLoaded(true);
-                });
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    const fetchCartByBacketId = async () => {
-        const backetId = sessionStorage.getItem('cartId');
-        const password = sessionStorage.getItem('cartPass');
-        try {
-            const response = await fetch(process.env.REACT_APP_API_URL + 'showcart', {
-                method: 'POST',
-                headers:
-                {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ id: backetId, password: password })
-            });
-            if (!response.ok) {
-                handleBadResponse();
-                return null;
-            }
-            await response.json()
-                .then(data => {
-                    if (data !== null) {
-                        setBooksInCart(data);
-                        fetchTotalNoAuthentication();
-                    } else {
-                        handleBadResponse();
-                    }
-                })
-                .catch(err => console.error(err));
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    const fetchCart = async () => {
-        if (sessionStorage.getItem('authorizedUsername') !== null) {
-            await fetchCartByUserId();
-        } else if (sessionStorage.getItem('cartId')) {
-            await fetchCartByBacketId();
-        } else {
-            setInfoLoaded(true);
-        }
-    }
-
     useEffect(() => {
-        fetchCart();
+        fetchCart(setBooksInCart, handleTotal, handleBadResponse);
     }, []);
 
     const deleteBookNoAuthentication = async (id) => {
@@ -237,7 +107,7 @@ function CartMenu() {
             await deleteBookNoAuthentication(id);
         }
         await fetchIdsOfBooksInCart();
-        await fetchCart();
+        await fetchCart(setBooksInCart, handleTotal, handleBadResponse);
     }
 
     const fetchReduceQuantityAuthentication = async (id) => {
@@ -301,7 +171,7 @@ function CartMenu() {
                 await fetchReduceQuantity(id);
                 await fetchIdsOfBooksInCart();
             }
-            await fetchCart();
+            await fetchCart(setBooksInCart, handleTotal, handleBadResponse);
             setQuantityChanges(false);
         }
     }

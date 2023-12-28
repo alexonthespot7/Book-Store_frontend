@@ -9,9 +9,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import useMediaQuery from "../Hooks/useMediaQuery";
 import AuthContext from "../context/AuthContext";
-import BooksinCategory from "./Booksincategory";
+import BooksInCategory from "./BooksInCategory";
 
-function Allcategories() {
+function AllCategories() {
     const [categories, setCategories] = useState([]);
     const [dataFetched, setDataFetched] = useState(false);
     const [searchNow, setSearchNow] = useState('');
@@ -101,7 +101,7 @@ function Allcategories() {
                 >
                     <Typography variant={titleSize} sx={{ color: 'white', fontFamily: 'serif', marginBottom: 2.5 }} >{category.name}</Typography>
                     <div style={{ width: carouselWidth }}>
-                        <BooksinCategory category={category} />
+                        <BooksInCategory category={category} />
                     </div>
                 </motion.div>
             </AnimatePresence>
@@ -218,4 +218,4 @@ function Allcategories() {
     );
 }
 
-export default Allcategories;
+export default AllCategories;

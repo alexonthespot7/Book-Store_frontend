@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { Menu, MenuItem, Button, ListItemIcon, Divider, IconButton } from '@mui/material';
 
@@ -7,7 +7,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import AuthContext from '../context/AuthContext';
 import useMediaQuery from '../Hooks/useMediaQuery';
@@ -17,6 +17,7 @@ export default function Logout() {
 
     const { setCartDrawerOpen, setOpenSnackbar, setSnackbarMessage } = useContext(AuthContext);
 
+    const location = useLocation();
     const navigate = useNavigate();
 
     const openMenu = Boolean(menuAnchor);
@@ -151,9 +152,11 @@ export default function Logout() {
                     Logout
                 </Button>
             }
-            <IconButton size={buttonSize} onClick={() => setCartDrawerOpen(true)}>
-                <ShoppingCartOutlinedIcon color='thirdary' />
-            </IconButton>
+            {location.pathname !== '/cart' &&
+                <IconButton size={buttonSize} onClick={() => setCartDrawerOpen(true)}>
+                    <ShoppingCartOutlinedIcon color='thirdary' />
+                </IconButton>
+            }
         </div >
     );
 }

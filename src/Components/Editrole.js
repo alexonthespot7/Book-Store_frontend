@@ -10,7 +10,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import MenuItem from '@mui/material/MenuItem';
 import { RollerShadesClosedRounded } from '@mui/icons-material';
 
-export default function Editrole({ params, updateRole }) {
+export default function EditRole({ params, updateRole }) {
   const [open, setOpen] = useState(false);
 
   const [roleInfo, setRoleInfo] = useState({

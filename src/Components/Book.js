@@ -19,7 +19,7 @@ import Carousel from 'nuka-carousel/lib/carousel';
 import AuthContext from '../context/AuthContext';
 import useMediaQuery from '../Hooks/useMediaQuery';
 import BookDialog from './BookDialog';
-import Editbook from './Editbook';
+import EditBook from './EditBook';
 
 const initialBook = {
     id: '',
@@ -339,7 +339,7 @@ export default function Book() {
                                         </Button>
                                     </div>
                                     <div style={{ display: 'flex', gap: 25, marginTop: 20 }}>
-                                        {sessionStorage.getItem('role') === 'ADMIN' && <Editbook book={book} setBook={setBook} />}
+                                        {sessionStorage.getItem('role') === 'ADMIN' && <EditBook book={book} setBook={setBook} />}
                                         {sessionStorage.getItem('role') === 'ADMIN' &&
                                             <IconButton onClick={() => deleteBook(`${process.env.REACT_APP_API_URL}api/books/${book.id}`)} >
                                                 <DeleteIcon color='thirdary' />

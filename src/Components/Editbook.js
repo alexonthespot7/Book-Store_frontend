@@ -39,7 +39,7 @@ const inputType = {
     bookYear: 'number',
 }
 
-function Editbook({ book, setBook }) {
+function EditBook({ book, setBook }) {
     const [open, setOpen] = useState(false);
     const [categories, setCategories] = useState([]);
     const [isError, setIsError] = useState(initialIsError);
@@ -263,4 +263,4 @@ function Editbook({ book, setBook }) {
     );
 }
 
-export default Editbook;
+export default EditBook;

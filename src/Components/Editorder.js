@@ -6,7 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import countryList from "react-select-country-list";
 
 
-export default function Editorder({ order, updateOrder }) {
+export default function EditOrder({ order, updateOrder }) {
 
     const [open, setOpen] = useState(false);
     const [nameError, setNameError] = useState(false);

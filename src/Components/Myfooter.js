@@ -36,7 +36,7 @@ function Bottom() {
   );
 }
 
-function Myfooter() {
+function MyFooter() {
   return (
     <Footer
       theme='dark'
@@ -79,4 +79,4 @@ function Myfooter() {
   );
 }
 
-export default Myfooter;
+export default MyFooter;

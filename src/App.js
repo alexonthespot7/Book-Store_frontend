@@ -9,7 +9,7 @@ import AuthContext from './context/AuthContext';
 import useMediaQuery from './Hooks/useMediaQuery';
 import BookRoutes from './Routes/BookRoutes';
 import MyAppBar from './Components/AppBar/MyAppBar';
-import Myfooter from './Components/Myfooter';
+import MyFooter from './Components/MyFooter';
 import MenuDrawer from './Components/AppBar/MenuDrawer';
 import CartMenuDrawer from './Components/AppBar/CartMenuDrawer';
 
@@ -73,7 +73,7 @@ function App() {
           />
         </Main>
       </Box>
-      <Myfooter />
+      <MyFooter />
     </div >
   );
 }

@@ -16,7 +16,7 @@ import AuthContext from '../context/AuthContext';
 import { useContext } from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import Editrole from './Editrole';
+import EditRole from './EditRole';
 import { CircularProgress, Snackbar } from '@mui/material';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -100,7 +100,7 @@ function Users() {
             cellRenderer: params => {
                 if (sessionStorage.getItem('authorizedId') != params.data.id) {
                     return (
-                        <Editrole params={params} updateRole={updateRole} />
+                        <EditRole params={params} updateRole={updateRole} />
                     )
                 }
             },

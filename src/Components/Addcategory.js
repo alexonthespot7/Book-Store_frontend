@@ -12,7 +12,7 @@ const initialCategory = {
     name: ''
 }
 
-export default function Addcategory({ handleData }) {
+export default function AddCategory({ handleData }) {
     const [open, setOpen] = useState(false);
     const [nameErr, setNameErr] = useState(false);
     const [nameHelper, setNameHelper] = useState('');
