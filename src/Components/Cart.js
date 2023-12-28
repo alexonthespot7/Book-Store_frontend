@@ -2,8 +2,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useContext, useState, useEffect, useMemo } from 'react';
 
-import MuiAlert from '@mui/material/Alert';
-
 import { Button, Card, CardActionArea, CircularProgress, Divider, Paper, TextField, Typography } from '@mui/material';
 
 import EastIcon from '@mui/icons-material/East';
@@ -19,6 +17,7 @@ import mscard from '../pictures/mscard.png';
 import { createSearchParams, Navigate } from 'react-router-dom';
 import useMediaQuery from '../Hooks/useMediaQuery';
 import BookDialog from './BookDialog';
+import DialogInfo from './DialogInfo';
 
 const defaultFont = 16;
 
@@ -34,6 +33,10 @@ const buttonProceedStyle = {
 }
 
 function Cart() {
+    const [openInfo, setOpenInfo] = useState(false);
+    const [textInfo, setTextInfo] = useState('');
+    const [infoField, setInfoField] = useState('');
+
     const [booksInCart, setBooksInCart] = useState([]);
     const [total, setTotal] = useState(0);
     const [user, setUser] = useState({});
@@ -61,7 +64,7 @@ function Cart() {
 
     const options = useMemo(() => countryList().getData(), []);
 
-    const { setOpenSnackbar, setSnackbarMessage, setBgrColor } = useContext(AuthContext);
+    const { currencyFormatter, setOpenSnackbar, setSnackbarMessage, setBgrColor, fetchBook } = useContext(AuthContext);
 
     const matchesM = useMediaQuery("(min-width: 850px)");
     const matchesS = useMediaQuery("(min-width: 440px)");
@@ -248,12 +251,6 @@ function Cart() {
         }
     }, []);
 
-    const currencyFormatter = (currency, sign) => {
-        let sansDec = currency.toFixed(2);
-        let formatted = sansDec.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        return sign + `${formatted}`;
-    }
-
     const changeAddressInfo = (event) => {
         setAddressInfo({ ...addressInfo, [event.target.name]: event.target.value });
     }
@@ -263,21 +260,9 @@ function Cart() {
         setAddressInfo({ ...addressInfo, country: value.label })
     }
 
-    const openBookInCart = (thisbookid) => {
+    const openBookInCart = async (bookId) => {
+        await fetchBook(bookId, setBookInCart);
         setOpenInCart(true);
-        fetch(process.env.REACT_APP_API_URL + 'books/' + thisbookid,
-            {
-                method: 'GET'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data !== null) {
-                    setBookInCart(data);
-                } else {
-                    alert('There is no such book');
-                }
-            })
-            .catch(err => console.error(err));
     }
 
     const proceed = () => {
@@ -328,6 +313,12 @@ function Cart() {
         }
     }
 
+    const openOrderInfoDialog = (orderNumber, orderPassword) => {
+        setOpenInfo(true);
+        setInfoField('Order Info');
+        setTextInfo(<p>Thank you for your purchase! Please write down or take a photo of your:<br /><br />Order number: <b>{orderNumber}</b><br /> Order Password: <b>{orderPassword}</b></p>);
+    }
+
     const makeSaleNotLogged = () => {
         const backetId = sessionStorage.getItem('cartId');
         const password = sessionStorage.getItem('cartPass');
@@ -344,11 +335,9 @@ function Cart() {
             .then(response => response.json())
             .then(data => {
                 if (data !== null) {
+                    openOrderInfoDialog(data.orderid, data.password);
                     setInfoLoaded(true);
-                    setTotal(0);
-                    sessionStorage.removeItem('cartId');
-                    sessionStorage.removeItem('cartPass');
-                    alert('Thank you for your purchase! Please write down or take a photo of your:\nOrder number: ' + data.orderid + '\nOrder Password: ' + data.password);
+                    // alert('Thank you for your purchase! Please write down or take a photo of your:\nOrder number: ' + data.orderid + '\nOrder Password: ' + data.password);
                 } else {
                     alert('Something went wrong during making the sale')
                 }
@@ -399,6 +388,15 @@ function Cart() {
         if (check);
         setInfoLoaded(false);
         makeSale();
+    }
+
+    const handleCloseInfoDialog = () => {
+        setOpenInfo(false);
+        setTextInfo('');
+        setInfoField('');
+        setTotal(0);
+        sessionStorage.removeItem('cartId');
+        sessionStorage.removeItem('cartPass');
     }
 
     return (
@@ -603,6 +601,7 @@ function Cart() {
                         <Divider style={{ width: '100%', marginBottom: 20 }} />
                     </div>
                     <BookDialog additionalBook={bookInCart} setAdditionalBook={setBookInCart} openAdditional={openInCart} setOpenAdditional={setOpenInCart} isInCart={true} />
+                    <DialogInfo openInfo={openInfo} handleClose={handleCloseInfoDialog} textInfo={textInfo} infoField={infoField} />
                 </div >}
                 {(infoLoaded && total === 0) &&
                     <Navigate

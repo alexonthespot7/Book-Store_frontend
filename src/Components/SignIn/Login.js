@@ -5,6 +5,8 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, 
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import LoginIcon from '@mui/icons-material/Login';
 
+import { useNavigate } from "react-router";
+
 import AuthContext from "../../context/AuthContext";
 import useMediaQuery from "../../Hooks/useMediaQuery";
 import ResetPassword from "./ResetPassword";
@@ -30,6 +32,8 @@ function Login({ buttonSize }) {
     const [loading, setLoading] = useState(false);
 
     const { setOpenSnackbar, setSnackbarMessage } = useContext(AuthContext);
+
+    const navigate = useNavigate();
 
     const matches350px = useMediaQuery("(min-width: 350px)");
     const inputSize = matches350px ? 'medium' : 'small';
@@ -71,6 +75,7 @@ function Login({ buttonSize }) {
         setOpenLoginDialog(false);
         setOpenSnackbar(true);
         setSnackbarMessage('Login process went successfully');
+        navigate('/');
     }
 
     const fetchLoginUser = async () => {

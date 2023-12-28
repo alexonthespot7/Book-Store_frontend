@@ -83,7 +83,6 @@ export default function Logout() {
     }
 
     const mainDivGap = matches1028px ? 8 : 0;
-    const marginSmall = matches430px ? 0 : -3;
 
     const mainDivStyle = matches870px ? { display: 'flex', flexDirection: 'row', gap: mainDivGap } : {}
     const buttonSize = matches870px ? 'medium' : 'small';
@@ -157,7 +156,6 @@ export default function Logout() {
             </IconButton>
         </div >
     );
-
 }
 
 

@@ -99,34 +99,6 @@ export default function Book() {
         if (!book) navigate('/');
     }, [book]);
 
-    const deleteBook = (link) => {
-        if (window.confirm('Do you want to delete this book?')) {
-            const token = sessionStorage.getItem('jwt');
-            fetch(link,
-                {
-                    method: 'DELETE',
-                    headers: { 'Authorization': token }
-                }
-            )
-                .then(response => {
-                    if (!response.ok) {
-                        alert('Something went wrong in deletion');
-                    }
-                    else {
-                        let previousPictureRef = ref(storage, book.url);
-                        deleteObject(previousPictureRef)
-                            .then(() => {
-                                setOpenSnackbar(true);
-                                setSnackbarMessage('The book was deleted successfully');
-                                navigate("/");
-                            })
-                            .catch(err => console.error(err));
-                    }
-                })
-                .catch(err => console.error(err));
-        }
-    }
-
     const openAdditionalDialog = async (bookId) => {
         await fetchBook(bookId, setAdditionalBook);
         setOpenAdditional(true);
@@ -296,6 +268,35 @@ export default function Book() {
         }
     }
 
+    const deleteBook = async (link) => {
+        if (!window.confirm('Do you want to delete this book?')) {
+            return null;
+        }
+        const token = sessionStorage.getItem('jwt');
+        try {
+            const response = await fetch(link,
+                {
+                    method: 'DELETE',
+                    headers: { 'Authorization': token }
+                }
+            );
+            if (!response.ok) {
+                alert('Something is wrong with the server');
+                return null;
+            }
+            let previousPictureRef = ref(storage, book.url);
+            deleteObject(previousPictureRef)
+                .then(() => {
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('The book was deleted successfully');
+                    navigate("/");
+                })
+                .catch(err => console.error(err));
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -333,7 +334,7 @@ export default function Book() {
                                             <Typography sx={quantityStyle}>{quantity}</Typography>
                                             <Button onClick={() => handleQuantity('+')} sx={buttonPlus}>+</Button>
                                         </Card>
-                                        <Button onClick={() => addBookToCart(book.id)} endIcon={<AddShoppingCartIcon />} sx={cartStyle} component={Paper} elevation={10} >
+                                        <Button onClick={() => addBookToCart(book.id, quantity)} endIcon={<AddShoppingCartIcon />} sx={cartStyle} component={Paper} elevation={10} >
                                             Add to Cart
                                         </Button>
                                     </div>

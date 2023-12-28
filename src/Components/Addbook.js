@@ -52,7 +52,6 @@ function Addbook({ fetchBooks }) {
 
     const navigate = useNavigate();
 
-    const jwtToken = sessionStorage.getItem('jwt');
 
     useEffect(() => {
         fetchCategories(setCategories);
@@ -103,6 +102,7 @@ function Addbook({ fetchBooks }) {
 
     // Function to add the new book for administrator:
     const addBook = async (newBook) => {
+        const jwtToken = sessionStorage.getItem('jwt');
         try {
             const response = await fetch(process.env.REACT_APP_API_URL + 'api/books', {
                 method: 'POST',
@@ -117,7 +117,7 @@ function Addbook({ fetchBooks }) {
                 handleBadResponseAddBook(response);
                 return null;
             }
-            fetchBooks();
+            await fetchBooks();
             setOpenAddBookDialog(false);
             setOpenSnackbar(true);
             setSnackbarMessage('New book was added successfully');

@@ -47,7 +47,7 @@ function ContextProvider(props) {
                 handleBadResponseBooksInCartAuth(response);
                 return null;
             }
-            response.json()
+            await response.json()
                 .then(data => setIdsOfBooksInCart(data))
                 .catch(err => console.error(err));
         } catch (error) {
@@ -68,9 +68,9 @@ function ContextProvider(props) {
         }
     }
 
-    const fetchIdsOfBooksInCartNoAuth = async (backetid) => {
+    const fetchIdsOfBooksInCartNoAuth = async () => {
         try {
-            const response = await fetch(process.env.REACT_APP_API_URL + 'booksids/' + backetid,
+            const response = await fetch(process.env.REACT_APP_API_URL + 'booksids/' + sessionStorage.getItem('cartId'),
                 {
                     method: 'GET'
                 });
@@ -78,7 +78,7 @@ function ContextProvider(props) {
                 handleBadResponseBooksInCartNoAuth(response);
                 return null;
             }
-            response.json()
+            await response.json()
                 .then(data => setIdsOfBooksInCart(data))
                 .catch(err => console.error(err));
         } catch (error) {
@@ -105,7 +105,7 @@ function ContextProvider(props) {
                 setSnackbarMessage('Something is wrong with the server');
                 return null;
             }
-            setCartDrawerOpen(true);
+            await fetchIdsOfBooksInCartAuthenticated();
             setOpenSnackbar(true);
             setSnackbarMessage('The book was added to your cart');
         } catch (error) {
@@ -115,7 +115,7 @@ function ContextProvider(props) {
         }
     }
 
-    const fetchCreateCartNoAuthentication = async (bookid) => {
+    const fetchCreateCartNoAuthentication = async (bookid, quantity) => {
         try {
             const response = await fetch(process.env.REACT_APP_API_URL + 'createbacket', {
                 method: 'POST'
@@ -125,11 +125,11 @@ function ContextProvider(props) {
                 setSnackbarMessage('Something is wrong with the server');
                 return null;
             }
-            response.json()
+            await response.json()
                 .then(data => {
                     sessionStorage.setItem('cartId', data.id);
                     sessionStorage.setItem('cartPass', data.password);
-                    fetchAddBookToCartNoAuthentication(bookid);
+                    fetchAddBookToCartNoAuthentication(bookid, quantity);
                 })
                 .catch(err => console.error(err));
         } catch (error) {
@@ -165,7 +165,7 @@ function ContextProvider(props) {
                 handleBadResponseAddBookToCartNoAuth(response);
                 return null;
             }
-            setCartDrawerOpen(true);
+            await fetchIdsOfBooksInCartNoAuth();
             setOpenSnackbar(true);
             setSnackbarMessage('The book was added to your cart');
         } catch (error) {
@@ -177,20 +177,29 @@ function ContextProvider(props) {
 
     const addBookToCartNoAuthentication = async (bookid, quantity) => {
         if (!sessionStorage.getItem('cartId')) {
-            await fetchCreateCartNoAuthentication(bookid);
+            await fetchCreateCartNoAuthentication(bookid, quantity);
         } else {
             await fetchAddBookToCartNoAuthentication(bookid, quantity);
         }
     }
 
-    const addBookToCart = async (bookid, quantity = 1) => {
+    const fetchIdsOfBooksInCart = async () => {
+        if (sessionStorage.getItem('jwt')) {
+            await fetchIdsOfBooksInCartAuthenticated();
+        } else if (sessionStorage.getItem('cartId') !== null) {
+            await fetchIdsOfBooksInCartNoAuth(sessionStorage.getItem('cartId'));
+        } else {
+            setIdsOfBooksInCart([]);
+        }
+    }
+
+    const addBookToCart = async (bookid, quantity) => {
         if (sessionStorage.getItem('jwt') !== null) {
             await fetchAddBookToCartAuthenticated(bookid, quantity);
-            fetchIdsOfBooksInCartAuthenticated();
         } else {
             await addBookToCartNoAuthentication(bookid, quantity);
-            fetchIdsOfBooksInCartNoAuth(sessionStorage.getItem('cartId'));
         }
+        setCartDrawerOpen(true);
     }
 
     const fetchBook = async (bookId, handleData) => {
@@ -200,7 +209,7 @@ function ContextProvider(props) {
                 alert('Something is wrong with the server');
                 return null;
             }
-            response.json()
+            await response.json()
                 .then(data => {
                     handleData(data);
                 })
@@ -230,7 +239,7 @@ function ContextProvider(props) {
         <AuthContext.Provider value={{
             currencyFormatter, openSnackbar, setOpenSnackbar, snackbarMessage, setSnackbarMessage,
             dialogueWidth, bgrColor, setBgrColor, cartDrawerOpen, setCartDrawerOpen,
-            fetchIdsOfBooksInCartAuthenticated, idsOfBooksInCart, setIdsOfBooksInCart, fetchIdsOfBooksInCartNoAuth,
+            fetchIdsOfBooksInCart, idsOfBooksInCart, setIdsOfBooksInCart,
             resetAuthentication, addBookToCart, fetchBook, fetchCategories
         }}>
             {props.children}

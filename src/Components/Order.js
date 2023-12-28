@@ -1,13 +1,14 @@
 import { Card, CircularProgress, Divider, Typography } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import useMediaQuery from "../Hooks/useMediaQuery";
 
 
 
 import DialogInfo from "./DialogInfo";
 import BookDialog from "./BookDialog";
+import AuthContext from "../context/AuthContext";
 
 
 function Order({ order, alignProp, marginProp }) {
@@ -19,6 +20,8 @@ function Order({ order, alignProp, marginProp }) {
     const [openInfo, setOpenInfo] = useState(false);
     const [textInfo, setTextInfo] = useState('');
     const [infoField, setInfoField] = useState('');
+
+    const { currencyFormatter } = useContext(AuthContext);
 
     const matchesXXL = useMediaQuery("(min-width: 1120px)");
     const matchesXL = useMediaQuery("(min-width: 1040px)");
@@ -129,18 +132,18 @@ function Order({ order, alignProp, marginProp }) {
             .catch(err => console.error(err));
     }
 
-    const currencyFormatter = (currency, sign) => {
-        let sansDec = currency.toFixed(2);
-        let formatted = sansDec.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        return sign + `${formatted}`;
-    }
-
     const infoTextHandle = (text, field) => {
         if (text.length > 'shevelenkov1aa@eduspbsturu'.length) {
             setOpenInfo(true);
             setTextInfo(text);
             setInfoField(field);
         }
+    }
+
+    const handleCloseInfoDialog = () => {
+        setOpenInfo(false);
+        setTextInfo('');
+        setInfoField('');
     }
 
     return (
@@ -226,7 +229,7 @@ function Order({ order, alignProp, marginProp }) {
                     </div>
                     <BookDialog additionalBook={bookInCart} setAdditionalBook={setBookInCart} openAdditional={openInCart} setOpenAdditional={setOpenInCart} isInCart={true} />
                 </div >
-                <DialogInfo openInfo={openInfo} setOpenInfo={setOpenInfo} textInfo={textInfo} setTextInfo={setTextInfo} infoField={infoField} setInfoField={setInfoField} />
+                <DialogInfo openInfo={openInfo} handleClose={handleCloseInfoDialog} textInfo={textInfo} infoField={infoField} />
             </div>}
             {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 22, marginBottom: 22 }}><CircularProgress color="inherit" /></div>}
         </motion.div>

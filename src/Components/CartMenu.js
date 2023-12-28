@@ -1,15 +1,16 @@
-import { Button, CardActionArea, CircularProgress, Divider, IconButton, Paper, Snackbar, Typography } from "@mui/material";
-import { useState, useEffect, useContext, forwardRef } from "react";
+import { useState, useEffect, useContext } from "react";
+
+import { Button, CardActionArea, CircularProgress, Divider, IconButton, Paper, Typography } from "@mui/material";
 
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
-import MuiAlert from '@mui/material/Alert';
+
+import { useNavigate } from "react-router-dom";
 
 import AuthContext from "../context/AuthContext";
 import useMediaQuery from "../Hooks/useMediaQuery";
-import { useNavigate } from "react-router-dom";
 import BookDialog from "./BookDialog";
 
 const firstDiv = { transition: '0.45s', display: 'flex', justifyContent: 'flex-start', gap: 10, marginLeft: 30, marginRight: 30 }
@@ -28,348 +29,307 @@ const buttonStyle = {
     "&:hover": { backgroundColor: '#585858' }
 }
 
-const Alert = forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
 function CartMenu() {
     const [quantityChanges, setQuantityChanges] = useState(false);
     const [infoLoaded, setInfoLoaded] = useState(false);
     const [total, setTotal] = useState(0);
     const [booksInCart, setBooksInCart] = useState([]);
-
     const [bookInCart, setBookInCart] = useState(null);
     const [openInCart, setOpenInCart] = useState(false);
 
-    const { setOpenSnackbar, setSnackbarMessage, setCartDrawerOpen, fetchIdsOfBooksInCartAuthenticated, fetchIdsOfBooksInCartNoAuth } = useContext(AuthContext);
-
-    const matchesFifth = useMediaQuery("(min-width: 310px)");
-    const matchesSixth = useMediaQuery("(min-width: 305px)");
-    const matchesSeventh = useMediaQuery("(min-width: 300px)");
-
-    const defineAuthorTitleSize = () => {
-        if (matchesFifth) {
-            return 16;
-        } else if (matchesSixth) {
-            return 14;
-        } else {
-            return 12;
-        }
-    }
-
-    const myDir = matchesSeventh ? 'row' : 'column';
-    const myWidth = matchesSeventh ? 30 : 60;
-
-    const myPurchaseSize = matchesFifth ? 30 : 24;
-    const defaultFont = matchesFifth ? 16 : 14;
-    const authorTitleSize = defineAuthorTitleSize();
-
-    const fetchTotal = (token) => {
-        fetch(process.env.REACT_APP_API_URL + 'getcurrenttotal',
-            {
-                method: 'GET',
-                headers: { 'Authorization': token }
-            }
-        )
-            .then(response => response.json())
-            .then(data => {
-                if (data !== null) {
-                    setTotal(data.total);
-                    setInfoLoaded(true);
-                }
-            })
-            .catch(err => console.error(err));
-    }
-
-    const fetchCartByUserId = () => {
-        const token = sessionStorage.getItem('jwt');
-        const id = sessionStorage.getItem('authorizedId');
-
-        fetch(process.env.REACT_APP_API_URL + 'showcart/' + id,
-            {
-                method: 'GET',
-                headers: { 'Authorization': token }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data !== null) {
-                    setBooksInCart(data);
-                    fetchTotal(token);
-                }
-            })
-            .catch(err => console.error(err));
-    }
-
-    const fetchTotalNotLogged = (backetId, password) => {
-        fetch(process.env.REACT_APP_API_URL + 'totalofbacket', {
-            method: 'POST',
-            headers:
-            {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ id: backetId, password: password })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data !== null) {
-                    setTotal(data.total);
-                    setInfoLoaded(true);
-                }
-            })
-            .catch(err => console.error(err));
-    }
-
-    const fetchCartByBacketId = () => {
-        const backetId = sessionStorage.getItem('cartId');
-        const password = sessionStorage.getItem('cartPass');
-        fetch(process.env.REACT_APP_API_URL + 'showcart', {
-            method: 'POST',
-            headers:
-            {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ id: backetId, password: password })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data !== null) {
-                    setBooksInCart(data);
-                    fetchTotalNotLogged(backetId, password);
-                }
-            })
-            .catch(err => console.error(err));
-    }
-
-    useEffect(() => {
-        if (sessionStorage.getItem('authorizedUsername') !== null) {
-            fetchCartByUserId();
-        } else if (sessionStorage.getItem('cartId')) {
-            fetchCartByBacketId();
-        } else {
-            setInfoLoaded(true);
-        }
-    }, []);
-
-    const currencyFormatter = (currency, sign) => {
-        let sansDec = currency.toFixed(2);
-        let formatted = sansDec.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        return sign + `${formatted}`;
-    }
-
-    const deleteBookNotLogged = (id) => {
-        const backetId = sessionStorage.getItem('cartId');
-        const password = sessionStorage.getItem('cartPass');
-        fetch(process.env.REACT_APP_API_URL + 'deletebook/' + id,
-            {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: backetId, password: password })
-            })
-            .then(response => {
-                if (response.ok) {
-                    setOpenSnackbar(true);
-                    setSnackbarMessage('Book was deleted from your cart');
-                    fetchCartByBacketId();
-                    fetchIdsOfBooksInCartNoAuth(backetId);
-                    fetchTotalNotLogged(backetId, password);
-                } else {
-                    setOpenSnackbar(true);
-                    setSnackbarMessage('Cannot delete book right now');
-                }
-            })
-            .catch(err => {
-                setOpenSnackbar(true);
-                setSnackbarMessage(err);
-            });
-    }
-
-    const deleteBook = (id) => {
-        setInfoLoaded(false);
-        if (sessionStorage.getItem('authorizedUsername') !== null) {
-            const token = sessionStorage.getItem('jwt');
-
-            fetch(process.env.REACT_APP_API_URL + 'deleteitem/' + id,
-                {
-                    method: 'DELETE',
-                    headers: { 'Authorization': token }
-                })
-                .then(response => {
-                    if (response.ok) {
-                        setOpenSnackbar(true);
-                        setSnackbarMessage('Book was deleted from your cart');
-                        fetchCartByUserId();
-                        fetchIdsOfBooksInCartAuthenticated();
-                        fetchTotal(sessionStorage.getItem('jwt'));
-                    } else {
-                        setOpenSnackbar(true);
-                        setSnackbarMessage('Cannot delete book right now');
-                    }
-                })
-                .catch(err => {
-                    setOpenSnackbar(true);
-                    setSnackbarMessage(err);
-                });
-
-        } else if (sessionStorage.getItem('cartId')) {
-            deleteBookNotLogged(id);
-        }
-    }
+    const { currencyFormatter, setOpenSnackbar, setSnackbarMessage, setCartDrawerOpen, fetchIdsOfBooksInCart, addBookToCart, fetchBook } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
-    const checkout = () => {
-        if (total === 0) {
-            setOpenSnackbar(true);
-            setSnackbarMessage('There are no products in the cart');
-        } else {
-            setCartDrawerOpen(false);
-            navigate('/cart');
+    const matches310px = useMediaQuery("(min-width: 310px)");
+    const matches305px = useMediaQuery("(min-width: 305px)");
+    const matches300px = useMediaQuery("(min-width: 300px)");
+
+    const handleBadResponse = () => {
+        setCartDrawerOpen(false);
+        navigate('/');
+    }
+
+    const fetchTotalAuthentication = async () => {
+        const token = sessionStorage.getItem('jwt');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'getcurrenttotal',
+                {
+                    method: 'GET',
+                    headers: { 'Authorization': token }
+                }
+            );
+            if (!response.ok) {
+                handleBadResponse();
+                return null;
+            }
+            await response.json()
+                .then(data => {
+                    if (data !== null) {
+                        setTotal(data.total);
+                        setInfoLoaded(true);
+                    } else {
+                        handleBadResponse();
+                    }
+                })
+                .catch(err => {
+                    setTotal(0);
+                    setInfoLoaded(true);
+                });
+        } catch (error) {
+            console.error(error);
         }
     }
 
-    const fetchAddQuantityNonLogged = (id) => {
-        const backetId = sessionStorage.getItem('cartId');
-        const password = sessionStorage.getItem('cartPass');
-        fetch(process.env.REACT_APP_API_URL + 'addbook/' + backetId, {
-            method: 'POST',
-            headers:
-            {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ quantity: 1, bookid: id, password: password })
-        })
-            .then(response => {
-                if (response.ok) {
-                    fetchCartByBacketId();
-                    fetchIdsOfBooksInCartNoAuth(backetId);
-                    fetchTotalNotLogged(backetId, password);
-                    setQuantityChanges(false);
-                    setOpenSnackbar(true);
-                    setSnackbarMessage('Item in your cart was changed');
-                } else {
-                    alert('Something went wrong during adding book quantity');
-                }
-            })
-            .catch(err => console.error(err));
-    }
-
-    const fetchAddQuantity = (id) => {
-        if (sessionStorage.getItem('authorizedUsername') !== null) {
-            const token = sessionStorage.getItem('jwt');
-            fetch(process.env.REACT_APP_API_URL + 'additem/' + id, {
-                method: 'POST',
-                headers:
+    const fetchCartByUserId = async () => {
+        const token = sessionStorage.getItem('jwt');
+        const id = sessionStorage.getItem('authorizedId');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'showcart/' + id,
                 {
-                    'Content-Type': 'application/json',
-                    'Authorization': token
-                },
-                body: JSON.stringify({ quantity: 1 })
-            })
-                .then(response => {
-                    if (response.ok) {
-                        fetchIdsOfBooksInCartAuthenticated();
-                        fetchCartByUserId();
-                        fetchTotal(sessionStorage.getItem('jwt'));
-                        setQuantityChanges(false);
-                        setOpenSnackbar(true);
-                        setSnackbarMessage('Item in your cart was changed');
+                    method: 'GET',
+                    headers: { 'Authorization': token }
+                });
+            if (!response.ok) {
+                handleBadResponse();
+                return null;
+            }
+            await response.json()
+                .then(data => {
+                    if (data !== null) {
+                        setBooksInCart(data);
+                        fetchTotalAuthentication();
                     } else {
-                        alert('Something went wrong during adding book quantity');
+                        handleBadResponse();
                     }
                 })
                 .catch(err => console.error(err));
-        } else if (sessionStorage.getItem('cartId') !== null) {
-            fetchAddQuantityNonLogged(id);
+        } catch (error) {
+            console.error(error);
         }
     }
 
-    const fetchReduceQuantityNotLogged = (id) => {
+    const fetchTotalNoAuthentication = async () => {
         const backetId = sessionStorage.getItem('cartId');
         const password = sessionStorage.getItem('cartPass');
-
-        fetch(process.env.REACT_APP_API_URL + 'reduceitemnoauth/' + id, {
-            method: 'PUT',
-            headers:
-            {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ id: backetId, password: password })
-        })
-            .then(response => {
-                if (response.ok) {
-                    fetchCartByBacketId();
-                    fetchIdsOfBooksInCartNoAuth(backetId);
-                    fetchTotalNotLogged(backetId, password);
-                    setQuantityChanges(false);
-                    setOpenSnackbar(true);
-                    setSnackbarMessage('Item in your cart was changed');
-                } else {
-                    alert('Something went wrong during reducing the book quantity');
-                }
-            })
-            .catch(err => console.error(err));
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'totalofbacket', {
+                method: 'POST',
+                headers:
+                {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: backetId, password: password })
+            });
+            if (!response.ok) {
+                handleBadResponse();
+                return null;
+            }
+            await response.json()
+                .then(data => {
+                    if (data !== null) {
+                        setTotal(data.total);
+                        setInfoLoaded(true);
+                    } else {
+                        handleBadResponse();
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    setTotal(0);
+                    setInfoLoaded(true);
+                });
+        } catch (error) {
+            console.error(error);
+        }
     }
 
-    const fetchReduceQuantity = (id) => {
-        if (sessionStorage.getItem('authorizedUsernmae') !== null) {
-            const token = sessionStorage.getItem('jwt');
-            fetch(process.env.REACT_APP_API_URL + 'reduceitem/' + id, {
+    const fetchCartByBacketId = async () => {
+        const backetId = sessionStorage.getItem('cartId');
+        const password = sessionStorage.getItem('cartPass');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'showcart', {
+                method: 'POST',
+                headers:
+                {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: backetId, password: password })
+            });
+            if (!response.ok) {
+                handleBadResponse();
+                return null;
+            }
+            await response.json()
+                .then(data => {
+                    if (data !== null) {
+                        setBooksInCart(data);
+                        fetchTotalNoAuthentication();
+                    } else {
+                        handleBadResponse();
+                    }
+                })
+                .catch(err => console.error(err));
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const fetchCart = async () => {
+        if (sessionStorage.getItem('authorizedUsername') !== null) {
+            await fetchCartByUserId();
+        } else if (sessionStorage.getItem('cartId')) {
+            await fetchCartByBacketId();
+        } else {
+            setInfoLoaded(true);
+        }
+    }
+
+    useEffect(() => {
+        fetchCart();
+    }, []);
+
+    const deleteBookNoAuthentication = async (id) => {
+        const backetId = sessionStorage.getItem('cartId');
+        const password = sessionStorage.getItem('cartPass');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'deletebook/' + id,
+                {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: backetId, password: password })
+                });
+            if (!response.ok) {
+                handleBadResponse();
+                return null;
+            }
+            setOpenSnackbar(true);
+            setSnackbarMessage('Book was deleted from your cart');
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const deleteBookAuthenticated = async (id) => {
+        const token = sessionStorage.getItem('jwt');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'deleteitem/' + id,
+                {
+                    method: 'DELETE',
+                    headers: { 'Authorization': token }
+                });
+            if (!response.ok) {
+                handleBadResponse();
+                return null;
+            }
+            setOpenSnackbar(true);
+            setSnackbarMessage('Book was deleted from your cart');
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const deleteBookFromCart = async (id) => {
+        setInfoLoaded(false);
+        if (sessionStorage.getItem('authorizedUsername') !== null) {
+            await deleteBookAuthenticated(id);
+        } else if (sessionStorage.getItem('cartId')) {
+            await deleteBookNoAuthentication(id);
+        }
+        await fetchIdsOfBooksInCart();
+        await fetchCart();
+    }
+
+    const fetchReduceQuantityAuthentication = async (id) => {
+        const token = sessionStorage.getItem('jwt');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'reduceitem/' + id, {
                 method: 'PUT',
                 headers:
                 {
                     'Authorization': token
                 }
-            })
-                .then(response => {
-                    if (response.ok) {
-                        fetchIdsOfBooksInCartAuthenticated();
-                        fetchCartByUserId();
-                        fetchTotal(sessionStorage.getItem('jwt'));
-                        setQuantityChanges(false);
-                        setOpenSnackbar(true);
-                        setSnackbarMessage('Item in your cart was changed');
-                    } else {
-                        alert('Something went wrong during reducing the book quantity');
-                    }
-                })
-                .catch(err => console.error(err));
-        } else if (sessionStorage.getItem('cartId') !== null) {
-            fetchReduceQuantityNotLogged(id);
+            });
+            if (!response.ok) {
+                handleBadResponse();
+                return null;
+            }
+            setOpenSnackbar(true);
+            setSnackbarMessage('Book in your cart was changed');
+        } catch (error) {
+            console.error(error);
         }
     }
 
-    const changeQuantity = (id, operation) => {
+    const fetchReduceQuantityNoAuthentication = async (id) => {
+        const backetId = sessionStorage.getItem('cartId');
+        const password = sessionStorage.getItem('cartPass');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'reduceitemnoauth/' + id, {
+                method: 'PUT',
+                headers:
+                {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: backetId, password: password })
+            });
+            if (!response.ok) {
+                handleBadResponse();
+                return null;
+            }
+            setOpenSnackbar(true);
+            setSnackbarMessage('Book in your cart was changed');
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const fetchReduceQuantity = async (id) => {
+        if (sessionStorage.getItem('authorizedUsername') !== null) {
+            await fetchReduceQuantityAuthentication(id);
+        } else if (sessionStorage.getItem('cartId') !== null) {
+            await fetchReduceQuantityNoAuthentication(id);
+        }
+    }
+
+    const changeQuantity = async (id, operation) => {
         if (!quantityChanges) {
             setQuantityChanges(true);
             if (operation === '+') {
-                fetchAddQuantity(id);
+                await addBookToCart(id, 1);
             } else {
-                fetchReduceQuantity(id);
+                await fetchReduceQuantity(id);
+                await fetchIdsOfBooksInCart();
             }
+            await fetchCart();
+            setQuantityChanges(false);
         }
     }
 
-    const openBookInCart = (thisbookid) => {
+    const openBookInCart = async (bookId) => {
+        await fetchBook(bookId, setBookInCart);
         setOpenInCart(true);
-        fetch(process.env.REACT_APP_API_URL + 'books/' + thisbookid,
-            {
-                method: 'GET'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data !== null) {
-                    setBookInCart(data);
-                } else {
-                    alert('There is no such book');
-                }
-            })
-            .catch(err => console.error(err));
     }
 
-    const items = booksInCart.map((book, index) =>
+    const defineAuthorTitleSize = () => {
+        if (matches310px) {
+            return 16;
+        } else if (matches305px) {
+            return 14;
+        } else {
+            return 12;
+        }
+    }
+    const authorTitleSize = defineAuthorTitleSize();
+
+    const myDir = matches300px ? 'row' : 'column';
+    const myWidth = matches300px ? 30 : 60;
+    const defaultFont = matches310px ? 16 : 14;
+
+    const books = booksInCart.map((book, index) =>
         <div key={index} style={firstDiv}>
             <div>
-                <IconButton onClick={() => deleteBook(book.bookid)} size='small' sx={{ marginBottom: -2.5, zIndex: 4, marginLeft: -1.5 }}>
+                <IconButton onClick={() => deleteBookFromCart(book.bookid)} size='small' sx={{ marginBottom: -2.5, zIndex: 4, marginLeft: -1.5 }}>
                     <CancelOutlinedIcon fontSize="small" color="sidish" />
                 </IconButton>
                 <CardActionArea onClick={() => openBookInCart(book.bookid)} sx={imgCart}>
@@ -383,7 +343,7 @@ function CartMenu() {
                     <Typography variant='h7' fontSize={defaultFont} fontFamily='serif' color='#A9A9A9'>Quantity:</Typography>
                     <div style={{ display: 'flex', marginTop: 2, flexDirection: myDir }}>
                         <Typography align="center" variant='h7' sx={{ width: myWidth }}>{book.quantity}</Typography>
-                        {matchesSeventh && <Divider orientation="vertical" flexItem sx={{ border: '1px solid #D3D3D3', height: 15, marginTop: 0.5, marginLeft: 1 }} />}
+                        {matches300px && <Divider orientation="vertical" flexItem sx={{ border: '1px solid #D3D3D3', height: 15, marginTop: 0.5, marginLeft: 1 }} />}
                         <div style={{ marginTop: -0.5, marginLeft: 2 }}>
                             <IconButton onClick={() => changeQuantity(book.bookid, '+')} size='small' >
                                 <AddIcon fontSize="inherit" color="sidish" />
@@ -404,6 +364,18 @@ function CartMenu() {
         </div>
     );
 
+    const checkout = () => {
+        if (total === 0) {
+            setOpenSnackbar(true);
+            setSnackbarMessage('There are no products in the cart');
+        } else {
+            setCartDrawerOpen(false);
+            navigate('/cart');
+        }
+    }
+
+    const myPurchaseSize = matches310px ? 30 : 24;
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={thirdDiv}>
@@ -413,7 +385,7 @@ function CartMenu() {
             {infoLoaded &&
                 <div>
                     <div>
-                        {items}
+                        {books}
                     </div>
                     <Divider sx={{ border: '1px solid black', marginBottom: 4, marginTop: 4 }} />
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginLeft: 20, marginRight: 20 }}>
@@ -430,7 +402,7 @@ function CartMenu() {
             }
             {!infoLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 10, marginBottom: 10 }}><CircularProgress color="sidish" /></div>}
         </div>
-    )
+    );
 }
 
 export default CartMenu;

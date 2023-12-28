@@ -1,18 +1,20 @@
+import { useContext, useEffect, useState } from "react";
+
 import { Button, Card, CardActionArea, CircularProgress, Dialog, DialogContent, IconButton, Paper, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
 
 import CloseIcon from '@mui/icons-material/Close';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import useMediaQuery from "../Hooks/useMediaQuery";
-import { useContext } from "react";
-import AuthContext from "../context/AuthContext";
+
 import { useNavigate } from "react-router-dom";
+
+import useMediaQuery from "../Hooks/useMediaQuery";
+import AuthContext from "../context/AuthContext";
 
 function BookDialog({ additionalBook, setAdditionalBook, openAdditional, setOpenAdditional, isInCart }) {
     const [dataFetched, setDataFetched] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
-    const { addBookToCart } = useContext(AuthContext);
+    const { currencyFormatter, setCartDrawerOpen, addBookToCart } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
@@ -29,12 +31,7 @@ function BookDialog({ additionalBook, setAdditionalBook, openAdditional, setOpen
     const handleClose = () => {
         setOpenAdditional(false);
         setAdditionalBook(null);
-    }
-
-    const currencyFormatter = (currency, sign) => {
-        let sansDec = currency.toFixed(2);
-        let formatted = sansDec.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        return sign + `${formatted}`;
+        setQuantity(1);
     }
 
     const handleQuantity = (operation) => {
@@ -49,12 +46,13 @@ function BookDialog({ additionalBook, setAdditionalBook, openAdditional, setOpen
 
     const relocateToBook = () => {
         handleClose();
+        setCartDrawerOpen(false);
         navigate(`/book/${additionalBook.id}`);
     }
 
     const addCartToBookWithCustomQuantity = async (bookId) => {
-        await addBookToCart(bookId, quantity);
         handleClose();
+        await addBookToCart(bookId, quantity);
     }
 
     // Custom styles

@@ -79,7 +79,7 @@ function Booklist() {
 
     const [searchParams, setSearchParams] = useSearchParams({});
 
-    const { currencyFormatter, setOpenSnackbar, setSnackbarMessage, setBgrColor, setCartDrawerOpen, fetchIdsOfBooksInCartAuthenticated, idsOfBooksInCart, setIdsOfBooksInCart, fetchIdsOfBooksInCartNoAuth, addBookToCart } = useContext(AuthContext);
+    const { currencyFormatter, setOpenSnackbar, setSnackbarMessage, setBgrColor, setCartDrawerOpen, fetchIdsOfBooksInCart, idsOfBooksInCart, addBookToCart } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
@@ -165,14 +165,9 @@ function Booklist() {
         setBgrColor('#FFFAFA');
         setDataFetched(false);
         fetchBooks();
+
         //fetching ids of books which are already in the cart based on the user authentication status:
-        if (authorized) {
-            fetchIdsOfBooksInCartAuthenticated();
-        } else if (sessionStorage.getItem('cartId') !== null) {
-            fetchIdsOfBooksInCartNoAuth(sessionStorage.getItem('cartId'));
-        } else {
-            setIdsOfBooksInCart([]);
-        }
+        fetchIdsOfBooksInCart();
 
         //verify user case
         if (searchParams.get('token')) {
@@ -278,7 +273,7 @@ function Booklist() {
                                     </div>
                                 </CardActionArea>
                             </Card>
-                            {!idsOfBooksInCart.includes(book.id) && <Button onClick={() => addBookToCart(book.id)} endIcon={<AddShoppingCartIcon />} sx={buttonStyle} component={Paper} elevation={10} >
+                            {!idsOfBooksInCart.includes(book.id) && <Button onClick={() => addBookToCart(book.id, 1)} endIcon={<AddShoppingCartIcon />} sx={buttonStyle} component={Paper} elevation={10} >
                                 Add to Cart
                             </Button>}
                             {idsOfBooksInCart.includes(book.id) &&

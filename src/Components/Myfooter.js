@@ -1,36 +1,37 @@
-import Footer from 'rc-footer';
-import 'rc-footer/assets/index.css';
-
 import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import InstagramIcon from '@mui/icons-material/Instagram';
-import useMediaQuery from '../Hooks/useMediaQuery';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
-function Bottom() {
-  const matchesXS = useMediaQuery("(min-width: 360px)");
-  const matchesXXS = useMediaQuery("(min-width: 322px)");
-  const matchesXXXS = useMediaQuery("(min-width: 263px)");
+import Footer from 'rc-footer';
+import 'rc-footer/assets/index.css';
 
-  const definePSize = () => {
-    if (matchesXS) {
+import useMediaQuery from '../Hooks/useMediaQuery';
+
+function Bottom() {
+  const matches360px = useMediaQuery("(min-width: 360px)");
+  const matches322px = useMediaQuery("(min-width: 322px)");
+  const matches263px = useMediaQuery("(min-width: 263px)");
+
+  const defineFontSize = () => {
+    if (matches360px) {
       return 16;
-    } else if (matchesXXS) {
+    } else if (matches322px) {
       return 14;
-    } else if (matchesXXXS) {
+    } else if (matches263px) {
       return 12;
     } else {
       return 10;
     }
   }
 
-  const pSize = definePSize();
+  const fontSize = defineFontSize();
 
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 0, marginTop: 0, color: 'white' }}>
-      <p style={{ fontSize: pSize }}>©Axos inc. 2023</p>
-      <p style={{ fontSize: pSize }}>aleksei.shevelenkov@gmail.com</p>
+      <p style={{ fontSize: fontSize }}>©Axos inc. 2023</p>
+      <p style={{ fontSize: fontSize }}>aleksei.shevelenkov@gmail.com</p>
     </div>
   );
 }
@@ -75,7 +76,7 @@ function Myfooter() {
       ]}
       bottom=<Bottom />
     />
-  )
+  );
 }
 
 export default Myfooter;

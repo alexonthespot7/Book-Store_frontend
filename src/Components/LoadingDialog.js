@@ -1,5 +1,7 @@
-import { CircularProgress, Dialog, DialogContent, DialogTitle } from "@mui/material";
 import { useContext } from "react";
+
+import { CircularProgress, Dialog, DialogContent, DialogTitle } from "@mui/material";
+
 import AuthContext from "../context/AuthContext";
 
 export default function LoadingDialog({ title, open, onClose }) {
