@@ -7,7 +7,6 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import AuthContext from '../../context/AuthContext';
 import CartMenu from '../CartMenu';
 
-
 export default function CartMenuDrawer({ DrawerHeader, matches400px }) {
     const { cartDrawerOpen, setCartDrawerOpen } = useContext(AuthContext);
 

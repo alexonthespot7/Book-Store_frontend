@@ -10,8 +10,8 @@ import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage
 
 import { v4 } from 'uuid';
 
-import { storage } from '../firebase/firebase';
 import AuthContext from '../context/AuthContext';
+import { storage } from '../firebase/firebase';
 
 const initialBook = {
     title: '',
@@ -51,7 +51,6 @@ function AddBook({ fetchBooks }) {
     const { setOpenSnackbar, setSnackbarMessage, resetAuthentication, fetchCategories } = useContext(AuthContext);
 
     const navigate = useNavigate();
-
 
     useEffect(() => {
         fetchCategories(setCategories);

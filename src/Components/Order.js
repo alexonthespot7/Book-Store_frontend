@@ -155,7 +155,7 @@ function Order({ order, alignProp, marginProp }) {
                     <DialogInfo openInfo={openInfo} handleClose={handleCloseInfoDialog} textInfo={textInfo} infoField={infoField} />
                 </div>
             }
-            {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 22, marginBottom: 22 }}><CircularProgress color="inherit" /></div>}
+            {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '25vh' }}><CircularProgress color="inherit" /></div>}
         </motion.div>
     );
 }

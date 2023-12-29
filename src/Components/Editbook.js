@@ -4,7 +4,6 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, 
 
 import EditIcon from '@mui/icons-material/Edit';
 
-import { storage } from '../firebase/firebase';
 import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 import { v4 } from 'uuid';
@@ -12,6 +11,7 @@ import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 
 import AuthContext from '../context/AuthContext';
+import { storage } from '../firebase/firebase';
 
 const initialBook = {
     title: '',

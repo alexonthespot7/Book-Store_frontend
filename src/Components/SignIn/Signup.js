@@ -42,9 +42,9 @@ function Signup({ buttonSize }) {
         password: (showPassword ? 'text' : 'password')
     }
 
-    const matches350 = useMediaQuery("(min-width: 350px)");
+    const matches350px = useMediaQuery("(min-width: 350px)");
 
-    const inputSize = matches350 ? 'medium' : 'small';
+    const inputSize = matches350px ? 'medium' : 'small';
 
     const { setOpenSnackbar, setSnackbarMessage, dialogueWidth } = useContext(AuthContext);
 

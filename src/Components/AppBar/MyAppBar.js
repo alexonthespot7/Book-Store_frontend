@@ -9,7 +9,6 @@ import SearchOrder from '../SearchOrder';
 import Logout from '../Logout';
 import SignIn from '../SignIn/SignIn';
 
-
 export default function MyAppBar({ matches400px, matches350px, menuDrawerOpen, setMenuDrawerOpen }) {
     const navigate = useNavigate();
     const authorized = sessionStorage.getItem('jwt') ? true : false;

@@ -36,7 +36,7 @@ export default function SearchOrder() {
     const matchesS = useMediaQuery("(min-width: 430px)");
     const matchesThird = useMediaQuery("(min-width: 400px)");
     const matchesFourth = useMediaQuery("(min-width: 350px)");
-    const matchesFifth = useMediaQuery("(min-width: 300px)");
+    const matchesFifth = useMediaQuery("(min-width: 325px)");
 
     const defineOrderTypoSize = () => {
         if (matchesSecond) {

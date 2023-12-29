@@ -1,15 +1,16 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 
 import { Menu, MenuItem, Button, IconButton } from '@mui/material';
 
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 
+import { useLocation } from 'react-router-dom';
+
 import useMediaQuery from '../../Hooks/useMediaQuery';
 import AuthContext from '../../context/AuthContext';
 import Login from './Login';
 import Signup from './Signup';
-import { useLocation } from 'react-router-dom';
 
 export default function SignIn() {
     const [anchorMenu, setAnchorMenu] = useState(null);

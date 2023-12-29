@@ -34,16 +34,6 @@ function BookDialog({ additionalBook, setAdditionalBook, openAdditional, setOpen
         setQuantity(1);
     }
 
-    const handleQuantity = (operation) => {
-        if (operation === '-') {
-            if (quantity > 1) {
-                setQuantity(prev => prev - 1);
-            }
-        } else {
-            setQuantity(prev => prev + 1);
-        }
-    }
-
     const relocateToBook = () => {
         handleClose();
         setCartDrawerOpen(false);
@@ -53,6 +43,16 @@ function BookDialog({ additionalBook, setAdditionalBook, openAdditional, setOpen
     const addCartToBookWithCustomQuantity = async (bookId) => {
         handleClose();
         await addBookToCart(bookId, quantity);
+    }
+
+    const handleQuantity = (operation) => {
+        if (operation === '-') {
+            if (quantity > 1) {
+                setQuantity(prev => prev - 1);
+            }
+        } else {
+            setQuantity(prev => prev + 1);
+        }
     }
 
     // Custom styles

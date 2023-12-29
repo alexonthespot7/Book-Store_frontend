@@ -1,71 +1,91 @@
-import React, { useEffect, useState, useRef, useContext, useMemo, useCallback } from "react";
+import { useEffect, useState, useRef, useContext, useMemo, useCallback } from "react";
 
-import { Button, InputAdornment, Snackbar, TextField, Typography } from "@mui/material";
-import MuiAlert from '@mui/material/Alert';
+import { Button, CircularProgress, InputAdornment, TextField, Typography } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AgGridReact } from "ag-grid-react";
 
 import AuthContext from "../context/AuthContext";
-import useMediaQuery from "../Hooks/useMediaQuery";
 import EditOrder from "./EditOrder";
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
 export default function Orders() {
+    const [dataFetched, setDataFetched] = useState(false);
     const [orders, setOrders] = useState([]);
+
+    const navigate = useNavigate();
 
     const { setOpenSnackbar, setSnackbarMessage, setBgrColor } = useContext(AuthContext);
 
     const gridRef = useRef();
 
-    const matches = useMediaQuery("(min-width: 908px)");
-
-    const gridWidth = matches ? '818px' : '90%';
+    const fetchOrders = async () => {
+        const token = sessionStorage.getItem('jwt');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'orders',
+                {
+                    method: 'GET',
+                    headers: { 'Authorization': token }
+                });
+            if (!response.ok) {
+                navigate('/');
+                return null;
+            }
+            await response.json()
+                .then(data => {
+                    if (!data) {
+                        navigate('/');
+                        return null;
+                    }
+                    setOrders(data);
+                    setDataFetched(true);
+                })
+                .catch(err => console.error(err));
+        } catch (error) {
+            navigate('/');
+        }
+    }
 
     useEffect(() => {
         fetchOrders();
         setBgrColor('#FFFAFA')
     }, []);
 
-    const fetchOrders = () => {
-        const token = sessionStorage.getItem('jwt');
-
-        fetch(process.env.REACT_APP_API_URL + 'orders',
-            {
-                method: 'GET',
-                headers: { 'Authorization': token }
-            })
-            .then(response => response.json())
-            .then(data => setOrders(data))
-            .catch(err => console.error(err));
+    const handleBadResponseUpdateOrder = (response) => {
+        if (response.status === 500) {
+            navigate('/');
+        } else {
+            setOpenSnackbar(true);
+            setSnackbarMessage('Something is wrong with the server. Please try again later');
+        }
     }
 
-    const updateOrder = (updatedOrderInfo, link) => {
+    const updateOrder = async (updatedOrderInfo, link) => {
+        setDataFetched(false);
         const token = sessionStorage.getItem('jwt');
-        fetch(link, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': token
-            },
-            body: JSON.stringify(updatedOrderInfo)
-        })
-            .then(response => {
-                if (response.ok) {
-                    fetchOrders();
-                    setOpenSnackbar(true);
-                    setSnackbarMessage('The order info was updated')
-                } else {
-                    alert('Something went wrong during the order update');
-                }
-            })
-            .catch(err => console.error(err))
+        try {
+            const response = await fetch(link, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(updatedOrderInfo)
+            });
+            if (!response.ok) {
+                handleBadResponseUpdateOrder(response);
+                return null;
+            }
+            await fetchOrders();
+            setOpenSnackbar(true);
+            setSnackbarMessage('The order info was updated');
+        } catch (error) {
+            console.error(error);
+            setOpenSnackbar(true);
+            setSnackbarMessage('Something is wrong with the server. Please try again later');
+        }
     }
 
     const idGetter = (params) => {
@@ -74,7 +94,7 @@ export default function Orders() {
         }
     }
 
-    const [columns, setColumns] = useState([
+    const columns = [
         {
             headerName: 'Number',
             cellRenderer: params => <Link to={{ pathname: '/orders/admin/' + params.data.orderid }}>{params.data.orderid}</Link>,
@@ -95,7 +115,7 @@ export default function Orders() {
                 if (params.data.backet !== null) {
                     return (
                         <Link to={{ pathname: "/userlist" }}>{params.value}</Link>
-                    )
+                    );
                 }
             },
             type: 'narrow'
@@ -103,10 +123,9 @@ export default function Orders() {
         { headerName: 'User email', field: 'backet.user.email' },
         {
             headerName: '',
-            width: '100%',
             cellRenderer: params => <EditOrder order={params.data} updateOrder={updateOrder} />
         },
-    ]);
+    ];
 
     const defaultColDef = useMemo(() => {
         return {
@@ -114,7 +133,7 @@ export default function Orders() {
             filter: 'agTextColumnFilter',
             resizable: true,
             sortable: true,
-            cellStyle: { 'text-align': 'left' }
+            cellStyle: { 'textAlign': 'left' }
         };
     }, []);
 
@@ -152,36 +171,39 @@ export default function Orders() {
             exit={{ opacity: 0 }}
         >
             <Typography color='#424242' variant="h5">Orders</Typography>
-            <div style={{ display: 'flex', gap: 10 }}>
-                <TextField
-                    type='search'
-                    fullWidth={false}
-                    size='small'
-                    id="filter-text-box"
-                    placeholder="Search for orders..."
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon />
-                            </InputAdornment>
-                        ),
-                    }}
-                    variant="standard"
-                    onChange={onFilterTextBoxChanged}
+            {dataFetched && <>
+                <div style={{ display: 'flex', gap: 10 }}>
+                    <TextField
+                        type='search'
+                        fullWidth={false}
+                        size='small'
+                        id="filter-text-box"
+                        placeholder="Search for orders..."
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon />
+                                </InputAdornment>
+                            ),
+                        }}
+                        variant="standard"
+                        onChange={onFilterTextBoxChanged}
+                    />
+                    <Button onClick={onBtnExport} variant="text" color="sidish">Export</Button>
+                </div>
+                <AgGridReact
+                    ref={gridRef}
+                    defaultColDef={defaultColDef}
+                    columnTypes={columnTypes}
+                    columnDefs={columns}
+                    rowData={orders}
+                    pagination={true}
+                    paginationPageSize={10}
+                    suppressCellFocus={true}
+                    animateRows="true"
                 />
-                <Button onClick={onBtnExport} variant="text" color="sidish">Export</Button>
-            </div>
-            <AgGridReact
-                ref={gridRef}
-                defaultColDef={defaultColDef}
-                columnTypes={columnTypes}
-                columnDefs={columns}
-                rowData={orders}
-                pagination={true}
-                paginationPageSize={10}
-                suppressCellFocus={true}
-                animateRows="true"
-            />
+            </>}
+            {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '25vh' }}><CircularProgress color="inherit" /></div>}
         </motion.div>
-    )
+    );
 }

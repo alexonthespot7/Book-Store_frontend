@@ -28,7 +28,7 @@ function AllCategories() {
     const matches440px = useMediaQuery("(min-width: 440px)");
     const matches400px = useMediaQuery("(min-width: 400px)");
     const matches350px = useMediaQuery("(min-width: 350px)");
-    const matches320px = useMediaQuery("(min-width(320px)");
+    const matches320px = useMediaQuery("(min-width: 320px)");
     const matches300px = useMediaQuery("(min-width: 300px)");
 
     const filteredCategories = categories.filter(
@@ -46,7 +46,6 @@ function AllCategories() {
 
     useEffect(() => {
         fetchCategories(handleFetchCategoriesData);
-        setDataFetched(true)
         setBgrColor('#1c1c1c');
     }, []);
 

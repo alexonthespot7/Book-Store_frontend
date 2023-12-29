@@ -103,7 +103,7 @@ function CategoriesAdmin() {
                     animateRows="true"
                 />
             }
-            {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="inherit" /></div>}
+            {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '25vh' }}><CircularProgress color="inherit" /></div>}
             <div style={{ display: 'flex', justifyContent: 'end', marginRight: 15 }}>
                 <AddCategory handleData={handleData} />
             </div>

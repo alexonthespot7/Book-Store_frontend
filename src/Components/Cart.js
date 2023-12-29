@@ -414,7 +414,7 @@ function Cart() {
                         }}
                     />
                 }
-                {!infoLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="inherit" /></div>}
+                {!infoLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '25vh' }}><CircularProgress color="inherit" /></div>}
                 <DialogInfo openInfo={openInfo} handleClose={handleCloseInfoDialog} textInfo={textInfo} infoField={infoField} />
             </motion.div>
         </AnimatePresence >

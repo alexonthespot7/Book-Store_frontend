@@ -53,7 +53,7 @@ function ResetPassword({ openReset, setOpenReset }) {
         }
     }
 
-    const handleGoodResponse = (response) => {
+    const handleGoodResponse = () => {
         setOpenSnackbar(true);
         setSnackbarMessage('A temporary password was sent to your email address');
         closeResetDialog();
@@ -70,11 +70,16 @@ function ResetPassword({ openReset, setOpenReset }) {
                 handleBadResponse(response);
                 return null;
             }
-            handleGoodResponse(response);
+            handleGoodResponse();
         } catch (error) {
             console.error(error);
             alert('Something is wrong with the server');
         }
+    }
+
+    const isValidEmail = (email) => {
+        const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return pattern.test(email);
     }
 
     const resetPassword = () => {
@@ -89,11 +94,6 @@ function ResetPassword({ openReset, setOpenReset }) {
         }
         fetchResetPassword(emailInfo);
         setLoading(true);
-    }
-
-    const isValidEmail = (email) => {
-        const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return pattern.test(email);
     }
 
     return loading ? (

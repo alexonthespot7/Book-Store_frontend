@@ -25,7 +25,7 @@ export default function BooksInCategory({ category }) {
     const matches800px = useMediaQuery("(min-width: 800px)");
     const matches600px = useMediaQuery("(min-width: 600px)");
     const matches440px = useMediaQuery("(min-width: 440px)");
-    const matches320px = useMediaQuery("(min-width(320px)");
+    const matches320px = useMediaQuery("(min-width: 320px)");
 
     const fetchBooksByCategory = async () => {
         try {

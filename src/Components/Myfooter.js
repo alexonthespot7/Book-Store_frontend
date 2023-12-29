@@ -10,26 +10,27 @@ import 'rc-footer/assets/index.css';
 import useMediaQuery from '../Hooks/useMediaQuery';
 
 function Bottom() {
-  const matches360px = useMediaQuery("(min-width: 360px)");
-  const matches322px = useMediaQuery("(min-width: 322px)");
+  const matches550px = useMediaQuery("(min-width: 550px)");
+  const matches450px = useMediaQuery("(min-width: 450px)");
   const matches263px = useMediaQuery("(min-width: 263px)");
 
   const defineFontSize = () => {
-    if (matches360px) {
+    if (matches550px) {
       return 16;
-    } else if (matches322px) {
-      return 14;
+    } else if (matches450px) {
+      return 15;
     } else if (matches263px) {
-      return 12;
+      return 14;
     } else {
-      return 10;
+      return 12;
     }
   }
-
   const fontSize = defineFontSize();
+  const horizontalMargin = matches550px ? '5%' : '2.5%';
+  const direction = matches450px ? 'row' : 'column-reverse';
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 0, marginTop: 0, color: 'white' }}>
+    <div style={{ display: 'flex', flexDirection: direction, justifyContent: 'space-between', marginLeft: horizontalMargin, marginRight: horizontalMargin, color: 'white' }}>
       <p style={{ fontSize: fontSize }}>©Axos inc. 2023</p>
       <p style={{ fontSize: fontSize }}>aleksei.shevelenkov@gmail.com</p>
     </div>

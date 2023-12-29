@@ -10,7 +10,6 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { deleteObject, ref } from 'firebase/storage';
-import { storage } from '../firebase/firebase';
 
 import { motion } from 'framer-motion';
 
@@ -20,6 +19,7 @@ import AuthContext from '../context/AuthContext';
 import useMediaQuery from '../Hooks/useMediaQuery';
 import BookDialog from './BookDialog';
 import EditBook from './EditBook';
+import { storage } from '../firebase/firebase';
 
 const initialBook = {
     id: '',
@@ -54,16 +54,8 @@ export default function Book() {
     const matches440px = useMediaQuery("(min-width: 440px)");
     const matches400px = useMediaQuery("(min-width: 400px)");
     const matches350px = useMediaQuery("(min-width: 350px)");
-    const matches320px = useMediaQuery("(min-width(320px)");
+    const matches320px = useMediaQuery("(min-width: 320px)");
     const matches300px = useMediaQuery("(min-width: 300px)");
-
-    const handleQuantity = (action) => {
-        if (action === '-' && quantity > 1) {
-            setQuantity(prev => prev - 1);
-        } else if (action === '+') {
-            setQuantity(prev => prev + 1);
-        }
-    }
 
     const fetchTopSales = async () => {
         try {
@@ -294,6 +286,14 @@ export default function Book() {
                 .catch(err => console.error(err));
         } catch (error) {
             console.error(error);
+        }
+    }
+
+    const handleQuantity = (action) => {
+        if (action === '-' && quantity > 1) {
+            setQuantity(prev => prev - 1);
+        } else if (action === '+') {
+            setQuantity(prev => prev + 1);
         }
     }
 
