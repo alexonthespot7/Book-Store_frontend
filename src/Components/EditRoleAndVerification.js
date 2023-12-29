@@ -83,9 +83,9 @@ export default function EditRoleAndVerification({ params, updateRole }) {
                         </TextField>
                     }
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleSave}>Save</Button>
+                <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Button color='sidish' onClick={handleClose}>Cancel</Button>
+                    <Button color='sidish' variant='contained' onClick={handleSave}>Save</Button>
                 </DialogActions>
             </Dialog>
         </div>
