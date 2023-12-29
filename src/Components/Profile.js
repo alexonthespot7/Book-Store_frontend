@@ -1,16 +1,11 @@
-import { useEffect, useState, useContext, forwardRef } from "react";
+import { useEffect, useState, useContext } from "react";
 
-import { Box, Button, Card, CircularProgress, Divider, IconButton, InputAdornment, Paper, TextField, Typography, useMediaQuery } from "@mui/material";
+import { Box, Button, Card, CircularProgress, Divider, TextField, Typography, useMediaQuery } from "@mui/material";
 
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 import RemoveIcon from '@mui/icons-material/Remove';
 
 import AuthContext from "../context/AuthContext";
 import { useParams } from "react-router-dom";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import { motion } from 'framer-motion';
 
@@ -19,7 +14,7 @@ import Select from 'react-select';
 import { useMemo } from "react";
 import MyOrders from "./MyOrders";
 import DialogInfo from "./DialogInfo";
-
+import ChangePassword from "./ChangePassword";
 
 function Profile() {
     const [user, setUser] = useState({});
@@ -45,88 +40,12 @@ function Profile() {
     });
 
     const [division, setDivision] = useState('personalData');
-
-    const [passwordInfo, setPasswordInfo] = useState({
-        username: sessionStorage.getItem('authorizedUsername'),
-        oldPassword: '',
-        newPassword: ''
-    });
-
-    const [passwordCheck, setPasswordCheck] = useState('');
-
-    const [oldPasswordError, setOldPasswordError] = useState(false);
-    const [oldPasswordHelper, setOldPasswordHelper] = useState('');
-    const [passwordError, setPasswordError] = useState(false);
-    const [passwordHelper, setPasswordHelper] = useState('');
-    const [openChangePasswordDialog, setOpenChangePasswordDialog] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [showCheck, setShowCheck] = useState(false);
-    const [showOld, setShowOld] = useState(false);
     const [allowChangePersonal, setAllowChangePersonal] = useState(false);
     const [allowChangeAddress, setAllowChangeAddress] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [openInfo, setOpenInfo] = useState(false);
     const [textInfo, setTextInfo] = useState('');
     const [infoField, setInfoField] = useState('');
-
-    const matchesXL = useMediaQuery("(min-width: 1120px)");
-    const matchesL1 = useMediaQuery("(min-width: 1050px)");
-    const matchesL = useMediaQuery("(min-width: 1000px)");
-    const matchesM1 = useMediaQuery("(min-width: 800px)");
-    const matchesM = useMediaQuery("(min-width: 650px)");
-    const matchesX = useMediaQuery("(min-width: 400px)");
-
-    const typoSize = 'h4';
-    const alignMain = matchesL ? 'left' : 'center';
-    const alignSidebar = matchesL ? 'left' : 'center';
-    const mainDirection = matchesM ? 'row' : 'column';
-    const defineMainGap = () => {
-
-        if (matchesXL) {
-            return 225;
-        } else if (matchesL1) {
-            return 175;
-        } else if (matchesM1) {
-            return 140;
-        } else if (matchesM) {
-            return 125
-        } else {
-            return 25;
-        }
-    }
-    const mainGap = defineMainGap();
-    const footerMargin = matchesM ? 5 : 2.5;
-
-    const gridStyle = matchesL ? {
-        width: '85%',
-        margin: 'auto',
-        display: 'grid',
-        gridColumnGap: '1em',
-        gridRowGap: '20px',
-        gridTemplateColumns: '2fr 6fr',
-        gridTemplateAreas:
-            `"header header"
-            "sidebar main"
-            "footer footer"`,
-    } : {
-        width: '100%',
-        margin: 'auto',
-        display: 'grid',
-        gridColumnGap: '1em',
-        gridRowGap: '20px',
-        gridTemplateAreas: `"header header"
-            "main main"
-            "footer footer"
-            "sidebar sidebar"`,
-    }
-
-    const dataSize = (division === 'personalData') ? 18 : 17;
-    const dataColor = (division === 'personalData') ? 'thirdary' : '#808080';
-    const orderColor = (division === 'myOrders') ? 'thirdary' : '#808080';
-    const orderSize = (division === 'myOrders') ? 18 : 17;
-    const widthMinusFields = matchesX ? 0 : 30;
-    const widthMinusPannel = matchesX ? 0 : 50;
-    const buttonPasswordSize = matchesX ? 'medium' : 'small';
 
     const { setOpenSnackbar, setSnackbarMessage, setBgrColor } = useContext(AuthContext);
 
@@ -166,114 +85,62 @@ function Profile() {
         }
     }, []);
 
-    const handleCloseChangePasswordDialog = () => {
-        setOpenChangePasswordDialog(false);
-    }
+    const matches1120px = useMediaQuery("(min-width: 1120px)");
+    const matches1050px = useMediaQuery("(min-width: 1050px)");
+    const matches1000px = useMediaQuery("(min-width: 1000px)");
+    const matches800px = useMediaQuery("(min-width: 800px)");
+    const matches650px = useMediaQuery("(min-width: 650px)");
+    const matches400px = useMediaQuery("(min-width: 400px)");
 
-    const handleOpenChangePasswordDialog = () => {
-        setOpenChangePasswordDialog(true);
-        setPasswordInfo({
-            username: sessionStorage.getItem('authorizedUsername'),
-            oldPassword: '',
-            newPassword: ''
-        });
-        setOldPasswordError(false);
-        setOldPasswordHelper('');
-        setPasswordError(false);
-        setPasswordHelper('');
-        setPasswordCheck('');
-    }
+    const alignMain = matches1000px ? 'left' : 'center';
+    const alignSidebar = matches1000px ? 'left' : 'center';
+    const mainDirection = matches650px ? 'row' : 'column';
+    const defineMainGap = () => {
 
-    const inputChanged = (event) => {
-        if (event.target.name === 'passwordCheck') {
-            setPasswordCheck(event.target.value);
+        if (matches1120px) {
+            return 225;
+        } else if (matches1050px) {
+            return 175;
+        } else if (matches800px) {
+            return 140;
+        } else if (matches650px) {
+            return 125
         } else {
-            setPasswordInfo({ ...passwordInfo, [event.target.name]: event.target.value });
-        }
-        if (event.target.name === 'passwordCheck') {
-            setPasswordError(false);
-            setPasswordHelper('');
-        } else if (event.target.name === 'oldPassword') {
-            setOldPasswordError(false);
-            setOldPasswordHelper('');
-        } else {
-            setPasswordError(false);
-            setPasswordHelper('');
+            return 25;
         }
     }
+    const mainGap = defineMainGap();
 
-    const changePassword = (passwordInfo) => {
-        const token = sessionStorage.getItem('jwt');
-
-        fetch(process.env.REACT_APP_API_URL + 'changepassword', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': token
-            },
-            body: JSON.stringify(passwordInfo)
-        })
-            .then(response => {
-                if (response.ok) {
-                    fetchUser();
-                    setOpenSnackbar(true);
-                    setSnackbarMessage('Password was changed successfully');
-                    setOpenChangePasswordDialog(false);
-                } else if (response.status === 409) {
-                    setOldPasswordError(true);
-                    setOldPasswordHelper('Old password is incorrect');
-                } else {
-                    setOpenChangePasswordDialog(false);
-                    setOpenSnackbar(true);
-                    setSnackbarMessage('You cannot change password at the moment');
-                }
-            })
-            .catch(err => console.error(err))
+    const gridStyle = matches1000px ? {
+        width: '85%',
+        margin: 'auto',
+        display: 'grid',
+        gridColumnGap: '1em',
+        gridRowGap: '20px',
+        gridTemplateColumns: '2fr 6fr',
+        gridTemplateAreas:
+            `"header header"
+            "sidebar main"
+            "footer footer"`,
+    } : {
+        width: '100%',
+        margin: 'auto',
+        display: 'grid',
+        gridColumnGap: '1em',
+        gridRowGap: '20px',
+        gridTemplateAreas: `"header header"
+            "main main"
+            "footer footer"
+            "sidebar sidebar"`,
     }
 
-    const handleSave = () => {
-        let check = true;
-        if (passwordInfo.oldPassword === '') {
-            check = false;
-            setOldPasswordError(true);
-            setOldPasswordHelper('This field cannot be empty');
-        }
-        if (passwordInfo.newPassword === '') {
-            check = false;
-            setPasswordError(true);
-            setPasswordHelper('Password cannot be empty');
-        }
-        if (passwordCheck !== passwordInfo.newPassword) {
-            check = false;
-            setPasswordError(true);
-            setPasswordHelper('Password doesn\'t match');
-        }
-
-        if (check) {
-            changePassword(passwordInfo);
-            setPasswordInfo({
-                username: sessionStorage.getItem('authorizedId'),
-                oldPassword: '',
-                newPassword: ''
-            });
-            setPasswordCheck('');
-        }
-
-    }
-
-    const handleClickShowPassword = (info) => {
-        if (info === 'new') {
-            setShowPassword((show) => !show);
-        } else if (info === 'check') {
-            setShowCheck((show) => !show);
-        } else {
-            setShowOld((show) => !show);
-        }
-    }
-
-    const handleMouseDownPassword = (event) => {
-        event.preventDefault();
-    };
+    const dataSize = (division === 'personalData') ? 18 : 17;
+    const dataColor = (division === 'personalData') ? 'thirdary' : '#808080';
+    const orderColor = (division === 'myOrders') ? 'thirdary' : '#808080';
+    const orderSize = (division === 'myOrders') ? 18 : 17;
+    const widthMinusFields = matches400px ? 0 : 30;
+    const widthMinusPannel = matches400px ? 0 : 50;
+    const buttonPasswordSize = matches400px ? 'medium' : 'small';
 
     const updateUser = () => {
         const token = sessionStorage.getItem('jwt');
@@ -369,8 +236,8 @@ function Profile() {
                 sx={gridStyle}
             >
                 <Box sx={{ gridArea: 'header', display: 'flex', justifyContent: 'center', marginBottom: 2.5, marginTop: 2.5 }}>
-                    <Typography sx={{ backgroundColor: 'black', color: 'white', paddingLeft: 1, paddingRight: 1 }} variant={typoSize}>My</Typography>
-                    <Typography variant={typoSize}>Profile</Typography>
+                    <Typography sx={{ backgroundColor: 'black', color: 'white', paddingLeft: 1, paddingRight: 1 }} variant='h4'>My</Typography>
+                    <Typography variant='h4'>Profile</Typography>
                 </Box>
                 <Box sx={{ gridArea: 'sidebar', display: 'flex', justifyContent: alignSidebar }}>
                     <Card elevation={5} sx={{ borderRadius: '15px', backgroundColor: 'black', color: 'white', width: 250 - widthMinusPannel, height: 130, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', gap: 2 }}>
@@ -630,95 +497,10 @@ function Profile() {
                 </Box>}
                 {(division === 'myOrders') && <Box sx={{ gridArea: 'main', display: 'flex', flexDirection: 'column', gap: 5, alignItems: alignMain }}><MyOrders /></Box>}
                 {division !== 'myOrders' && <Box sx={{ gridArea: 'footer', display: 'flex', justifyContent: 'center' }}>
-                    <Button size={buttonPasswordSize} sx={{ borderRadius: '20px', width: 200 - widthMinusFields, height: 35, marginTop: footerMargin, marginBottom: 2.5, "&:hover": { filter: 'brightness(70%)' }, transition: '0.45s' }} variant='contained' color='sidish' onClick={handleOpenChangePasswordDialog}>Change password</Button>
+                    <ChangePassword fetchUser={fetchUser} buttonPasswordSize={buttonPasswordSize} widthMinusFields={widthMinusFields} />
                 </Box>}
             </Box >}
-            {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="inherit" /></div>}
-
-            <Dialog open={openChangePasswordDialog} onClose={handleCloseChangePasswordDialog}>
-                <DialogTitle>Change password</DialogTitle>
-                <DialogContent style={{ display: 'flex', flexDirection: 'column' }}>
-                    <TextField
-                        color="sidish"
-                        type={showOld ? 'text' : 'password'}
-                        error={oldPasswordError}
-                        helperText={oldPasswordHelper}
-                        margin="dense"
-                        name="oldPassword"
-                        value={passwordInfo.oldPassword}
-                        onChange={inputChanged}
-                        label="Old password"
-                        variant="outlined"
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        onClick={() => handleClickShowPassword('old')}
-                                        onMouseDown={handleMouseDownPassword}
-                                        edge="end"
-                                    >
-                                        {showOld ? <VisibilityOff color='sidish' /> : <Visibility color='sidish' />}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                    <TextField
-                        color="sidish"
-                        type={showPassword ? 'text' : 'password'}
-                        error={passwordError}
-                        helperText={passwordHelper}
-                        margin="dense"
-                        name="newPassword"
-                        value={passwordInfo.newPassword}
-                        onChange={inputChanged}
-                        label="Password"
-                        variant="outlined"
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        onClick={() => handleClickShowPassword('new')}
-                                        onMouseDown={handleMouseDownPassword}
-                                        edge="end"
-                                    >
-                                        {showPassword ? <VisibilityOff color='sidish' /> : <Visibility color='sidish' />}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                    <TextField
-                        color="sidish"
-                        type={showCheck ? 'text' : 'password'}
-                        error={passwordError}
-                        helperText={passwordHelper}
-                        margin="dense"
-                        name="passwordCheck"
-                        value={passwordCheck}
-                        onChange={inputChanged}
-                        label="Password Control"
-                        variant="outlined"
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        onClick={() => handleClickShowPassword('check')}
-                                        onMouseDown={handleMouseDownPassword}
-                                        edge="end"
-                                    >
-                                        {showCheck ? <VisibilityOff color='sidish' /> : <Visibility color='sidish' />}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button sx={{ transition: '0.45s' }} color='sidish' onClick={handleCloseChangePasswordDialog}>Cancel</Button>
-                    <Button sx={{ "&:hover": { filter: 'brightness(70%)' }, transition: '0.45s' }} color='sidish' variant='contained' onClick={handleSave}>Save</Button>
-                </DialogActions>
-            </Dialog>
+            {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '25vh' }}><CircularProgress color="inherit" /></div>}
             <DialogInfo openInfo={openInfo} setOpenInfo={setOpenInfo} textInfo={textInfo} setTextInfo={setTextInfo} infoField={infoField} setInfoField={setInfoField} />
         </motion.div>
     );

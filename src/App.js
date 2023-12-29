@@ -1,6 +1,6 @@
 import './App.css';
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 import { Box, Snackbar } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -37,11 +37,6 @@ function App() {
 
   const matches400px = useMediaQuery("(min-width: 400px)");
   const matches350px = useMediaQuery("(min-width: 350px)");
-
-  // useEffect(() => {
-  //   sessionStorage.clear();
-  // }, [])
-
 
   return (
     <div className="App">
