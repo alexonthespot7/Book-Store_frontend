@@ -17,7 +17,7 @@ export default function Orders() {
 
     const navigate = useNavigate();
 
-    const { setOpenSnackbar, setSnackbarMessage, setBgrColor } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, setBgrColor, getCurrentDateFormatted } = useContext(AuthContext);
 
     const gridRef = useRef();
 
@@ -96,6 +96,7 @@ export default function Orders() {
 
     const columns = [
         {
+            field: 'orderid',
             headerName: 'Number',
             cellRenderer: params => <Link to={{ pathname: '/orders/admin/' + params.data.orderid }}>{params.data.orderid}</Link>,
             type: 'narrow'
@@ -149,8 +150,12 @@ export default function Orders() {
         );
     }, []);
 
+    const exportParams = {
+        fileName: `orders_${getCurrentDateFormatted()}`
+    }
+
     const onBtnExport = useCallback(() => {
-        gridRef.current.api.exportDataAsCsv();
+        gridRef.current.api.exportDataAsCsv(exportParams);
     }, []);
 
     return (

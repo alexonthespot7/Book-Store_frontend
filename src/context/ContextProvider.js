@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { format } from "date-fns";
+
 import AuthContext from "./AuthContext";
 import useMediaQuery from '../Hooks/useMediaQuery';
 
@@ -12,6 +14,10 @@ function ContextProvider(props) {
 
     const matches550px = useMediaQuery("(min-width: 550px)");
     const dialogueWidth = matches550px ? 419 : '86%';
+
+    const getCurrentDateFormatted = () => {
+        return format(new Date(), "MM/dd/yyyy");
+    }
 
     const currencyFormatter = (currency, sign) => {
         let sansDec = currency.toFixed(2);
@@ -369,7 +375,7 @@ function ContextProvider(props) {
         <AuthContext.Provider value={{
             currencyFormatter, openSnackbar, setOpenSnackbar, snackbarMessage, setSnackbarMessage,
             dialogueWidth, bgrColor, setBgrColor, cartDrawerOpen, setCartDrawerOpen,
-            fetchIdsOfBooksInCart, idsOfBooksInCart, setIdsOfBooksInCart,
+            fetchIdsOfBooksInCart, idsOfBooksInCart, setIdsOfBooksInCart, getCurrentDateFormatted,
             resetAuthentication, addBookToCart, fetchBook, fetchCategories, fetchCart
         }}>
             {props.children}
