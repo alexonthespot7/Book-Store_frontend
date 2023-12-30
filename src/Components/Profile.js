@@ -80,9 +80,7 @@ function Profile() {
 
     useEffect(() => {
         setBgrColor('#FFFAFA');
-        if (sessionStorage.getItem('authorizedUsername')) {
-            fetchUser();
-        }
+        fetchUser();
     }, []);
 
     const matches1120px = useMediaQuery("(min-width: 1120px)");
