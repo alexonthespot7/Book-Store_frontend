@@ -28,7 +28,7 @@ const label = {
     passwordCheck: 'Password Control'
 }
 
-export default function ChangePassword({ fetchUser, buttonPasswordSize, widthMinusFields }) {
+export default function ChangePassword({ buttonPasswordSize, responsiveWidthToSubtract }) {
     const [loading, setLoading] = useState(false);
     const [passwordInfo, setPasswordInfo] = useState(initialPasswordInfo);
     const [openChangePasswordDialog, setOpenChangePasswordDialog] = useState(false);
@@ -91,7 +91,6 @@ export default function ChangePassword({ fetchUser, buttonPasswordSize, widthMin
                 handleBadResponse(response);
                 return null;
             }
-            await fetchUser();
             setOpenSnackbar(true);
             setSnackbarMessage('Password was changed successfully');
             handleCloseChangePasswordDialog();
@@ -136,7 +135,7 @@ export default function ChangePassword({ fetchUser, buttonPasswordSize, widthMin
     const footerMargin = matches650px ? 5 : 2.5;
     return (
         <>
-            <Button size={buttonPasswordSize} sx={{ borderRadius: '20px', width: 200 - widthMinusFields, height: 35, marginTop: footerMargin, marginBottom: 2.5, "&:hover": { filter: 'brightness(70%)' }, transition: '0.45s' }} variant='contained' color='sidish' onClick={handleOpenChangePasswordDialog}>
+            <Button size={buttonPasswordSize} sx={{ borderRadius: '20px', width: 200 - responsiveWidthToSubtract, height: 35, marginTop: footerMargin, marginBottom: 2.5, "&:hover": { filter: 'brightness(70%)' }, transition: '0.45s' }} variant='contained' color='sidish' onClick={handleOpenChangePasswordDialog}>
                 Change Password
             </Button>
             {!loading &&

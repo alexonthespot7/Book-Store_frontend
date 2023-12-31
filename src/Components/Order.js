@@ -134,7 +134,6 @@ function Order({ order, alignProp, marginProp }) {
                     <div style={{ display: 'flex', flexDirection: direction, alignItems: align, justifyContent: 'center', gap: mainGap }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 20, alignItems: align }}>
                             <Typography sx={{ marginBottom: 1 }} variant='h6'>Delivery details</Typography>
-
                             {Object.keys(orderInfo).map((field) => (
                                 <div key={field} style={{ display: 'flex', flexDirection: 'column' }}>
                                     <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>{field.toUpperCase()} </Typography>

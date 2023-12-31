@@ -15,20 +15,14 @@ function ContextProvider(props) {
     const matches550px = useMediaQuery("(min-width: 550px)");
     const dialogueWidth = matches550px ? 419 : '86%';
 
-    const getCurrentDateFormatted = () => {
-        return format(new Date(), "MM/dd/yyyy");
-    }
-
     const currencyFormatter = (currency, sign) => {
         let sansDec = currency.toFixed(2);
         let formatted = sansDec.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         return sign + `${formatted}`;
     }
 
-    const resetAuthentication = () => {
-        sessionStorage.clear();
-        setOpenSnackbar(true);
-        setSnackbarMessage('Please login again to prove your identity');
+    const getCurrentDateFormatted = () => {
+        return format(new Date(), "MM/dd/yyyy");
     }
 
     const handleBadResponseBooksInCartAuth = (response) => {
@@ -93,6 +87,22 @@ function ContextProvider(props) {
             setOpenSnackbar(true);
             setSnackbarMessage('Something is wrong with the server');
         }
+    }
+
+    const fetchIdsOfBooksInCart = async () => {
+        if (sessionStorage.getItem('jwt')) {
+            await fetchIdsOfBooksInCartAuthenticated();
+        } else if (sessionStorage.getItem('cartId') !== null) {
+            await fetchIdsOfBooksInCartNoAuth(sessionStorage.getItem('cartId'));
+        } else {
+            setIdsOfBooksInCart([]);
+        }
+    }
+
+    const resetAuthentication = () => {
+        sessionStorage.clear();
+        setOpenSnackbar(true);
+        setSnackbarMessage('Please login again to prove your identity');
     }
 
     const fetchAddBookToCartAuthenticated = async (bookId, quantity) => {
@@ -186,16 +196,6 @@ function ContextProvider(props) {
             await fetchCreateCartNoAuthentication(bookid, quantity);
         } else {
             await fetchAddBookToCartNoAuthentication(bookid, quantity);
-        }
-    }
-
-    const fetchIdsOfBooksInCart = async () => {
-        if (sessionStorage.getItem('jwt')) {
-            await fetchIdsOfBooksInCartAuthenticated();
-        } else if (sessionStorage.getItem('cartId') !== null) {
-            await fetchIdsOfBooksInCartNoAuth(sessionStorage.getItem('cartId'));
-        } else {
-            setIdsOfBooksInCart([]);
         }
     }
 
@@ -371,12 +371,48 @@ function ContextProvider(props) {
         }
     }
 
+    const handleSomethingWentWrong = () => {
+        setOpenSnackbar(true);
+        setSnackbarMessage('Something went wrong. Please try again later');
+    }
+
+    const fetchUser = async (handleBadResponseFetchUser, handleData) => {
+        const token = sessionStorage.getItem('jwt');
+        const userId = sessionStorage.getItem('authorizedId');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'users/' + userId,
+                {
+                    method: 'GET',
+                    headers: { 'Authorization': token }
+                });
+            if (!response.ok) {
+                handleBadResponseFetchUser(response);
+                return null;
+            }
+            await response.json()
+                .then(data => {
+                    if (data !== null) {
+                        handleData(data);
+                    } else {
+                        handleSomethingWentWrong();
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    handleSomethingWentWrong();
+                });
+        } catch (error) {
+            console.error(error);
+            handleSomethingWentWrong();
+        }
+    }
+
     return (
         <AuthContext.Provider value={{
-            currencyFormatter, openSnackbar, setOpenSnackbar, snackbarMessage, setSnackbarMessage,
-            dialogueWidth, bgrColor, setBgrColor, cartDrawerOpen, setCartDrawerOpen,
-            fetchIdsOfBooksInCart, idsOfBooksInCart, setIdsOfBooksInCart, getCurrentDateFormatted,
-            resetAuthentication, addBookToCart, fetchBook, fetchCategories, fetchCart
+            openSnackbar, setOpenSnackbar, snackbarMessage, setSnackbarMessage, bgrColor, setBgrColor,
+            cartDrawerOpen, setCartDrawerOpen, idsOfBooksInCart, setIdsOfBooksInCart,
+            dialogueWidth, currencyFormatter, getCurrentDateFormatted, fetchIdsOfBooksInCart,
+            resetAuthentication, addBookToCart, fetchBook, fetchCategories, fetchCart, fetchUser
         }}>
             {props.children}
         </AuthContext.Provider>
