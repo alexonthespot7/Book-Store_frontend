@@ -1,87 +1,76 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useMemo } from "react";
 
 import { Box, Button, Card, CircularProgress, Divider, TextField, Typography, useMediaQuery } from "@mui/material";
 
 import RemoveIcon from '@mui/icons-material/Remove';
 
-import AuthContext from "../context/AuthContext";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { motion } from 'framer-motion';
 
 import countryList from 'react-select-country-list';
 import Select from 'react-select';
-import { useMemo } from "react";
+
+import AuthContext from "../context/AuthContext";
 import MyOrders from "./MyOrders";
 import DialogInfo from "./DialogInfo";
 import ChangePassword from "./ChangePassword";
 
+const initialAllowChange = {
+    personalData: false,
+    addressData: false
+}
+
+const initialUser = {
+    id: '',
+    firstname: '',
+    lastname: '',
+    username: '',
+    email: '',
+    password: '',
+    role: '',
+    verificationCode: '',
+    accountVerified: '',
+    country: '',
+    city: '',
+    street: '',
+    postcode: ''
+}
+
+const initialCountry = {
+    value: '',
+    label: ''
+}
+
+const mainDivisions = ['personalData', 'myOrders'];
+
+const dataDivisionFields = {
+    personalData: {
+        firstColumn: ['firstname', 'lastname'],
+        secondColumn: ['email', 'username']
+    },
+    addressData: {
+        firstColumn: ['country', 'city'],
+        secondColumn: ['street', 'postcode']
+    }
+}
+
 function Profile() {
+    const [allowChange, setAllowChange] = useState(initialAllowChange);
     const [user, setUser] = useState({});
-    const [userUpdate, setUserUpdate] = useState({
-        id: '',
-        firstname: '',
-        lastname: '',
-        username: '',
-        email: '',
-        password: '',
-        role: '',
-        verificationCode: '',
-        accountVerified: '',
-        country: '',
-        city: '',
-        street: '',
-        postcode: ''
-    });
-
-    const [country, setCountry] = useState({
-        value: '',
-        label: ''
-    });
-
+    const [userUpdate, setUserUpdate] = useState(initialUser);
+    const [country, setCountry] = useState(initialCountry);
     const [division, setDivision] = useState('personalData');
-    const [allowChangePersonal, setAllowChangePersonal] = useState(false);
-    const [allowChangeAddress, setAllowChangeAddress] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [openInfo, setOpenInfo] = useState(false);
     const [textInfo, setTextInfo] = useState('');
     const [infoField, setInfoField] = useState('');
 
-    const { setOpenSnackbar, setSnackbarMessage, setBgrColor } = useContext(AuthContext);
+    const navigate = useNavigate();
 
-    const options = useMemo(() => countryList().getData(), []);
+    const { setOpenSnackbar, setSnackbarMessage, setBgrColor, fetchUser } = useContext(AuthContext);
 
-    let { id } = useParams();
-
-    const fetchUser = () => {
-        const token = sessionStorage.getItem('jwt');
-
-        fetch(process.env.REACT_APP_API_URL + 'users/' + id,
-            {
-                method: 'GET',
-                headers: { 'Authorization': token }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data !== null) {
-                    setDataLoaded(true);
-                    setUser(data);
-                    setUserUpdate(data);
-                    if (data.country !== '') {
-                        setCountry({
-                            value: countryList().getValue(data.country),
-                            label: data.country
-                        });
-                    }
-                }
-            })
-            .catch(err => console.error(err));
-    }
-
-    useEffect(() => {
-        setBgrColor('#FFFAFA');
-        fetchUser();
-    }, []);
+    const countries = useMemo(() => countryList().getData(), []);
 
     const matches1120px = useMediaQuery("(min-width: 1120px)");
     const matches1050px = useMediaQuery("(min-width: 1050px)");
@@ -90,25 +79,136 @@ function Profile() {
     const matches650px = useMediaQuery("(min-width: 650px)");
     const matches400px = useMediaQuery("(min-width: 400px)");
 
-    const alignMain = matches1000px ? 'left' : 'center';
-    const alignSidebar = matches1000px ? 'left' : 'center';
-    const mainDirection = matches650px ? 'row' : 'column';
-    const defineMainGap = () => {
+    const handleSomethingWentWrong = () => {
+        setOpenSnackbar(true);
+        setSnackbarMessage('Something went wrong. Please try again later');
+    }
 
-        if (matches1120px) {
-            return 225;
-        } else if (matches1050px) {
-            return 175;
-        } else if (matches800px) {
-            return 140;
-        } else if (matches650px) {
-            return 125
+    const handleBadResponseFetchUser = (response) => {
+        if ([401, 403, 500].includes(response.status)) {
+            navigate('/');
         } else {
-            return 25;
+            handleSomethingWentWrong();
         }
     }
-    const mainGap = defineMainGap();
 
+    const handleData = (data) => {
+        setDataLoaded(true);
+        setUser(data);
+        setUserUpdate(data);
+        if (data.country !== '') {
+            setCountry({
+                value: countryList().getValue(data.country),
+                label: data.country
+            });
+        }
+    }
+
+    useEffect(() => {
+        setBgrColor('#FFFAFA');
+        fetchUser(handleBadResponseFetchUser, handleData);
+    }, []);
+
+    const definePersonalDataMyOrdersTypographySize = (currentDivision) => {
+        return currentDivision === division ? 18 : 17;
+    }
+
+    const definePersonalDataMyOrdersTypographyColor = (currentDivision) => {
+        return currentDivision === division ? 'thirdary' : '#808080';
+    }
+
+    // The function formats camelCase or PascalCase strings by capitalizing the first letter of each word separated by capital letters, 
+    // returning the formatted string.
+    const formatText = (input) => {
+        const words = input.split(/(?=[A-Z])/);
+        return words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
+    const toggleAllowChange = (dataDivision) => {
+        setAllowChange({ ...allowChange, [dataDivision]: !allowChange[dataDivision] });
+    }
+
+    const cancelChanges = (dataDivision) => {
+        toggleAllowChange(dataDivision);
+        if (dataDivision === 'personalData') {
+            setUserUpdate({ ...userUpdate, firstname: user.firstname, lastname: user.lastname });
+        } else {
+            setUserUpdate({ ...userUpdate, country: user.country, city: user.city, street: user.street, postcode: user.postcode });
+        }
+    }
+
+    const infoTextHandle = (text, field) => {
+        if (text.length > 26) {
+            setOpenInfo(true);
+            setTextInfo(text);
+            setInfoField(field);
+        }
+    }
+
+    const handleChangeData = (event) => {
+        setUserUpdate({ ...userUpdate, [event.target.name]: event.target.value });
+    }
+
+    const handleChangeCountry = (value) => {
+        setCountry(value);
+        setUserUpdate({ ...userUpdate, country: value.label })
+    }
+
+    const handleBadResponseUpdateUser = (response) => {
+        if ([401, 403, 500].includes(response.status)) {
+            navigate('/');
+        } else {
+            handleSomethingWentWrong();
+        }
+    }
+
+    const fetchUpdateUser = async () => {
+        const token = sessionStorage.getItem('jwt');
+        setDataLoaded(false);
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'updateuser/' + userUpdate.id, {
+                method: 'PUT',
+                headers: {
+                    'Content-type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(userUpdate)
+            });
+            if (!response.ok) {
+                handleBadResponseUpdateUser(response);
+                return null;
+            }
+            setOpenSnackbar(true);
+            setSnackbarMessage('Your personal information was updated');
+            setAllowChange(initialAllowChange);
+            fetchUser();
+        } catch (error) {
+            console.error(error);
+            handleSomethingWentWrong();
+            navigate('/');
+        }
+    }
+
+    const applyChanges = (dataDivision) => {
+        for (const column of Object.values(dataDivisionFields[dataDivision])) {
+            for (const field of column) {
+                if (userUpdate[field] === '') {
+                    setOpenSnackbar(true);
+                    setSnackbarMessage(`${field.charAt(0).toUpperCase() + field.slice(1)} is mandatory`);
+                    return null;
+                }
+            }
+        }
+        fetchUpdateUser();
+    }
+
+    const handleCloseLongInfoDialog = () => {
+        setOpenInfo(false);
+        setTextInfo('');
+        setInfoField('');
+    }
+
+    // Styles:
     const gridStyle = matches1000px ? {
         width: '85%',
         margin: 'auto',
@@ -131,98 +231,26 @@ function Profile() {
             "footer footer"
             "sidebar sidebar"`,
     }
-
-    const dataSize = (division === 'personalData') ? 18 : 17;
-    const dataColor = (division === 'personalData') ? 'thirdary' : '#808080';
-    const orderColor = (division === 'myOrders') ? 'thirdary' : '#808080';
-    const orderSize = (division === 'myOrders') ? 18 : 17;
-    const widthMinusFields = matches400px ? 0 : 30;
-    const widthMinusPannel = matches400px ? 0 : 50;
+    const alignSidebar = matches1000px ? 'left' : 'center';
+    const mainDivisionsCardWidth = matches400px ? 250 : 200;
+    const alignMainAreaBox = matches1000px ? 'left' : 'center';
+    const dataDivisionDirection = matches650px ? 'row' : 'column';
+    const defineDataDivisionGap = () => {
+        if (matches1120px) {
+            return 225;
+        } else if (matches1050px) {
+            return 175;
+        } else if (matches800px) {
+            return 140;
+        } else if (matches650px) {
+            return 125
+        } else {
+            return 25;
+        }
+    }
+    const dataDivisionGap = defineDataDivisionGap();
+    const responsiveWidthToSubtract = matches400px ? 0 : 30;
     const buttonPasswordSize = matches400px ? 'medium' : 'small';
-
-    const updateUser = () => {
-        const token = sessionStorage.getItem('jwt');
-        fetch(process.env.REACT_APP_API_URL + 'updateuser/' + userUpdate.id, {
-            method: 'PUT',
-            headers: {
-                'Content-type': 'application/json',
-                'Authorization': token
-            },
-            body: JSON.stringify(userUpdate)
-        })
-            .then(response => {
-                if (response.ok) {
-                    setOpenSnackbar(true);
-                    setSnackbarMessage('Your personal information was updated');
-                    setAllowChangePersonal(false);
-                    setAllowChangeAddress(false);
-                    fetchUser();
-                } else {
-                    alert('Something went wrong during the user info update');
-                }
-            })
-            .catch(err => console.error(err))
-    }
-
-    const handleChangePersonal = (event) => {
-        if (allowChangePersonal) {
-            setOpenSnackbar(false);
-            setSnackbarMessage('');
-            setUserUpdate({ ...userUpdate, [event.target.name]: event.target.value });
-        }
-    }
-
-    const applyChangePersonal = () => {
-        let check = true;
-
-        if (userUpdate.firstname === '' && userUpdate.lastname !== '') {
-            check = false;
-            setOpenSnackbar(true);
-            setSnackbarMessage('Firstname must not be empty');
-        } else if (userUpdate.lastname === '' && userUpdate.firstname !== '') {
-            check = false;
-            setOpenSnackbar(true);
-            setSnackbarMessage('Lastname must not be empty');
-        } else if (userUpdate.lastname === '' && userUpdate.firstname === '') {
-            check = false;
-            setOpenSnackbar(true);
-            setSnackbarMessage('Please fill in lastname and firstname');
-        }
-        if (check) {
-            updateUser();
-        }
-    }
-
-    const cancelChangesPersonal = () => {
-        setAllowChangePersonal(false);
-        setUserUpdate(user);
-    }
-
-    const handleChangeAddress = (event) => {
-        if (allowChangeAddress) {
-            setUserUpdate({ ...userUpdate, [event.target.name]: event.target.value });
-        }
-    }
-
-    const handleChangeCountry = (value) => {
-        setCountry(value);
-        setUserUpdate({ ...userUpdate, country: value.label })
-    }
-
-    const cancelChangesAddress = () => {
-        setAllowChangeAddress(false);
-        setUserUpdate(user);
-    }
-
-
-
-    const infoTextHandle = (text, field) => {
-        if (text.length > 'shevelenkov1aa@eduspbsturu'.length) {
-            setOpenInfo(true);
-            setTextInfo(text);
-            setInfoField(field);
-        }
-    }
 
     return (
         <motion.div
@@ -230,279 +258,151 @@ function Profile() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
         >
-            {dataLoaded && <Box
-                sx={gridStyle}
-            >
-                <Box sx={{ gridArea: 'header', display: 'flex', justifyContent: 'center', marginBottom: 2.5, marginTop: 2.5 }}>
-                    <Typography sx={{ backgroundColor: 'black', color: 'white', paddingLeft: 1, paddingRight: 1 }} variant='h4'>My</Typography>
-                    <Typography variant='h4'>Profile</Typography>
+            {dataLoaded &&
+                <Box sx={gridStyle}>
+                    <Box sx={{ gridArea: 'header', display: 'flex', justifyContent: 'center', marginBottom: 2.5, marginTop: 2.5 }}>
+                        <Typography sx={{ backgroundColor: 'black', color: 'white', paddingLeft: 1, paddingRight: 1 }} variant='h4'>My</Typography>
+                        <Typography variant='h4'>Profile</Typography>
+                    </Box>
+                    <Box sx={{ gridArea: 'sidebar', display: 'flex', justifyContent: alignSidebar }}>
+                        <Card elevation={5} sx={{ borderRadius: '15px', backgroundColor: 'black', color: 'white', width: mainDivisionsCardWidth, height: 130, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', gap: 2 }}>
+                            {mainDivisions.map((currentDivision, index) => (
+                                <Typography
+                                    key={index}
+                                    onClick={() => setDivision(currentDivision)}
+                                    sx={{ marginLeft: 2, "&:hover": { filter: 'brightness(60%)' }, cursor: 'pointer', transition: '0.45s', display: 'flex', alignItems: 'center' }}
+                                    variant='h6'
+                                    fontSize={definePersonalDataMyOrdersTypographySize(currentDivision)}
+                                    color={definePersonalDataMyOrdersTypographyColor(currentDivision)}
+                                >
+                                    {(division === currentDivision) && <RemoveIcon fontSize='small' />}
+                                    {formatText(currentDivision)}
+                                </Typography>
+                            ))}
+                        </Card>
+                    </Box>
+
+                    <Box sx={{ gridArea: 'main', display: 'flex', flexDirection: 'column', gap: 5, alignItems: alignMainAreaBox }}>
+                        {(division === 'personalData') &&
+                            Object.entries(dataDivisionFields).map(([dataDivision, divisionColumns], dataDivisionIndex) => (
+                                <motion.div
+                                    key={dataDivisionIndex}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    style={{ display: 'flex', flexDirection: 'column' }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                        <Typography variant='h5' fontSize={22}>{formatText(dataDivision)}</Typography>
+                                        <Typography
+                                            sx={{ cursor: 'pointer', textDecoration: 'underline', "&:hover": { filter: 'brightness(125%)' }, transition: '0.45s' }}
+                                            variant='body'
+                                            color='#A9A9A9'
+                                            fontSize={14}
+                                            onClick={() => !allowChange[dataDivision] ? toggleAllowChange(dataDivision) : cancelChanges(dataDivision)}
+                                        >
+                                            {!allowChange[dataDivision] ? 'Change' : 'Cancel'}
+                                        </Typography>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: dataDivisionDirection, justifyContent: 'flex-start', gap: dataDivisionGap, marginTop: 25 }}>
+                                        {Object.values(divisionColumns).map((fields, columnIndex) => (
+                                            <div key={columnIndex} style={{ display: 'flex', flexDirection: 'column', gap: 25 }}>
+                                                {fields.map((field, fieldIndex) => (
+                                                    <div key={fieldIndex} style={{ display: 'flex', flexDirection: 'column' }}>
+                                                        <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>{field.toUpperCase()}</Typography>
+                                                        {(!allowChange[dataDivision] || dataDivisionFields.personalData.secondColumn.includes(field)) &&
+                                                            <>
+                                                                <Typography
+                                                                    onClick={() => infoTextHandle(user[field], field.charAt(0).toUpperCase() + field.slice(1))}
+                                                                    sx={{ cursor: user[field].length > 26 ? 'pointer' : 'default', minWidth: 225 - responsiveWidthToSubtract, maxWidth: 225 - responsiveWidthToSubtract, marginBottom: 0.5 }}
+                                                                    textAlign='left' noWrap fontWeight='bold' fontSize={14} variant='h7'
+                                                                >
+                                                                    {user[field]}
+                                                                </Typography>
+                                                                <Divider />
+                                                            </>
+                                                        }
+                                                        {allowChange[dataDivision] && !dataDivisionFields.personalData.secondColumn.includes(field) &&
+                                                            <>
+                                                                {field !== 'country' &&
+                                                                    <TextField
+                                                                        onChange={handleChangeData}
+                                                                        sx={{ paddingTop: 0.5, paddingBottom: 0.25, paddingLeft: 1, paddingRight: 1, borderRadius: '25px', backgroundColor: '#E8E8E8', width: 225 - responsiveWidthToSubtract }}
+                                                                        size='small'
+                                                                        name={field}
+                                                                        value={userUpdate[field]}
+                                                                        variant='standard'
+                                                                        InputProps={{ disableUnderline: true }}
+                                                                    />
+                                                                }
+                                                                {field === 'country' &&
+                                                                    <Select
+                                                                        styles={{
+                                                                            control: (baseStyles, state) => ({
+                                                                                ...baseStyles,
+                                                                                minWidth: 235 - responsiveWidthToSubtract,
+                                                                                maxWidth: 235 - responsiveWidthToSubtract,
+                                                                                minHeight: 20,
+                                                                                height: 35,
+                                                                                backgroundColor: '#E8E8E8',
+                                                                                borderRadius: '25px',
+                                                                                textAlign: 'left'
+                                                                            }),
+                                                                            menu: (baseStyles, state) => ({
+                                                                                ...baseStyles,
+                                                                                minWidth: 235 - responsiveWidthToSubtract,
+                                                                                maxWidth: 235 - responsiveWidthToSubtract,
+                                                                                backgroundColor: '#E8E8E8',
+                                                                                borderRadius: '25px',
+                                                                                textAlign: 'left'
+                                                                            }),
+                                                                            menuList: (baseStyles, state) => ({
+                                                                                ...baseStyles,
+                                                                                minWidth: 235 - responsiveWidthToSubtract,
+                                                                                maxWidth: 235 - responsiveWidthToSubtract,
+                                                                                backgroundColor: '#E8E8E8',
+                                                                                borderRadius: '25px',
+                                                                                "::-webkit-scrollbar": {
+                                                                                    display: 'none'
+                                                                                },
+                                                                                textAlign: 'left'
+                                                                            })
+                                                                        }}
+                                                                        options={countries} value={country} onChange={handleChangeCountry}
+                                                                    />
+                                                                }
+                                                            </>
+                                                        }
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {allowChange[dataDivision] &&
+                                        <Button
+                                            variant='contained' color='sidish' size={buttonPasswordSize}
+                                            sx={{ borderRadius: '20px', width: 200 - responsiveWidthToSubtract, height: 35, marginTop: 3, "&:hover": { filter: 'brightness(70%)' }, transition: '0.45s' }}
+                                            onClick={() => applyChanges(dataDivision)}
+                                        >
+                                            Apply Changes
+                                        </Button>
+                                    }
+                                </motion.div>
+                            ))
+                        }
+                        {(division === 'myOrders') && <MyOrders />}
+                    </Box>
+                    {(division !== 'myOrders') &&
+                        <Box sx={{ gridArea: 'footer', display: 'flex', justifyContent: 'center' }}>
+                            <ChangePassword buttonPasswordSize={buttonPasswordSize} responsiveWidthToSubtract={responsiveWidthToSubtract} />
+                        </Box>
+                    }
                 </Box>
-                <Box sx={{ gridArea: 'sidebar', display: 'flex', justifyContent: alignSidebar }}>
-                    <Card elevation={5} sx={{ borderRadius: '15px', backgroundColor: 'black', color: 'white', width: 250 - widthMinusPannel, height: 130, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', gap: 2 }}>
-                        <Typography
-                            onClick={() => setDivision('personalData')}
-                            underline="none"
-                            sx={{ marginLeft: 2, "&:hover": { filter: 'brightness(60%)' }, cursor: 'pointer', transition: '0.45s', display: 'flex', alignItems: 'center' }}
-                            variant='h6'
-                            fontSize={dataSize}
-                            color={dataColor}
-                        >
-                            {(division === 'personalData') && <RemoveIcon fontSize='small' />}
-                            Personal Data
-                        </Typography>
-                        <Typography
-                            onClick={() => setDivision('myOrders')}
-                            sx={{ marginLeft: 2, "&:hover": { filter: 'brightness(60%)' }, cursor: 'pointer', transition: '0.45s', display: 'flex', alignItems: 'center' }}
-                            variant='h6'
-                            fontSize={orderSize}
-                            color={orderColor}
-                        >
-                            {(division === 'myOrders') && <RemoveIcon fontSize='small' />}
-                            My Orders
-                        </Typography>
-                    </Card>
-                </Box>
-                {(division === 'personalData') && <Box sx={{ gridArea: 'main', display: 'flex', flexDirection: 'column', gap: 5, alignItems: alignMain }}>
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        style={{ display: 'flex', flexDirection: 'column' }}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <Typography variant='h5' fontSize={22}>Personal Data</Typography>
-                            {!allowChangePersonal && <Typography
-                                sx={{ cursor: 'pointer', textDecoration: 'underline', "&:hover": { filter: 'brightness(125%)' }, transition: '0.45s' }}
-                                variant='body'
-                                color='#A9A9A9'
-                                fontSize={14}
-                                onClick={() => setAllowChangePersonal(true)}
-                            >
-                                Change
-                            </Typography>}
-                            {allowChangePersonal && <Typography
-                                sx={{ cursor: 'pointer', textDecoration: 'underline', "&:hover": { filter: 'brightness(125%)' }, transition: '0.45s' }}
-                                variant='body'
-                                color='#A9A9A9'
-                                fontSize={14}
-                                onClick={cancelChangesPersonal}
-                            >
-                                Cancel
-                            </Typography>}
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: mainDirection, justifyContent: 'flex-start', gap: mainGap, marginTop: 25 }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 25 }}>
-                                {!allowChangePersonal &&
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>FIRSTNAME </Typography>
-                                        <Typography textAlign='left' noWrap onClick={() => infoTextHandle(user.firstname, 'Firstname')} sx={{ cursor: user.firstname.length > 'shevelenkov1aa@eduspbsturu'.length ? 'pointer' : 'default', minWidth: 225 - widthMinusFields, maxWidth: 225 - widthMinusFields, marginBottom: 0.5 }} fontWeight='bold' fontSize={14} variant='h7'>{user.firstname}</Typography>
-                                        <Divider />
-                                    </div>
-                                }
-                                {allowChangePersonal &&
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>FIRSTNAME </Typography>
-                                        <TextField
-                                            onChange={handleChangePersonal}
-                                            sx={{ paddingTop: 0.5, paddingBottom: 0.25, paddingLeft: 1, paddingRight: 1, borderRadius: '25px', backgroundColor: '#E8E8E8', width: 225 - widthMinusFields }}
-                                            size='small'
-                                            name='firstname'
-                                            value={userUpdate.firstname}
-                                            variant='standard'
-                                            InputProps={{ disableUnderline: true }}
-                                        />
-                                    </div>
-                                }
-                                {!allowChangePersonal &&
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>LASTNAME </Typography>
-                                        <Typography textAlign='left' noWrap onClick={() => infoTextHandle(user.lastname, 'Lastname')} sx={{ cursor: user.lastname.length > 'shevelenkov1aa@eduspbsturu'.length ? 'pointer' : 'default', minWidth: 225 - widthMinusFields, maxWidth: 225 - widthMinusFields, marginBottom: 0.5 }} fontWeight='bold' fontSize={14} variant='h7'>{user.lastname}</Typography>
-                                        <Divider />
-                                    </div>
-                                }
-                                {allowChangePersonal &&
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>LASTNAME </Typography>
-                                        <TextField
-                                            onChange={handleChangePersonal}
-                                            sx={{ paddingTop: 0.5, paddingBottom: 0.25, paddingLeft: 1, paddingRight: 1, borderRadius: '25px', backgroundColor: '#E8E8E8', width: 225 - widthMinusFields }}
-                                            size='small'
-                                            name='lastname'
-                                            value={userUpdate.lastname}
-                                            variant='standard'
-                                            InputProps={{ disableUnderline: true }}
-                                        />
-                                    </div>
-                                }
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 25 }}>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>EMAIL </Typography>
-                                    <Typography textAlign='left' noWrap onClick={() => infoTextHandle(user.email, 'Email')} sx={{ cursor: user.email.length > 'shevelenkov1aa@eduspbsturu'.length ? 'pointer' : 'default', minWidth: 225 - widthMinusFields, maxWidth: 225 - widthMinusFields, marginBottom: 0.5 }} fontWeight='bold' fontSize={14} variant='h7'>{user.email}</Typography>
-                                    <Divider />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>USERNAME </Typography>
-                                    <Typography textAlign='left' noWrap onClick={() => infoTextHandle(user.username, 'Username')} sx={{ cursor: user.username.length > 'shevelenkov1aa@eduspbsturu'.length ? 'pointer' : 'default', minWidth: 225 - widthMinusFields, maxWidth: 225 - widthMinusFields, marginBottom: 0.5 }} fontWeight='bold' fontSize={14} variant='h7'>{user.username}</Typography>
-                                    <Divider />
-                                </div>
-                            </div>
-                        </div>
-                        {allowChangePersonal && <Button size={buttonPasswordSize} sx={{ borderRadius: '20px', width: 200 - widthMinusFields, height: 35, marginTop: 3, "&:hover": { filter: 'brightness(70%)' }, transition: '0.45s' }} variant='contained' color='sidish' onClick={applyChangePersonal} >Apply Changes</Button>}
-                    </motion.div>
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        style={{ display: 'flex', flexDirection: 'column' }}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <Typography variant='h5' fontSize={22}>Address Data</Typography>
-                            {!allowChangeAddress && <Typography
-                                sx={{ cursor: 'pointer', textDecoration: 'underline', "&:hover": { filter: 'brightness(125%)' }, transition: '0.45s' }}
-                                variant='body'
-                                color='#A9A9A9'
-                                fontSize={14}
-                                onClick={() => setAllowChangeAddress(true)}
-                            >
-                                Change
-                            </Typography>}
-                            {allowChangeAddress && <Typography
-                                sx={{ cursor: 'pointer', textDecoration: 'underline', "&:hover": { filter: 'brightness(125%)' }, transition: '0.45s' }}
-                                variant='body'
-                                color='#A9A9A9'
-                                fontSize={14}
-                                onClick={cancelChangesAddress}
-                            >
-                                Cancel
-                            </Typography>}
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: mainDirection, gap: mainGap, marginTop: 25 }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 25 }}>
-                                {!allowChangeAddress &&
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>COUNTRY </Typography>
-                                        <Typography textAlign='left' noWrap sx={{ minWidth: 225 - widthMinusFields, maxWidth: 225 - widthMinusFields, marginBottom: 0.5 }} fontWeight='bold' fontSize={14} variant='h7'>{user.country}</Typography>
-                                        <Divider />
-                                    </div>
-                                }
-                                {allowChangeAddress &&
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>COUNTRY </Typography>
-                                        <Select
-                                            styles={{
-                                                control: (baseStyles, state) => ({
-                                                    ...baseStyles,
-                                                    minWidth: 235 - widthMinusFields,
-                                                    maxWidth: 235 - widthMinusFields,
-                                                    minHeight: 20,
-                                                    height: 35,
-                                                    backgroundColor: '#E8E8E8',
-                                                    borderRadius: '25px',
-                                                    textAlign: 'left'
-                                                }),
-                                                menu: (baseStyles, state) => ({
-                                                    ...baseStyles,
-                                                    minWidth: 235 - widthMinusFields,
-                                                    maxWidth: 235 - widthMinusFields,
-                                                    backgroundColor: '#E8E8E8',
-                                                    borderRadius: '25px',
-                                                    textAlign: 'left'
-                                                }),
-                                                menuList: (baseStyles, state) => ({
-                                                    ...baseStyles,
-                                                    minWidth: 235 - widthMinusFields,
-                                                    maxWidth: 235 - widthMinusFields,
-                                                    backgroundColor: '#E8E8E8',
-                                                    borderRadius: '25px',
-                                                    "::-webkit-scrollbar": {
-                                                        display: 'none'
-                                                    },
-                                                    textAlign: 'left'
-                                                })
-                                            }} options={options} value={country} onChange={handleChangeCountry} />
-                                    </div>
-                                }
-                                {!allowChangeAddress &&
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>CITY </Typography>
-                                        <Typography textAlign='left' noWrap onClick={() => infoTextHandle(user.city, 'City')} sx={{ cursor: user.city.length > 'shevelenkov1aa@eduspbsturu'.length ? 'pointer' : 'default', minWidth: 225 - widthMinusFields, maxWidth: 225 - widthMinusFields, marginBottom: 0.5 }} fontWeight='bold' fontSize={14} variant='h7'>{user.city}</Typography>
-                                        <Divider />
-                                    </div>
-                                }
-                                {allowChangeAddress &&
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>CITY </Typography>
-                                        <TextField
-                                            onChange={handleChangeAddress}
-                                            sx={{ paddingTop: 0.5, paddingBottom: 0.25, paddingLeft: 1, paddingRight: 1, borderRadius: '25px', backgroundColor: '#E8E8E8', width: 225 - widthMinusFields }}
-                                            size='small'
-                                            name='city'
-                                            value={userUpdate.city}
-                                            variant='standard'
-                                            InputProps={{ disableUnderline: true }}
-                                        />
-                                    </div>
-                                }
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 25 }}>
-                                {!allowChangeAddress &&
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>STREET, HOME, APARTMENT </Typography>
-                                        <Typography textAlign='left' noWrap onClick={() => infoTextHandle(user.street, 'Street address')} sx={{ cursor: user.street.length > 'shevelenkov1aa@eduspbsturu'.length ? 'pointer' : 'default', minWidth: 225 - widthMinusFields, maxWidth: 225 - widthMinusFields, marginBottom: 0.5 }} fontWeight='bold' fontSize={14} variant='h7'>{user.street}</Typography>
-                                        <Divider />
-                                    </div>
-                                }
-                                {allowChangeAddress &&
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>STREET, HOME, APARTMENT  </Typography>
-                                        <TextField
-                                            onChange={handleChangeAddress}
-                                            sx={{ paddingTop: 0.5, paddingBottom: 0.25, paddingLeft: 1, paddingRight: 1, borderRadius: '25px', backgroundColor: '#E8E8E8', width: 225 - widthMinusFields }}
-                                            size='small'
-                                            name='street'
-                                            value={userUpdate.street}
-                                            variant='standard'
-                                            InputProps={{ disableUnderline: true }}
-                                        />
-                                    </div>
-                                }
-                                {!allowChangeAddress &&
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>POSTCODE </Typography>
-                                        <Typography textAlign='left' noWrap onClick={() => infoTextHandle(user.postcode, 'postcode')} sx={{ cursor: user.postcode.length > 'shevelenkov1aa@eduspbsturu'.length ? 'pointer' : 'default', minWidth: 225 - widthMinusFields, maxWidth: 225 - widthMinusFields, marginBottom: 0.5 }} fontWeight='bold' fontSize={14} variant='h7'>{user.postcode}</Typography>
-                                        <Divider />
-                                    </div>
-                                }
-                                {allowChangeAddress &&
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <Typography textAlign='left' sx={{ marginBottom: 1 }} variant='h7' color='#A9A9A9' fontSize={14}>POSTCODE </Typography>
-                                        <TextField
-                                            onChange={handleChangeAddress}
-                                            sx={{ paddingTop: 0.5, paddingBottom: 0.25, paddingLeft: 1, paddingRight: 1, borderRadius: '25px', backgroundColor: '#E8E8E8', width: 225 - widthMinusFields }}
-                                            size='small'
-                                            name='postcode'
-                                            value={userUpdate.postcode}
-                                            variant='standard'
-                                            InputProps={{ disableUnderline: true }}
-                                        />
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                        {allowChangeAddress && <Button size={buttonPasswordSize} sx={{ borderRadius: '20px', width: 200 - widthMinusFields, height: 35, marginTop: 3, "&:hover": { filter: 'brightness(70%)' }, transition: '0.45s' }} variant='contained' color='sidish' onClick={applyChangePersonal} >Apply Changes</Button>}
-                    </motion.div>
-                </Box>}
-                {(division === 'myOrders') && <Box sx={{ gridArea: 'main', display: 'flex', flexDirection: 'column', gap: 5, alignItems: alignMain }}><MyOrders /></Box>}
-                {division !== 'myOrders' && <Box sx={{ gridArea: 'footer', display: 'flex', justifyContent: 'center' }}>
-                    <ChangePassword fetchUser={fetchUser} buttonPasswordSize={buttonPasswordSize} widthMinusFields={widthMinusFields} />
-                </Box>}
-            </Box >}
+            }
             {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '25vh' }}><CircularProgress color="inherit" /></div>}
-            <DialogInfo openInfo={openInfo} setOpenInfo={setOpenInfo} textInfo={textInfo} setTextInfo={setTextInfo} infoField={infoField} setInfoField={setInfoField} />
+            <DialogInfo openInfo={openInfo} setOpenInfo={setOpenInfo} handleClose={handleCloseLongInfoDialog} textInfo={textInfo} infoField={infoField} />
         </motion.div>
     );
 }
 
 export default Profile;
-

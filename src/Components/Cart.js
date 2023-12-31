@@ -1,4 +1,3 @@
-
 import { useContext, useState, useEffect, useMemo } from 'react';
 
 import { Button, CardActionArea, CircularProgress, Paper, TextField, Typography } from '@mui/material';
@@ -8,7 +7,6 @@ import EastIcon from '@mui/icons-material/East';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import countryList from 'react-select-country-list';
-
 import Select from 'react-select';
 
 import { createSearchParams, Navigate, useNavigate } from 'react-router-dom';
@@ -62,7 +60,7 @@ function Cart() {
 
     const countries = useMemo(() => countryList().getData(), []);
 
-    const { setOpenSnackbar, setSnackbarMessage, setBgrColor, fetchCart } = useContext(AuthContext);
+    const { setOpenSnackbar, setSnackbarMessage, setBgrColor, fetchCart, fetchUser } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
@@ -83,40 +81,27 @@ function Cart() {
         setSnackbarMessage('Something is wrong. Please try again');
     }
 
-    const fetchUser = async () => {
-        const userId = sessionStorage.getItem('authorizedId');
-        const token = sessionStorage.getItem('jwt');
-        fetch(process.env.REACT_APP_API_URL + 'users/' + userId,
-            {
-                method: 'GET',
-                headers: { 'Authorization': token }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data !== null) {
-                    setAddressInfo({
-                        firstname: data.firstname,
-                        lastname: data.lastname,
-                        email: data.email,
-                        country: '',
-                        city: data.city,
-                        street: data.street,
-                        postcode: data.postcode,
-                        note: ''
-                    });
-                    if (data.country !== '') {
-                        setCountry({
-                            value: countryList().getValue(data.country),
-                            label: data.country
-                        });
-                    }
-                }
-            })
-            .catch(err => console.error(err));
+    const handleData = (data) => {
+        setAddressInfo({
+            firstname: data.firstname,
+            lastname: data.lastname,
+            email: data.email,
+            country: '',
+            city: data.city,
+            street: data.street,
+            postcode: data.postcode,
+            note: ''
+        });
+        if (data.country !== '') {
+            setCountry({
+                value: countryList().getValue(data.country),
+                label: data.country
+            });
+        }
     }
 
     const fetchCartAndUser = async () => {
-        if (sessionStorage.getItem('jwt')) await fetchUser();
+        if (sessionStorage.getItem('jwt')) await fetchUser(handleBadResponse, handleData);
         await fetchCart(setBooksInCart, handleTotal, handleBadResponse);
     }
 
