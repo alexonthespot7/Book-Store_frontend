@@ -1,195 +1,162 @@
-import React, { useContext } from 'react';
+import { useContext, useState } from 'react';
 
 import { Menu, MenuItem, Button, ListItemIcon, Divider, IconButton } from '@mui/material';
+
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
 import AuthContext from '../context/AuthContext';
-
 import useMediaQuery from '../Hooks/useMediaQuery';
-import { Link } from 'react-router-dom';
 
-export default function Logout({ logout }) {
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const openMenu = Boolean(anchorEl);
+export default function Logout() {
+    const [menuAnchor, setMenuAnchor] = useState(null);
 
-    const { authorizedUsername, setSecondDrawerOpen } = useContext(AuthContext);
+    const { setCartDrawerOpen, setOpenSnackbar, setSnackbarMessage } = useContext(AuthContext);
 
-    const matchesXXL = useMediaQuery("(min-width: 1700px)");
-    const matchesXL = useMediaQuery("(min-width: 1400px)");
-    const matchesL = useMediaQuery("(min-width: 1228px)");
-    const matchesFirst = useMediaQuery("(min-width: 1028px)");
-    const matchesSecond = useMediaQuery("(min-width: 870px)");
-    const matchesM = useMediaQuery("(min-width: 700px)");
-    const matchesThird = useMediaQuery("(min-width: 430px)");
+    const location = useLocation();
+    const navigate = useNavigate();
 
-    const myGap = matchesFirst ? 8 : 0;
+    const openMenu = Boolean(menuAnchor);
+    const username = sessionStorage.getItem('authorizedUsername');
+    const userId = sessionStorage.getItem('authorizedId');
 
-    const marginSmall = matchesThird ? 0 : -3
+    const matches1700px = useMediaQuery("(min-width: 1700px)");
+    const matches1400px = useMediaQuery("(min-width: 1400px)");
+    const matches1228px = useMediaQuery("(min-width: 1228px)");
+    const matches1028px = useMediaQuery("(min-width: 1028px)");
+    const matches870px = useMediaQuery("(min-width: 870px)");
+    const matches700px = useMediaQuery("(min-width: 700px)");
+    const matches430px = useMediaQuery("(min-width: 430px)");
 
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+    const handleClickMenu = (event) => {
+        setMenuAnchor(event.currentTarget);
+    }
 
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
+    const handleCloseMenu = () => {
+        setMenuAnchor(null);
+    }
 
+    const logout = () => {
+        sessionStorage.clear();
+        setOpenSnackbar(true);
+        setSnackbarMessage('You\'ve just logged out');
+        navigate('/');
+    }
+
+    // the function to decide if the username/email should be shown 
+    // based on the length of the name and the screen width
     const showName = () => {
-        if (authorizedUsername.length <= 'ADMIN22'.length) {
-            if (matchesThird) {
+        if (username.length <= 7) {
+            if (matches430px) {
                 return true;
             } else {
                 return false;
             }
-        } else if (authorizedUsername.length <= 'alexonthespot'.length) {
-            if (matchesM) {
+        } else if (username.length <= 13) {
+            if (matches700px) {
                 return true;
             } else {
                 return false;
             }
-        } else if (authorizedUsername.length < 'xxxxxxxxx.xx@xxx.xxxxxx.xx'.length) {
-            if (matchesL) {
+        } else if (username.length < 26) {
+            if (matches1228px) {
                 return true;
             } else {
                 return false;
             }
-        } else if (authorizedUsername.length < 'xxxxxxxxxxxxxxx.xx@xxx.xxxxxx.xx'.length) {
-            if (matchesXL) {
+        } else if (username.length < 32) {
+            if (matches1400px) {
                 return true;
             } else {
                 return false;
             }
         } else {
-            if (matchesXXL) {
+            if (matches1700px) {
                 return true;
             } else {
                 return false;
             }
         }
     }
+    const mainDivGap = matches1028px ? 8 : 0;
+    const mainDivStyle = matches870px ? { display: 'flex', flexDirection: 'row', gap: mainDivGap } : {}
+    const buttonSize = matches870px ? 'medium' : 'small';
 
-    if (matchesSecond) {
-        return (
-            <div style={{ display: 'flex', flexDirection: 'row', gap: myGap }}>
-                {showName() && <Button onClick={handleClick} variant='text' startIcon={<AccountCircleIcon />} color='inherit'>
-                    {authorizedUsername}
-                </Button>}
-                {!showName() && <IconButton onClick={handleClick} color='thirdary'><AccountCircleIcon /></IconButton>}
-                <Menu
-                    anchorEl={anchorEl}
-                    id="account-menu"
-                    open={openMenu}
-                    onClose={handleClose}
-                    onClick={handleClose}
-                    PaperProps={{
-                        elevation: 0,
-                        sx: {
-                            overflow: 'visible',
-                            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                            mt: 1.5,
-                            '& .MuiAvatar-root': {
-                                width: 32,
-                                height: 32,
-                                ml: -0.5,
-                                mr: 1,
-                            },
-                            '&:before': {
-                                content: '""',
-                                display: 'block',
-                                position: 'absolute',
-                                top: 0,
-                                right: 14,
-                                width: 10,
-                                height: 10,
-                                bgcolor: 'background.paper',
-                                transform: 'translateY(-50%) rotate(45deg)',
-                                zIndex: 0,
-                            },
+    return (
+        <div style={mainDivStyle}>
+            {showName() &&
+                <Button size={buttonSize} onClick={handleClickMenu} variant='text' startIcon={<AccountCircleIcon />} color='inherit'>
+                    {username}
+                </Button>
+            }
+            {!showName() && <IconButton size={buttonSize} onClick={handleClickMenu} color='thirdary'><AccountCircleIcon /></IconButton>}
+            <Menu
+                anchorEl={menuAnchor}
+                id="account-menu"
+                open={openMenu}
+                onClose={handleCloseMenu}
+                onClick={handleCloseMenu}
+                PaperProps={{
+                    elevation: 0,
+                    sx: {
+                        overflow: 'visible',
+                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                        mt: 1.5,
+                        '& .MuiAvatar-root': {
+                            width: 32,
+                            height: 32,
+                            ml: -0.5,
+                            mr: 1,
                         },
-                    }}
-                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                >
-                    <MenuItem button component={Link} to={`/users/${sessionStorage.getItem('authorizedId')}`} >
-                        <ListItemIcon style={{ marginRight: -10 }}>
-                            <AccountBoxIcon fontSize="small" />
+                        '&:before': {
+                            content: '""',
+                            display: 'block',
+                            position: 'absolute',
+                            top: 0,
+                            right: 14,
+                            width: 10,
+                            height: 10,
+                            bgcolor: 'background.paper',
+                            transform: 'translateY(-50%) rotate(45deg)',
+                            zIndex: 0,
+                        },
+                    },
+                }}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            >
+                <MenuItem component={Link} to={`/users/${userId}`} >
+                    <ListItemIcon style={{ marginRight: -10 }}>
+                        <AccountBoxIcon fontSize='small' />
+                    </ListItemIcon>
+                    Profile
+                </MenuItem>
+                {!matches870px && <Divider />}
+                {!matches870px &&
+                    <MenuItem onClick={logout} >
+                        Logout
+                        <ListItemIcon>
+                            <LogoutIcon style={{ marginLeft: 5 }} fontSize='small' />
                         </ListItemIcon>
-                        Profile
                     </MenuItem>
-                </Menu>
+                }
+            </Menu>
+            {matches870px &&
                 <Button onClick={logout} endIcon={<LogoutIcon />} color="inherit">
                     Logout
                 </Button>
-                <IconButton onClick={() => setSecondDrawerOpen(true)}>
+            }
+            {location.pathname !== '/cart' &&
+                <IconButton size={buttonSize} onClick={() => setCartDrawerOpen(true)}>
                     <ShoppingCartOutlinedIcon color='thirdary' />
                 </IconButton>
-            </div >
-        )
-    } else {
-        return (
-            <div>
-                {matchesThird && showName() && <Button size='small' sx={{ marginRight: !showName() ? 0 : marginSmall }} onClick={handleClick} variant='text' startIcon={<AccountCircleIcon />} color='inherit'>
-                    {authorizedUsername}
-                </Button>}
-                {!(matchesThird && showName()) && <IconButton size="small" sx={{ marginRight: !showName() ? 0 : marginSmall }} onClick={handleClick} color='thirdary'><AccountCircleIcon /></IconButton>}
-                <Menu
-                    anchorEl={anchorEl}
-                    id="account-menu"
-                    open={openMenu}
-                    onClose={handleClose}
-                    onClick={handleClose}
-                    PaperProps={{
-                        elevation: 0,
-                        sx: {
-                            overflow: 'visible',
-                            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                            mt: 1.5,
-                            '& .MuiAvatar-root': {
-                                width: 32,
-                                height: 32,
-                                ml: -0.5,
-                                mr: 1,
-                            },
-                            '&:before': {
-                                content: '""',
-                                display: 'block',
-                                position: 'absolute',
-                                top: 0,
-                                right: 14,
-                                width: 10,
-                                height: 10,
-                                bgcolor: 'background.paper',
-                                transform: 'translateY(-50%) rotate(45deg)',
-                                zIndex: 0,
-                            },
-                        },
-                    }}
-                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                >
-                    <MenuItem button component={Link} to={`/users/${sessionStorage.getItem('authorizedId')}`} >
-                        <ListItemIcon style={{ marginRight: -10 }}>
-                            <AccountBoxIcon fontSize="small" />
-                        </ListItemIcon>
-                        Profile
-                    </MenuItem>
-                    <Divider />
-                    <MenuItem button onClick={logout} >
-                        Logout
-                        <ListItemIcon>
-                            <LogoutIcon style={{ marginLeft: 5 }} fontSize="small" />
-                        </ListItemIcon>
-                    </MenuItem>
-                </Menu>
-                <IconButton size='small' onClick={() => setSecondDrawerOpen(true)}>
-                    <ShoppingCartOutlinedIcon color='thirdary' />
-                </IconButton>
-            </div>
-        )
-    }
+            }
+        </div >
+    );
 }
 
 

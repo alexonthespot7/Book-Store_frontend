@@ -1,13 +1,8 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
+
 import { AnimatePresence, motion } from "framer-motion";
 
-function DialogInfo({ openInfo, setOpenInfo, setTextInfo, textInfo, setInfoField, infoField }) {
-    const handleClose = () => {
-        setOpenInfo(false);
-        setTextInfo('');
-        setInfoField('');
-    }
-
+function DialogInfo({ openInfo, handleClose, textInfo, infoField }) {
     return (
         <AnimatePresence>
             <motion.div
@@ -28,7 +23,6 @@ function DialogInfo({ openInfo, setOpenInfo, setTextInfo, textInfo, setInfoField
                 </Dialog>
             </motion.div>
         </AnimatePresence >
-
     );
 }
 

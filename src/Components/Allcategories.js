@@ -1,110 +1,35 @@
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 
-import MuiAlert from '@mui/material/Alert';
-import { Button, CircularProgress, IconButton, InputAdornment, Paper, Snackbar, TextField, Typography } from "@mui/material";
+import { Button, CircularProgress, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
 
 import SearchIcon from '@mui/icons-material/Search';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
-import useMediaQuery from "../Hooks/useMediaQuery";
 import AuthContext from "../context/AuthContext";
-import BooksinCategory from "./Booksincategory";
+import useMediaQuery from "../Hooks/useMediaQuery";
+import BooksInCategory from "./BooksInCategory";
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
-function Allcategories() {
+function AllCategories() {
     const [categories, setCategories] = useState([]);
     const [dataFetched, setDataFetched] = useState(false);
-
-    const [cartUpdated, setCartUpdated] = useState(false);
-
-
     const [searchNow, setSearchNow] = useState('');
     const [openSearch, setOpenSearch] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const { setBgrColor } = useContext(AuthContext);
+    const { setBgrColor, fetchCategories } = useContext(AuthContext);
 
-    const matchesSecond = useMediaQuery("(min-width: 870px)");
-    const matchesThird = useMediaQuery("(min-width: 500px)");
-    const matchesFourth = useMediaQuery("(min-width: 400px)");
-    const matchesFifth = useMediaQuery("(min-width: 350px)");
-    const matchesSixth = useMediaQuery("(min-width: 300px)");
-
-    const matchesXL = useMediaQuery("(min-width: 1280px)");
-    const matchesYL = useMediaQuery("(min-width: 1200px)");
-    const matchesL = useMediaQuery("(min-width: 1000px)");
-    const matchesM = useMediaQuery("(min-width: 800px)");
-    const matchesS = useMediaQuery("(min-width: 600px)");
-    const matchesSmall2 = useMediaQuery("(min-width: 500px)");
-    const matchesXS = useMediaQuery("(min-width: 440px)");
-    const matchesXSmall2 = useMediaQuery("(min-width: 400px)");
-    const matchesXXS = useMediaQuery("(min-width(320px)");
-    const matchesXXSmall2 = useMediaQuery("(min-width: 300px)");
-
-    const defineMarginSearch = () => {
-        if (matchesSmall2) {
-            return 70;
-        } else if (matchesXSmall2) {
-            return 40;
-        } else if (matchesXXSmall2) {
-            return 20;
-        } else {
-            return 10;
-        }
-    }
-
-    const marginSearch = defineMarginSearch();
-
-    const searchSize = matchesSmall2 ? 'medium' : 'small';
-
-    const typoSize = matchesM ? 'h4' : 'h5';
-
-    const defineTitleSize = () => {
-        if (matchesThird) {
-            return 'h4';
-        } else if (matchesFifth) {
-            return 'h5';
-        } else {
-            return 'h6';
-        }
-    }
-
-    const titleSize = defineTitleSize();
-
-    const defineCarouselWidth = () => {
-        if (matchesXL) {
-            return '65%';
-        } else if (matchesM) {
-            return 700;
-        } else if (matchesS) {
-            return 500;
-        } else if (matchesXS) {
-            return 350;
-        } else if (matchesXXS) {
-            return 240;
-        } else {
-            return 200;
-        }
-    }
-
-    const carouselWidth = defineCarouselWidth();
-
-    const defineSalesMargin = () => {
-        if (matchesSecond) {
-            return 40;
-        } else if (matchesThird) {
-            return 20;
-        } else {
-            return 10;
-        }
-    }
-
-    const salesMargin = defineSalesMargin();
+    const matches1280px = useMediaQuery("(min-width: 1280px)");
+    const matches870px = useMediaQuery("(min-width: 870px)");
+    const matches800px = useMediaQuery("(min-width: 800px)");
+    const matches600px = useMediaQuery("(min-width: 600px)");
+    const matches500px = useMediaQuery("(min-width: 500px)");
+    const matches440px = useMediaQuery("(min-width: 440px)");
+    const matches400px = useMediaQuery("(min-width: 400px)");
+    const matches350px = useMediaQuery("(min-width: 350px)");
+    const matches320px = useMediaQuery("(min-width: 320px)");
+    const matches300px = useMediaQuery("(min-width: 300px)");
 
     const filteredCategories = categories.filter(
         category => {
@@ -114,29 +39,59 @@ function Allcategories() {
         }
     );
 
-    const fetchCategories = () => {
-        fetch(process.env.REACT_APP_API_URL + 'categories')
-            .then(response => response.json())
-            .then(data => {
-                if (data !== null) {
-                    setCategories(data);
-                    setDataFetched(true);
-                }
-            })
-            .catch(err => console.error(err));
+    const handleFetchCategoriesData = (data) => {
+        setCategories(data);
+        setDataFetched(true);
     }
 
     useEffect(() => {
-        fetchCategories();
+        fetchCategories(handleFetchCategoriesData);
         setBgrColor('#1c1c1c');
     }, []);
 
+    const defineSalesMargin = () => {
+        if (matches870px) {
+            return 40;
+        } else if (matches500px) {
+            return 20;
+        } else {
+            return 10;
+        }
+    }
+    const salesMargin = defineSalesMargin();
 
+    const defineTitleSize = () => {
+        if (matches500px) {
+            return 'h4';
+        } else if (matches350px) {
+            return 'h5';
+        } else {
+            return 'h6';
+        }
+    }
+    const titleSize = defineTitleSize();
+
+    const defineCarouselWidth = () => {
+        if (matches1280px) {
+            return '65%';
+        } else if (matches800px) {
+            return 700;
+        } else if (matches600px) {
+            return 500;
+        } else if (matches440px) {
+            return 350;
+        } else if (matches320px) {
+            return 240;
+        } else {
+            return 200;
+        }
+    }
+    const carouselWidth = defineCarouselWidth();
 
     const content = filteredCategories.map((category, index) => {
         return (
-            <AnimatePresence>
-                <motion.div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: salesMargin }}
+            <AnimatePresence key={index}>
+                <motion.div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: salesMargin }}
                     layout
                     initial={{ scale: 0.5, height: 0 }}
                     animate={{ scale: 1, height: 'auto' }}
@@ -145,14 +100,14 @@ function Allcategories() {
                 >
                     <Typography variant={titleSize} sx={{ color: 'white', fontFamily: 'serif', marginBottom: 2.5 }} >{category.name}</Typography>
                     <div style={{ width: carouselWidth }}>
-                        <BooksinCategory category={category} setCartUpdated={setCartUpdated} />
+                        <BooksInCategory category={category} />
                     </div>
                 </motion.div>
             </AnimatePresence>
         );
     });
 
-    const handleLocalChange = (event) => {
+    const handleSearchFieldChange = (event) => {
         setSearchNow(event.target.value);
     }
 
@@ -166,8 +121,22 @@ function Allcategories() {
         setSearchNow('');
     }
 
-    return (
+    const searchSize = matches500px ? 'medium' : 'small';
+    const typoSize = matches800px ? 'h4' : 'h5';
+    const defineMarginSearch = () => {
+        if (matches500px) {
+            return 70;
+        } else if (matches400px) {
+            return 40;
+        } else if (matches300px) {
+            return 20;
+        } else {
+            return 10;
+        }
+    }
+    const marginSearch = defineMarginSearch();
 
+    return (
         <motion.div
             style={{ display: 'flex', flexDirection: 'column', gap: 30, marginBottom: 40 }}
             initial={{ opacity: 0 }}
@@ -184,7 +153,7 @@ function Allcategories() {
                 <div style={{ display: 'flex', gap: 8 }}>
                     <Typography
                         variant={typoSize}
-                        style={{ background: "-webkit-linear-gradient(45deg, #fff 70%, #000000 10%)", webkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+                        style={{ background: "-webkit-linear-gradient(45deg, #fff 70%, #000000 10%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
                     >
                         All
                     </Typography>
@@ -207,7 +176,7 @@ function Allcategories() {
                                     size={searchSize}
                                     fullWidth
                                     value={searchNow}
-                                    onChange={handleLocalChange}
+                                    onChange={handleSearchFieldChange}
                                     type='search'
                                     placeholder="Search for categories..."
                                     sx={{ backgroundColor: '#E8E8E8', color: 'black' }}
@@ -238,21 +207,14 @@ function Allcategories() {
 
                         }
                         {(filteredCategories.length > 0) && content}
-                        {(filteredCategories.length === 0 && openSearch) && <Typography color='white' variant='h6' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}>No categories were found for your query: "{searchQuery}"</Typography>}
-                        {(filteredCategories.length === 0 && !openSearch) && <Typography color='white' variant='h6' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}>Please reload the page or visit the website later</Typography>}
+                        {(filteredCategories.length === 0 && openSearch) && <Typography color='white' variant='h6' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '30vh' }}>No categories were found for your query: "{searchQuery}"</Typography>}
+                        {(filteredCategories.length === 0 && !openSearch) && <Typography color='white' variant='h6' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '30vh' }}>Please reload the page or visit the website later</Typography>}
                     </div>
                 </AnimatePresence>
             }
-            {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="thirdary" /></div>}
-
-            <Snackbar open={cartUpdated} autoHideDuration={3000} onClose={() => setCartUpdated(false)}>
-                <Alert onClose={() => setCartUpdated(false)} severity='sidish' sx={{ width: '100%' }}>
-                    Book was added to your cart
-                </Alert>
-            </Snackbar>
+            {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '30vh' }}><CircularProgress color="thirdary" /></div>}
         </motion.div >
-
     );
 }
 
-export default Allcategories;
+export default AllCategories;

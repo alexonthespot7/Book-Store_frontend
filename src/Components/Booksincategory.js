@@ -1,59 +1,92 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
 import { CardActionArea, CircularProgress, IconButton, Paper } from "@mui/material";
-
-import Carousel from "nuka-carousel/lib/carousel";
-
-import AdditionalBook from "./AdditionalBook";
-
-import useMediaQuery from "../Hooks/useMediaQuery";
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
+import Carousel from "nuka-carousel/lib/carousel";
+
+import AuthContext from "../context/AuthContext";
+import useMediaQuery from "../Hooks/useMediaQuery";
+import BookDialog from "./BookDialog";
+
 const newPriceHolder = { borderRadius: '25px', width: 78, height: 24, backgroundColor: 'white', color: 'black', display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: 'display', fontSize: 14 };
 
-export default function BooksinCategory({ category, setCartUpdated }) {
+export default function BooksInCategory({ category }) {
     const [books, setBooks] = useState([]);
     const [dataFetched, setDataFetched] = useState(false);
-
     const [openAdditional, setOpenAdditional] = useState(false);
     const [additionalBook, setAdditionalBook] = useState(null);
 
-    const matchesXL = useMediaQuery("(min-width: 1280px)");
-    const matchesM = useMediaQuery("(min-width: 800px)");
-    const matchesS = useMediaQuery("(min-width: 600px)");
-    const matchesXS = useMediaQuery("(min-width: 440px)");
-    const matchesXXS = useMediaQuery("(min-width(320px)");
+    const { currencyFormatter, fetchBook } = useContext(AuthContext);
 
+    const matches1280px = useMediaQuery("(min-width: 1280px)");
+    const matches800px = useMediaQuery("(min-width: 800px)");
+    const matches600px = useMediaQuery("(min-width: 600px)");
+    const matches440px = useMediaQuery("(min-width: 440px)");
+    const matches320px = useMediaQuery("(min-width: 320px)");
+
+    const fetchBooksByCategory = async () => {
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'booksbycategory', {
+                method: 'POST',
+                headers:
+                {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(category)
+            });
+            if (!response.ok) {
+                return null;
+            }
+            await response.json()
+                .then(data => {
+                    if (data !== null) {
+                        setBooks(data);
+                        setDataFetched(true);
+                    }
+                })
+                .catch(err => console.error(err));
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        fetchBooksByCategory();
+    }, []);
+
+    const openAdditionalDialog = async (bookId) => {
+        await fetchBook(bookId, setAdditionalBook);
+        setOpenAdditional(true);
+    }
 
     const defineArrowMargin = () => {
-        if (matchesXS) {
+        if (matches440px) {
             return -34;
-        } else if (matchesXXS) {
+        } else if (matches320px) {
             return -10;
         } else {
             return -5;
         }
     }
+    const arrowMargin = defineArrowMargin();
 
     const defineSlides = () => {
-        if (matchesXL) {
+        if (matches1280px) {
             return 5;
-        } else if (matchesM) {
+        } else if (matches800px) {
             return 4;
-        } else if (matchesS) {
+        } else if (matches600px) {
             return 3;
-        } else if (matchesXS) {
+        } else if (matches440px) {
             return 2;
         } else {
             return 1;
         }
     }
-
     const slidesToShow = defineSlides();
-
-    const arrowMargin = defineArrowMargin();
 
     const renderCenterRightControls = ({
         nextSlide,
@@ -92,53 +125,7 @@ export default function BooksinCategory({ category, setCartUpdated }) {
         }
     }
 
-    const fetchBooksByCat = () => {
-        fetch(process.env.REACT_APP_API_URL + 'books', {
-            method: 'POST',
-            headers:
-            {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(category)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data !== null) {
-                    setBooks(data);
-                    setDataFetched(true);
-                }
-            })
-            .catch(err => console.error(err));
-    }
-
-    useEffect(() => {
-        fetchBooksByCat();
-    }, []);
-
-    const currencyFormatter = (currency, sign) => {
-        let sansDec = currency.toFixed(2);
-        let formatted = sansDec.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        return sign + `${formatted}`;
-    }
-
-    const openAdditionalDialog = (thisbookid) => {
-        setOpenAdditional(true);
-        fetch(process.env.REACT_APP_API_URL + 'books/' + thisbookid,
-            {
-                method: 'GET'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data !== null) {
-                    setAdditionalBook(data);
-                } else {
-                    alert('There is no such book');
-                }
-            })
-            .catch(err => console.error(err));
-    }
-
-    const carouselStyle = (books.length < slidesToShow) ? { display: 'flex', justifyContent: 'center' } : {};
+    const carouselStyle = (books.length < slidesToShow) ? { display: 'flex', justifyContent: 'center' } : {}
 
     return (
         <Carousel
@@ -154,7 +141,7 @@ export default function BooksinCategory({ category, setCartUpdated }) {
             }}
             style={carouselStyle}
         >
-            {dataFetched && books.map((book, indexb) =>
+            {dataFetched && books.length > 0 && books.map((book, indexb) =>
                 <div key={indexb} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
                     <CardActionArea onClick={() => openAdditionalDialog(book.id)} sx={{ width: 120, height: 180, "&:hover": { filter: 'brightness(50%)' }, transition: '0.55s' }}>
                         <img
@@ -167,10 +154,10 @@ export default function BooksinCategory({ category, setCartUpdated }) {
                     <Paper style={newPriceHolder} elevation={0}>
                         {currencyFormatter(book.price, '€')}
                     </Paper>
-                    <AdditionalBook setCartUpdated={setCartUpdated} additionalBook={additionalBook} setAdditionalBook={setAdditionalBook} openAdditional={openAdditional} setOpenAdditional={setOpenAdditional} />
+                    <BookDialog additionalBook={additionalBook} setAdditionalBook={setAdditionalBook} openAdditional={openAdditional} setOpenAdditional={setOpenAdditional} />
                 </div >
             )}
-            {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 22, marginBottom: 22 }}><CircularProgress color="thirdary" /></div>}
+            {!dataFetched && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2.5vh', marginBottom: '2.5vh' }}><CircularProgress color="thirdary" /></div>}
         </Carousel>
-    )
+    );
 }

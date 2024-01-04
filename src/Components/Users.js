@@ -1,64 +1,66 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { AgGridReact } from 'ag-grid-react';
+import { useContext, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 
-import Typography from '@mui/material/Typography';
-import InputAdornment from '@mui/material/InputAdornment';
-import TextField from '@mui/material/TextField';
-import MuiAlert from '@mui/material/Alert';
+import { Button, CircularProgress, InputAdornment, TextField, Typography } from '@mui/material';
 
 import SearchIcon from '@mui/icons-material/Search';
 
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-import useMediaQuery from '../Hooks/useMediaQuery';
+import { useNavigate } from 'react-router-dom';
+
+import { motion } from 'framer-motion';
+
 import AuthContext from '../context/AuthContext';
-import { useContext } from 'react';
-
-import { AnimatePresence, motion } from 'framer-motion';
-import Editrole from './Editrole';
-import { CircularProgress, Snackbar } from '@mui/material';
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+import EditRoleAndVerification from './EditRoleAndVerification';
 
 function Users() {
     const [users, setUsers] = useState([]);
-    const [userEdited, setUserEdited] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    const { setBgrColor } = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    const { setOpenSnackbar, setSnackbarMessage, setBgrColor, getCurrentDateFormatted } = useContext(AuthContext);
 
     const gridRef = useRef();
 
-    const matches = useMediaQuery("(min-width: 908px)");
-
-    const gridWidth = matches ? '818px' : '90%';
-
+    const fetchUsers = async () => {
+        const token = sessionStorage.getItem('jwt');
+        try {
+            const response = await fetch(process.env.REACT_APP_API_URL + 'users',
+                {
+                    method: 'GET',
+                    headers: { 'Authorization': token }
+                });
+            if (!response.ok) {
+                navigate('/');
+                return null;
+            }
+            await response.json()
+                .then(data => {
+                    if (!data) {
+                        setOpenSnackbar(true);
+                        setSnackbarMessage('Something went wrong. Please try again');
+                        return null;
+                    }
+                    setUsers(data);
+                    setDataLoaded(true);
+                })
+                .catch(err => console.error(err));
+        } catch (error) {
+            console.error(error);
+            navigate('/');
+        }
+    }
 
     useEffect(() => {
         fetchUsers();
         setBgrColor('#FFFAFA');
     }, []);
 
-    const fetchUsers = () => {
-        const token = sessionStorage.getItem('jwt');
-
-        fetch(process.env.REACT_APP_API_URL + 'users',
-            {
-                method: 'GET',
-                headers: { 'Authorization': token }
-            })
-            .then(response => response.json())
-            .then(data => {
-                setUsers(data);
-                setDataLoaded(true);
-            })
-            .catch(err => console.error(err));
-    }
-
-    const updateRole = (updatedRole, link) => {
+    const updateRole = (updatedRoleAndVerification, link) => {
+        console.log(updatedRoleAndVerification);
         const token = sessionStorage.getItem('jwt');
         fetch(link, {
             method: 'PUT',
@@ -66,12 +68,13 @@ function Users() {
                 'Content-Type': 'application/json',
                 'Authorization': token
             },
-            body: JSON.stringify(updatedRole)
+            body: JSON.stringify(updatedRoleAndVerification)
         })
             .then(response => {
                 if (response.ok) {
                     fetchUsers()
-                    setUserEdited(true);
+                    setOpenSnackbar(true);
+                    setSnackbarMessage('User info was updated successfully');
                 } else {
                     alert('Something went wrong during the user role update');
                 }
@@ -80,10 +83,10 @@ function Users() {
     }
 
     const linkGetter = (params) => {
-        return `${process.env.REACT_APP_API_URL}changerole/${params.data.id}`;
+        return `${process.env.REACT_APP_API_URL}verifyandchangerole/${params.data.id}`;
     }
 
-    const [columns, setColumns] = useState([
+    const columns = [
         { field: 'firstname' },
         { field: 'lastname' },
         { field: 'username' },
@@ -95,17 +98,17 @@ function Users() {
         { field: 'street' },
         { field: 'postcode' },
         {
-            headerName: 'Change Role',
+            headerName: '',
             valueGetter: linkGetter,
             cellRenderer: params => {
                 if (sessionStorage.getItem('authorizedId') != params.data.id) {
                     return (
-                        <Editrole params={params} updateRole={updateRole} />
+                        <EditRoleAndVerification params={params} updateRole={updateRole} />
                     )
                 }
             },
         }
-    ]);
+    ];
 
     const defaultColDef = useMemo(() => {
         return {
@@ -113,7 +116,7 @@ function Users() {
             filter: 'agTextColumnFilter',
             resizable: true,
             sortable: true,
-            cellStyle: { 'text-align': 'left' }
+            cellStyle: { 'textAlign': 'left' }
         };
     }, []);
 
@@ -129,6 +132,15 @@ function Users() {
         );
     }, []);
 
+    const exportParams = {
+        columnKeys: ['firstname', 'lastname', 'username', 'email', 'country', 'city', 'street', 'postcode'],
+        fileName: `users_${getCurrentDateFormatted()}`
+    }
+
+    const onBtnExport = useCallback(() => {
+        gridRef.current.api.exportDataAsCsv(exportParams);
+    }, []);
+
     return (
         <motion.div
             className="ag-theme-alpine"
@@ -138,7 +150,7 @@ function Users() {
                 justifyContent: 'center',
                 gap: 15,
                 height: 617,
-                width: gridWidth,
+                width: '90%',
                 margin: 'auto',
                 marginTop: 10,
             }}
@@ -147,22 +159,25 @@ function Users() {
             exit={{ opacity: 0 }}
         >
             <Typography color='#424242' variant="h5">Users</Typography>
-            <TextField
-                type='search'
-                fullWidth={false}
-                size='small'
-                id="filter-text-box"
-                placeholder="Search..."
-                InputProps={{
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <SearchIcon />
-                        </InputAdornment>
-                    ),
-                }}
-                variant="standard"
-                onChange={onFilterTextBoxChanged}
-            />
+            <div style={{ display: 'flex', gap: 10 }}>
+                <TextField
+                    type='search'
+                    fullWidth={false}
+                    size='small'
+                    id="filter-text-box"
+                    placeholder="Search..."
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        ),
+                    }}
+                    variant="standard"
+                    onChange={onFilterTextBoxChanged}
+                />
+                <Button onClick={onBtnExport} variant="text" color="sidish">Export</Button>
+            </div>
             {dataLoaded &&
                 <AgGridReact
                     ref={gridRef}
@@ -176,14 +191,9 @@ function Users() {
                     animateRows="true"
                 />
             }
-            {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 77, marginBottom: 77 }}><CircularProgress color="inherit" /></div>}
-            <Snackbar open={userEdited} autoHideDuration={3000} onClose={() => setUserEdited(false)}>
-                <Alert onClose={() => setUserEdited(false)} severity="sidish" sx={{ width: '100%' }}>
-                    User info was updated successfully!
-                </Alert>
-            </Snackbar>
+            {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20vh' }}><CircularProgress color="inherit" /></div>}
         </motion.div>
-    )
+    );
 }
 
 export default Users;
