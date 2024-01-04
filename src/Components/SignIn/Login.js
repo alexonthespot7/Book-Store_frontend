@@ -194,7 +194,7 @@ function Login({ buttonSize }) {
             {loading && <LoadingDialog title='Login' open={openLoginDialog} onClose={closeLoginDialog} />}
             <ResetPassword openReset={openReset} setOpenReset={setOpenReset} />
         </div>
-    )
+    );
 }
 
 export default Login;

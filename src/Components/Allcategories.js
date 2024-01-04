@@ -7,8 +7,8 @@ import SearchOffIcon from '@mui/icons-material/SearchOff';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
-import useMediaQuery from "../Hooks/useMediaQuery";
 import AuthContext from "../context/AuthContext";
+import useMediaQuery from "../Hooks/useMediaQuery";
 import BooksInCategory from "./BooksInCategory";
 
 function AllCategories() {

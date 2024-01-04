@@ -82,9 +82,7 @@ export default function Logout() {
             }
         }
     }
-
     const mainDivGap = matches1028px ? 8 : 0;
-
     const mainDivStyle = matches870px ? { display: 'flex', flexDirection: 'row', gap: mainDivGap } : {}
     const buttonSize = matches870px ? 'medium' : 'small';
 

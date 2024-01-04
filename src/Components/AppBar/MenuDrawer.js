@@ -9,8 +9,6 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import { Link } from 'react-router-dom';
 
 export default function MenuDrawer({ DrawerHeader, matches400px, menuDrawerOpen, setMenuDrawerOpen }) {
-    const drawerWidth = matches400px ? 300 : '100%';
-
     const isAdmin = sessionStorage.getItem('role') === 'ADMIN';
 
     const handleDrawerClose = () => {
@@ -33,6 +31,8 @@ export default function MenuDrawer({ DrawerHeader, matches400px, menuDrawerOpen,
 
     const adminPages = isAdmin ? ['Categories', 'Users', 'Orders'] : [];
     const publicPages = ['Books', 'By Categories'];
+
+    const drawerWidth = matches400px ? 300 : '100%';
 
     return (
         <Drawer

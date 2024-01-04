@@ -120,7 +120,7 @@ function ResetPassword({ openReset, setOpenReset }) {
                 <Button color='sidish' sx={{ "&:hover": { filter: 'brightness(40%)' }, transition: '0.45s' }} variant='outlined' onClick={closeResetDialog}>Cancel</Button>
             </DialogActions>
         </Dialog>
-    )
+    );
 }
 
 export default ResetPassword;

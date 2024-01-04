@@ -4,11 +4,12 @@ import { Box, Button, Card, CircularProgress, Divider, TextField, Typography, us
 
 import RemoveIcon from '@mui/icons-material/Remove';
 
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { motion } from 'framer-motion';
 
 import countryList from 'react-select-country-list';
+
 import Select from 'react-select';
 
 import AuthContext from "../context/AuthContext";

@@ -192,9 +192,9 @@ function CartMenu() {
     }
     const authorTitleSize = defineAuthorTitleSize();
 
-    const myDir = matches300px ? 'row' : 'column';
-    const myWidth = matches300px ? 30 : 60;
-    const defaultFont = matches310px ? 16 : 14;
+    const responsiveDirection = matches300px ? 'row' : 'column';
+    const responsiveWidth = matches300px ? 30 : 60;
+    const responsiveFontSize = matches310px ? 16 : 14;
 
     const books = booksInCart.map((book, index) =>
         <div key={index} style={firstDiv}>
@@ -210,9 +210,9 @@ function CartMenu() {
                 <Typography fontSize={authorTitleSize} maxWidth={190} >{book.author}</Typography>
                 <Typography fontSize={authorTitleSize} maxWidth={190} >{book.title}</Typography>
                 <div>
-                    <Typography variant='h7' fontSize={defaultFont} fontFamily='serif' color='#A9A9A9'>Quantity:</Typography>
-                    <div style={{ display: 'flex', marginTop: 2, flexDirection: myDir }}>
-                        <Typography align="center" variant='h7' sx={{ width: myWidth }}>{book.quantity}</Typography>
+                    <Typography variant='h7' fontSize={responsiveFontSize} fontFamily='serif' color='#A9A9A9'>Quantity:</Typography>
+                    <div style={{ display: 'flex', marginTop: 2, flexDirection: responsiveDirection }}>
+                        <Typography align="center" variant='h7' sx={{ width: responsiveWidth }}>{book.quantity}</Typography>
                         {matches300px && <Divider orientation="vertical" flexItem sx={{ border: '1px solid #D3D3D3', height: 15, marginTop: 0.5, marginLeft: 1 }} />}
                         <div style={{ marginTop: -0.5, marginLeft: 2 }}>
                             <IconButton onClick={() => changeQuantity(book.bookid, '+')} size='small' >
@@ -225,7 +225,7 @@ function CartMenu() {
                     </div>
                 </div>
                 <div>
-                    <Typography fontSize={defaultFont} variant='h7' fontFamily='serif' color='#A9A9A9'>Total:</Typography>
+                    <Typography fontSize={responsiveFontSize} variant='h7' fontFamily='serif' color='#A9A9A9'>Total:</Typography>
                     <div style={{ display: 'flex', marginTop: 2 }}>
                         <Typography align="center" variant='h7' sx={{ width: 30 }}>{currencyFormatter(book.quantity * book.price, '€')}</Typography>
                     </div>

@@ -7,8 +7,8 @@ import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 
 import { useLocation } from 'react-router-dom';
 
-import useMediaQuery from '../../Hooks/useMediaQuery';
 import AuthContext from '../../context/AuthContext';
+import useMediaQuery from '../../Hooks/useMediaQuery';
 import Login from './Login';
 import Signup from './Signup';
 
@@ -26,10 +26,6 @@ export default function SignIn() {
     const matches450px = useMediaQuery("(min-width: 450px)");
     const matches300px = useMediaQuery("(min-width: 300px)");
 
-    const gapBetweenLoginAndSignupButtons = matches1028px ? 8 : 0;
-
-    const buttonSize = matches870px ? 'medium' : 'small';
-
     const handleClickMenu = (event) => {
         setAnchorMenu(event.currentTarget);
     }
@@ -37,6 +33,10 @@ export default function SignIn() {
     const handleCloseMenu = () => {
         setAnchorMenu(null);
     }
+
+    const gapBetweenLoginAndSignupButtons = matches1028px ? 8 : 0;
+
+    const buttonSize = matches870px ? 'medium' : 'small';
 
     if (matches870px) {
         return (

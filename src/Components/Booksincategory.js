@@ -7,8 +7,8 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
 import Carousel from "nuka-carousel/lib/carousel";
 
-import useMediaQuery from "../Hooks/useMediaQuery";
 import AuthContext from "../context/AuthContext";
+import useMediaQuery from "../Hooks/useMediaQuery";
 import BookDialog from "./BookDialog";
 
 const newPriceHolder = { borderRadius: '25px', width: 78, height: 24, backgroundColor: 'white', color: 'black', display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: 'display', fontSize: 14 };

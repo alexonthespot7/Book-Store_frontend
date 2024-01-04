@@ -15,7 +15,6 @@ import { motion } from 'framer-motion';
 import AuthContext from '../context/AuthContext';
 import EditRoleAndVerification from './EditRoleAndVerification';
 
-
 function Users() {
     const [users, setUsers] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
@@ -194,7 +193,7 @@ function Users() {
             }
             {!dataLoaded && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20vh' }}><CircularProgress color="inherit" /></div>}
         </motion.div>
-    )
+    );
 }
 
 export default Users;

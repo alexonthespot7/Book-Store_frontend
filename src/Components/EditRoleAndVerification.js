@@ -89,5 +89,5 @@ export default function EditRoleAndVerification({ params, updateRole }) {
                 </DialogActions>
             </Dialog>
         </div>
-    )
+    );
 }

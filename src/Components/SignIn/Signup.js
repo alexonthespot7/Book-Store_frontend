@@ -44,8 +44,6 @@ function Signup({ buttonSize }) {
 
     const matches350px = useMediaQuery("(min-width: 350px)");
 
-    const inputSize = matches350px ? 'medium' : 'small';
-
     const { setOpenSnackbar, setSnackbarMessage, dialogueWidth } = useContext(AuthContext);
 
     const clearFormErrors = () => {
@@ -168,6 +166,8 @@ function Signup({ buttonSize }) {
         clearFormErrors();
     }
 
+    const inputSize = matches350px ? 'medium' : 'small';
+
     return (
         <div>
             <Button size={buttonSize} onClick={handleClickOpenSignup} startIcon={<ExitToAppIcon />} color="inherit">
@@ -228,8 +228,7 @@ function Signup({ buttonSize }) {
             }
             {loading && <LoadingDialog title='Sign up' open={openSignup} onClose={handleClose} />}
         </div>
-
-    )
+    );
 }
 
 export default Signup;

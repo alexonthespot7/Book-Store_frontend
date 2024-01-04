@@ -7,8 +7,8 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 import { useNavigate } from "react-router-dom";
 
-import useMediaQuery from "../Hooks/useMediaQuery";
 import AuthContext from "../context/AuthContext";
+import useMediaQuery from "../Hooks/useMediaQuery";
 
 function BookDialog({ additionalBook, setAdditionalBook, openAdditional, setOpenAdditional, isInCart }) {
     const [dataFetched, setDataFetched] = useState(false);
