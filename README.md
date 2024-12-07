@@ -2,9 +2,9 @@
 
 > This React.js-based application functions as the user-facing interface for the Bookstore project.<br>
 > Seamlessly designed for intuitive interaction, it provides a diverse range of functionalities catering to book browsing, selection, and ordering, addressing the needs of both customers and administrators.
+>
 > The back-end side can be found [here](https://github.com/alexonthespot7/Book-Store_backend)<br>
-> <br>
-> The deployed app [https://bookstore-axos.netlify.app](https://bookstore-axos.netlify.app/)
+
 
 ## Table of Contents
 * [Usage Guide](#usage-guide)
